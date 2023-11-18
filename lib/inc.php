@@ -128,11 +128,11 @@ function translate_month($month){
   return $months[intval($month)-1];
 }
 
-function format_date($date){
+function format_date($date,$format='j.n.Y'){
   $weekdays=array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag');
   $weekday=date('w',strtotime($date));
   $weekday=$weekdays[$weekday];
-  return substr($weekday,0,2).'., '.date('j.n.Y',strtotime($date));
+  return substr($weekday,0,2).'., '.date($format,strtotime($date));
 }
 
 function send_email($to,$subject,$text){
