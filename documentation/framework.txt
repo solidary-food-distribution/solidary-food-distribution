@@ -1,0 +1,43 @@
+Documentation / Framework
+
+1. Browser request
+
+2 web/.htaccess
+2.1 rewrites requests to web/index.php?index_path=...
+2.2 existing files are not forwarded (p.e. js css images...)
+
+3. web/index.php
+3.1 index_path pattern is <module>/<action>?query-parameters
+3.2 default is start/index
+3.3 modules/<module>/action.php needs to be existend
+3.4 in there action-function execute_<action>() needs to be existend
+
+4. action.php / action-function
+4.1 included maybe lib/...
+4.2 available variables are globals $MODULE,$ACTION,$TEMPLATE,$LAYOUT
+4.3 action-function may return an array with:
+4.4 "template" - template to be used in app/<module>/templates/ - defaults to <action>.php
+4.5 "layout" - layout to be used in templates/ - defaults to layout.php
+4.6 any variables to be used in the template and/or layout.php
+4.7 may output directly and exit() to prevent template-execution
+
+5. template
+5.1 included maybe templates/...
+5.2 available variables are those returned in action-function and globals
+5.3 any output is written to buffer
+
+6. layout
+6.1 template buffer is replaced in variable $CONTENT
+
+7. example
+7.1 Request "/product/detail?pid=15"
+7.2 .htaccess rewrites to web/index.php?index_path=product/detail?pid=15
+7.3 action modules/product/action.php execute_detail() is called
+7.3.1 $pid=intval($_GET['pid']);
+7.3.2 $product=SQL::selectOne("SELECT * FROM products WHERE pid=".$pid);
+7.3.3 return array('product'=>$product)
+7.4 template modules/product/templates/detail.php
+7.4.1 in detail.php: <div class="product_name"><?php echo htmlentities($product['name']) ?></div>
+7.5 layout templates/layout.php is called
+7.5.1 $CONTENT is replaced with buffered template output
+

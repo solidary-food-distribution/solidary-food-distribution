@@ -1,0 +1,35 @@
+header{
+  background-color: #37662d;
+}
+
+main{
+  background-color: #eb9a31;
+  z-index: 0;
+}
+
+#background{
+  position:fixed;
+  top:5em;
+  left:0px;
+  width: 100%;
+  max-width: 1024px;
+  height: 100%;
+  background-image: url('/img/Mit-Sinn-Leben-Logo-1030x579.png');
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  background-size: contain;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+footer{
+  background-color: #37662d;
+}
+
+.row{
+  background-color: rgba(255,255,255,0.9);
+}
+
+.headline{
+  color: white;
+}
