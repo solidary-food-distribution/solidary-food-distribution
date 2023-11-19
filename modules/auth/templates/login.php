@@ -52,7 +52,7 @@
         <div>E-Mail</div>
       </div>
       <div class="col3">
-        <div><input type="text" id="email" name="email<?php echo time() ?>" onkeyup="auth_may_login(event)" /></div>
+        <div><input type="text" id="email" name="email<?php echo time() ?>" onkeyup="auth_may_login(event)" value="<?php echo htmlentities($email) ?>" /></div>
       </div>
     </div>
     <div class="inner_row">
@@ -65,7 +65,7 @@
     </div>
     <div class="inner_row mt1">
       <div class="col3">
-        <div id="password_lost" class="button" onclick="auth_password_lost()">Passwort vergessen</div>
+        <div id="password_lost" class="button" onclick="location.href='/auth/password_lost?email='+$('#email').val()">Passwort vergessen</div>
       </div>
       <div class="col1 right last">
         <div id="login" class="button" onclick="auth_login()">Login</div>

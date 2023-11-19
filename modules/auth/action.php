@@ -7,7 +7,7 @@ function execute_login(){
     forward_to_page('/');
   }
   //_forward/_query: see inc.php ensure_authed_user() - TODO to be implemented
-  return array('forward'=>get_request_param('_forward'), 'query'=>get_request_param('_query'));
+  return array('email'=>get_request_param('email'), 'forward'=>get_request_param('_forward'), 'query'=>get_request_param('_query'));
 }
 
 function execute_login_ajax(){
@@ -28,12 +28,17 @@ function execute_logout(){
   forward_to_page('/');
 }
 
+function execute_password_lost(){
+  $email=trim(get_request_param('email'));
+  return array('email'=>$email);
+}
+
 function execute_password_lost_ajax(){
   $email=trim(get_request_param('email'));
   $message='';
   $hide_form=0;
   if(empty($email)){
-    $message='Bitte E-Mail angeben und erneut auf "Passwort vergessen" klicken';
+    $message='Bitte E-Mail angeben und erneut auf "Passwort zurücksetzen" klicken';
   }
   if($message==''){
     require('sql.class.php');
@@ -42,7 +47,7 @@ function execute_password_lost_ajax(){
     if(empty($user)){
       $message='Unbekannte E-Mail-Adresse';
     }elseif(time()-strtotime($user['passwd_sent'])<120){
-      $message='E-Mail mit Passwort-Link wurde bereits vor Kurzem geschickt. Bitte in 2 Minuten erneut probieren.';
+      $message='E-Mail mit Passwort-Setzen-Link wurde bereits vor Kurzem geschickt. Bitte in 2 Minuten erneut probieren.';
     }
   }
   if($message==''){
@@ -51,7 +56,7 @@ function execute_password_lost_ajax(){
     send_email($email,"Mit Sinn Leben eG - Passwort erneuern",
       "Dieser Link ist ca 1 Stunde gültig zum Erneuern vom Passwort:\r\n".
       "https://".$_SERVER['HTTP_HOST']."/auth/password_reset?pwt=".$pwt."\r\n");
-    $message="Es wurde eine E-Mail mit Link zum Erneuern vom Passwort geschickt.";
+    $message="Es wurde eine E-Mail mit Link zum Setzen eines neuen Passwortes geschickt.";
     $hide_form=1;
   }
 
