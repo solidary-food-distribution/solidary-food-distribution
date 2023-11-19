@@ -38,7 +38,7 @@ function execute_password_lost_ajax(){
   $message='';
   $hide_form=0;
   if(empty($email)){
-    $message='Bitte E-Mail angeben und erneut auf "Passwort zurücksetzen" klicken';
+    $message='Bitte E-Mail-Adresse angeben und erneut auf "Passwort zurücksetzen" klicken';
   }
   if($message==''){
     require('sql.class.php');
