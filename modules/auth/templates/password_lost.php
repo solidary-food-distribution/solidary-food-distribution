@@ -1,8 +1,8 @@
 <div class="center login">
   <div class="row" id="login_form">
     <div class="inner_row mb1">
-      <div class="col3">
-        <div>Bitte E-Mail-Adresse angeben, es wird dorthin eine E-Mail mit einem Link zum Setzen eines neuen Passwortes gesendet.</div>
+      <div class="col4">
+        <div class="left">Bitte E-Mail-Adresse angeben, es wird dorthin eine E-Mail mit einem Link zum Setzen eines neuen Passwortes gesendet.</div>
       </div>
     </div>
     <div class="inner_row">

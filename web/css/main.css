@@ -203,6 +203,9 @@ h2 a{
 .center{
   text-align: center;
 }
+.left{
+  text-align: left;
+}
 
 .row{
   border: 1px solid black;
