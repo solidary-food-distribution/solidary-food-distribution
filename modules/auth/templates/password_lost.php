@@ -2,7 +2,7 @@
   <div class="row" id="login_form">
     <div class="inner_row mb1">
       <div class="col3">
-        <div>Sie erhalten dann eine E-Mail mit einem Link zum Setzen eines neuen Passwortes</div>
+        <div>Bitte E-Mail-Adresse angeben, es wird dorthin eine E-Mail mit einem Link zum Setzen eines neuen Passwortes gesendet.</div>
       </div>
     </div>
     <div class="inner_row">

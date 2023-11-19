@@ -47,7 +47,7 @@ function execute_password_lost_ajax(){
     if(empty($user)){
       $message='Unbekannte E-Mail-Adresse';
     }elseif(time()-strtotime($user['passwd_sent'])<120){
-      $message='E-Mail mit Passwort-Setzen-Link wurde bereits vor Kurzem geschickt. Bitte in 2 Minuten erneut probieren.';
+      $message='E-Mail mit Passwort-Setzen-Link wurde bereits vor Kurzem gesendet. Bitte in 2 Minuten erneut probieren.';
     }
   }
   if($message==''){
@@ -56,7 +56,7 @@ function execute_password_lost_ajax(){
     send_email($email,"Mit Sinn Leben eG - Passwort erneuern",
       "Dieser Link ist ca 1 Stunde gültig zum Erneuern vom Passwort:\r\n".
       "https://".$_SERVER['HTTP_HOST']."/auth/password_reset?pwt=".$pwt."\r\n");
-    $message="Es wurde eine E-Mail mit Link zum Setzen eines neuen Passwortes geschickt.";
+    $message="Es wurde eine E-Mail mit Link zum Setzen eines neuen Passwortes gesendet.";
     $hide_form=1;
   }
 
