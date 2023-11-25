@@ -8,7 +8,7 @@ class Order{
   public Product $product;
   public Member $member;
   public float $amount;
-  public DateTime $lock_date;
+  public string $lock_date; //REFACTOR DateTime
 
   public function is_locked(){
     if($this->product->orders_lock_date=='0000-00-00 00:00:00' || $this->product->orders_lock_date>date('Y-m-d H:i:s')){

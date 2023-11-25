@@ -64,7 +64,7 @@ class Orders extends ArrayObject{
       $order->product->amount_steps = floatval($row['amount_steps']);
       $order->product->amount_min = floatval($row['amount_min']);
       $order->product->amount_max = floatval($row['amount_max']);
-      $order->product->orders_lock_date = new DateTime($row['orders_lock_date']);
+      $order->product->orders_lock_date = $row['orders_lock_date']; //REFACTOR new DateTime($row['orders_lock_date']);
       $order->product->price = floatval($row['price']);
       $order->product->tax = floatval($row['tax']);
       $order->product->tax_incl = boolval($row['tax_incl']);
@@ -78,7 +78,7 @@ class Orders extends ArrayObject{
         $order->member->id = intval($member_ids[0]);
       }
       $order->amount = floatval($row['amount']);
-      $order->lock_date = new DateTime($row['lock_date']);
+      $order->lock_date = $row['lock_date']; //REFACTOR new DateTime($row['lock_date']);
       $array[$row['pid'].'-'.$row['member_id']]=$order;
     }
     return $array;

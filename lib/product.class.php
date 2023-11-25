@@ -14,7 +14,7 @@ class Product{
   public float $amount_min;
   public float $amount_max;
   public string $status;
-  public DateTime $orders_lock_date;
+  public string $orders_lock_date; //REFACTOR DateTime
   public float $price;
   public float $tax;
   public bool $tax_incl;
