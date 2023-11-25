@@ -56,13 +56,23 @@ footer{
 select{
   border: none;
   font-size: 1em;
-  background-color: transparent;
-  max-height: 1em;
+  background-color: white;
+  max-height: 1.5em;
   line-height: 1em;
+  border: 1px solid black;
+  padding: 0;
 }
 
 input{
+  border: 1px solid black;
+  font-family: Garamond,Arial,sans-serif;
   font-size: 1em;
+  padding: 0;
+  margin: -1px;
+  height: 1em;
+}
+input[type="radio"],input[type="checkbox"],label{
+  cursor: pointer;
 }
 
 .header_h5 header{
@@ -151,6 +161,9 @@ h2 a{
   font-size: 1.5em;
   cursor: pointer;
 }
+.selection .item.selected{
+  box-shadow: 0 0 0 4px black;
+}
 .selection .item .label{
   display: block;
   margin-top: 40%;
@@ -165,7 +178,7 @@ h2 a{
   margin-top: 0.5em;
   display: flex;
 }
-.controls .control, .button, .control_l, .control_m, .control_r{
+ .button, .input, .controls .control, .control_l, .control_m, .control_r{
   display: inline-block;
   border: 2px solid black;
   border-radius: 0.5em;
@@ -175,6 +188,11 @@ h2 a{
   cursor: pointer;
   min-width: 1.5em;
   text-align: center;
+}
+.input{
+  border: 1px solid black;
+  border-radius: unset;
+  margin: 0;
 }
 .control_l{
   margin-right: 0;
@@ -193,6 +211,11 @@ h2 a{
   border-bottom-left-radius: 0em;
   border-left: none;
 }
+.filter.search{
+  position: absolute;
+  right: 0px;
+}
+
 .disabled{
   border-color: #aaaaaa;
   color: #aaaaaa;
@@ -201,12 +224,22 @@ h2 a{
 .main_button{
   margin-left: 0.5em;
 }
+.button.trash{
+  margin-right: 1em;
+}
 
 .center{
   text-align: center;
 }
 .left{
   text-align: left;
+}
+.right{
+  text-align: right;
+}
+
+.smaller{
+  font-size: 0.8em;
 }
 
 .row{
@@ -226,12 +259,18 @@ h2 a{
   flex-flow: row wrap;
   width: 100%;
 }
-.inner_row.mt1{
+
+
+div.mt0_5{
+  margin-top: 0.5em;
+}
+div.mt1{
   margin-top: 1em;
 }
-.inner_row.mb1{
+div.mb1{
   margin-bottom: 1em;
 }
+
 .row .col,.row .col1,.row .col2,.row .col3,.row .col4,.row .col5{
   display: flex;
   justify-content: flex-start;

@@ -19,11 +19,6 @@ $sum=0;
   </div><div class="control_r <?php echo $month_next?'':'disabled' ?>" onclick="<?php echo $month_next?'location.href=\'/timesheet?month='.$month_next.'\'':'' ?>">
     <i class="fa-solid fa-caret-right"></i>
   </div>
-  <?php if($edit_id!='new'): ?>
-    <div class="control" onclick="location.href='/timesheet/new?month=<?php echo $month ?>';">
-      Neuer Eintrag
-    </div>
-  <?php endif ?>
 </div>
 <?php
   $PROPERTIES['header']=ob_get_clean();
@@ -78,6 +73,12 @@ $sum=0;
     <?php endif ?>
   </div>
 <?php endforeach ?>
+
+<?php if($edit_id!='new'): ?>
+  <div class="main_button button" onclick="location.href='/timesheet/new?month=<?php echo $month ?>';">
+    Neuer Eintrag
+  </div>
+<?php endif ?>
 
 <?php ob_start(); ?>
   <div class="row">

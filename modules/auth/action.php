@@ -12,13 +12,21 @@ function execute_login(){
 
 function execute_login_ajax(){
   $error='';
-  require('user.class.php');
-  $user=User::get_by_email_password(get_request_param('email'),trim(get_request_param('password')));
-  if($user){
-    $user->set_session();
+  require('users.class.php');
+  $users = new Users(array('email' => get_request_param('email')));
+  if(empty($users)){
+    $error='Unbekannte E-Mail-Adresse.';
   }else{
-    $error='Unbekannte E-Mail und/oder falsches Passwort.';
+    $user = $users->first();
+    if(!$user->password_verify(trim(get_request_param('password')))){
+      $error='Falsches Passwort.';
+    }
   }
+  if(empty($error)){
+    $user->set_session();
+    logger(print_r($_SESSION['user'],1));
+  }
+
   echo json_encode(array('error'=>$error));
   exit;
 }

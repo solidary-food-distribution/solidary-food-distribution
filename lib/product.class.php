@@ -1,33 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
+require_once('member.class.php');
 
 class Product{
-  public $id;
-  public $name;
-  public $producer_id;
-  public $producer_name;
-  public $type;
-  public $period;
-  public $amount_steps;
-  public $amount_min;
-  public $amount_max;
-  public $status;
-  public $orders_lock_date;
-  public $price;
-  public $tax;
-  public $tax_incl;
-
-  public function __construct($product_id,$init_by_database=true){
-    $this->id=$product_id;
-  }
-
-  public function init_with_array($array){
-    unset($array['id']);
-    foreach($array as $k=>$v){
-      if(property_exists('Product',$k)){
-        $this->{$k}=$v;
-      }
-    }
-  }
+  public int $id;
+  public string $name;
+  public Member $producer;
+  public string $type;
+  public string $period;
+  public float $amount_steps;
+  public float $amount_min;
+  public float $amount_max;
+  public string $status;
+  public DateTime $orders_lock_date;
+  public float $price;
+  public float $tax;
+  public bool $tax_incl;
 
 }

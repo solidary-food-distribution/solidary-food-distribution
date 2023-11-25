@@ -14,21 +14,34 @@ function get_ts(){
 }
 
 function replace_header_main_footer(html){
-  var header_pos=html.indexOf('</header>');
+  var header_pos=html.indexOf('</HEADER>');
   if(header_pos>=0){
     var header=html.substring(0,header_pos+9);
     html=html.substring(header_pos+9);
-    header=header.replace('<header>','').replace('</header>','');
+    header=header.replace('<HEADER>','').replace('</HEADER>','');
     $('#header').html(header);
   }
-  var footer_pos=html.indexOf('<footer>');
+  var footer_pos=html.indexOf('<FOOTER>');
   if(footer_pos>=0){
     var footer=html.substring(footer_pos);
     html=html.substring(0,footer_pos);
-    footer=footer.replace('<footer>','').replace('</footer>','');
+    footer=footer.replace('<FOOTER>','').replace('</FOOTER>','');
     $('#footer').html(footer);
   }
-  $('main').html(html);
+  $('#main').html(html);
 }
 
+function ajax_id_replace(id, url){
+  $.ajax({
+    type: 'POST',
+    url: url,
+    dataType: 'html',
+    success: function(html){
+      $('#'+id).replaceWith(html);
+    }
+  });
+}
 
+function ajax_field_update(id, url){
+
+}

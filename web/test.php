@@ -1,3 +1,8 @@
+<?php 
+system("php --version");
+phpinfo(); 
+?>
+<?php /*
 <head>
   <script data-cfasync="false" type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 <script>
@@ -18,3 +23,4 @@ function tester(){
 <body>
   <button onclick="tester()">Tester</button>
 </body>
+*/?>

@@ -1,0 +1,82 @@
+<?php
+declare(strict_types=1);
+
+require_once('user.class.php');
+
+class Users extends ArrayObject{
+
+  public function __construct(array $filters = array(), array $orderby = array(), int $limit_start = 0, int $limit_count = -1){
+    $users = $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
+    parent::__construct($users);
+  }
+
+  public function first(){
+    $array = $this->getArrayCopy();
+    return $array[key($array)];
+  }
+
+  public function keys(){
+    return array_keys($this->getArrayCopy());
+  }
+
+  private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
+    require_once('sql.class.php');
+    $qry =
+      "SELECT * ".
+      "FROM msl_users u ";
+    if(!empty($filters)){
+      $qry .= "WHERE ".SQL::buildFilterQuery($filters);
+    }
+    if(!empty($orderby)){
+      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+    }
+    $us = SQL::selectID($qry, 'id');
+
+    $users = array();
+    foreach($us as $id=>$u){
+      $user = new User();
+      $user->id = $u['id'];
+      $user->name = $u['name'];
+      $user->email = $u['email'];
+      $user->password = $u['passwd'];
+      $user->member_id = $u['member_id'];
+      $users[$id] = $user;
+    }
+
+    $users = $this->load_access_from_db($users);
+
+    return $users;
+  }
+
+  private function load_access_from_db($users){
+    if(empty($users)){
+      return array();
+    }
+    $keys = array_keys($users);
+    require_once('sql.class.php');
+    $qry =
+      "SELECT * ".
+      "FROM msl_access a ".
+      "WHERE start<=CURDATE() AND end>=CURDATE() ".
+        "AND user_id IN (".SQL::escapeArray($keys).")";
+    $as = SQL::select($qry);
+    foreach($as as $a){
+      $users[$a['user_id']]->access[$a['access']][$a['member_id']]['start'] = $a['start'];
+      $users[$a['user_id']]->access[$a['access']][$a['member_id']]['end'] = $a['end'];
+      if($a['member_id']){
+        $users[$a['user_id']]->members[$a['member_id']][$a['access']]['start'] = $a['start'];
+        $users[$a['user_id']]->members[$a['member_id']][$a['access']]['end'] = $a['end'];
+      }
+    }
+    foreach($users as $id=>$user){
+      if(isset($user->access['products']) 
+        || isset($user->access['members'])
+        || isset($user->access['users'])
+        || isset($user->access['orders'])
+        || isset($user->access['debits'])){
+        $user->access['admin']=1;
+      }
+    }
+    return $users;
+  }
+}

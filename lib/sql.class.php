@@ -10,22 +10,27 @@ if(mysqli_connect_errno()){
 }else{
   mysqli_set_charset($mysqli,"UTF8");
 }
+
 class SQL{
   static function update($qry){
-    global $mysqli;
+    global $mysqli, $MODULE, $ACTION, $user;
     $res=mysqli_query($mysqli,$qry);
     if(!$res){
       self::log($qry);
+      return false;
     }
+    file_put_contents(__DIR__.'/../log/sql_update.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']." update\n$qry\n\n",FILE_APPEND);
+    return self::affected_rows();
   }
   static function insert($qry){
-    global $mysqli;
+    global $mysqli, $MODULE, $ACTION, $user;
     $res=mysqli_query($mysqli,$qry);
     if(!$res){
       self::log($qry);
       return false;
     }
     $ret=mysqli_insert_id($mysqli);
+    file_put_contents(__DIR__.'/../log/sql_update.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']." insert\n$qry -> $ret\n\n",FILE_APPEND);
     return $ret;
   }
   static function affected_rows(){
@@ -92,20 +97,6 @@ class SQL{
     }
     return $ret;
   }
-  static function aToString($ar){
-    $str="";
-    foreach($ar as $v){
-      $str .=$v.',';
-    }
-    return rtrim($str,',');
-  }
-  static function aToStr2($ar){
-    $str="";
-    foreach($ar as $v){
-      $str .="'".$v."',";
-    }
-    return rtrim($str,',');
-  }
   static function escapeArray(&$ar){
     $str="";
     foreach($ar as $v){
@@ -119,10 +110,41 @@ class SQL{
   }
   static function escapeFieldName($str){
     //nur A-Z0-9 und _
-    return preg_replace('/[^\w-]/', '', $str);
+    return preg_replace('/[^\w\-\.]/', '', $str);
   }
   static function log($qry){
-    global $mysqli, $MODULE, $ACTION;
-    file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
+    global $mysqli, $MODULE, $ACTION, $user;
+    file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['id']."\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
+  }
+  static function buildFilterQuery($filters){
+    $qry='';
+    foreach($filters as $field => $value){
+      $qry .= ' AND '.SQL::escapeFieldName($field);
+      if(is_array($value)){
+        $qry .= ' IN ('.SQL::escapeArray($value).') ';
+      }else{
+        if(strpos($field, '%') !== false){
+          $qry .= " LIKE ";
+        }else{
+          $qry .= " = ";
+        }
+        $qry .= "'".SQL::escapeString($value)."' ";
+      }
+    }
+    return substr($qry, 5);
+  }
+  static function buildOrderbyQuery($orderby){
+    $qry='';
+    foreach($orderby as $field => $dir){
+      $qry .= ', '.SQL::escapeFieldName($field).' '.SQL::escapeFieldName($dir);
+    }
+    return ltrim($qry, ',');
+  }
+  static function buildUpdateQuery($updates){
+    $qry='';
+    foreach($updates as $field => $value){
+      $qry .= ', '.SQL::escapeFieldName($field)." = '".SQL::escapeString($value)."'";
+    }
+    return ltrim($qry, ',');
   }
 }

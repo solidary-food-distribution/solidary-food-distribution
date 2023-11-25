@@ -2,7 +2,7 @@
 $PROPERTIES['pathbar']=array('/admin'=>'Administration');
 ?>
 <div class="selection">
-  <?php if($members): ?>
+  <?php if(0 && $members): ?>
     <div class="item" onclick="location.href='/members'">
       <span class="label">Mitglieder</span>
     </div>

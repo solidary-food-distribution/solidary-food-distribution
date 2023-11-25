@@ -1,5 +1,5 @@
 <?php
-$version='202311190951';
+$version='202311251225';
 $body_class='';
 $header='';
 $footer='';
@@ -64,7 +64,9 @@ if($authed){
   </header>
   <main>
     <div id="background"></div>
-    <?php echo $CONTENT ?>
+    <div id="main">
+      <?php echo $CONTENT ?>
+    </div>
   </main>
   <footer id="footer">
     <?php echo $footer ?>

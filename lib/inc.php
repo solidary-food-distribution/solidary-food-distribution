@@ -128,11 +128,27 @@ function translate_month($month){
   return $months[intval($month)-1];
 }
 
+function format_money($value){
+  return number_format(floatval($value),2,',','');
+}
+
+function format_amount($value){
+  if(round(floatval($value),3)==0){
+    return '';
+  }
+  return str_replace('.', ',', round($value,3));
+}
+
 function format_date($date,$format='j.n.Y'){
+  if(gettype($date)=='object' && get_class($date)=='DateTime'){
+    $time=$date->getTimestamp();
+  }else{
+    $time=strtotime($date);
+  }
   $weekdays=array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag');
-  $weekday=date('w',strtotime($date));
+  $weekday=date('w',$time);
   $weekday=$weekdays[$weekday];
-  return substr($weekday,0,2).'., '.date($format,strtotime($date));
+  return substr($weekday,0,2).'., '.date($format,$time);
 }
 
 function send_email($to,$subject,$text){
@@ -142,3 +158,4 @@ function send_email($to,$subject,$text){
     'X-Mailer: PHP/' . phpversion();
   mail($to,$subject,$text,$header);
 }
+
