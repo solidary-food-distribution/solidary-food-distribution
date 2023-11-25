@@ -20,7 +20,7 @@
     <div class="amount_ctrl">
       <?php if($item->amount_weight): ?>
         <div class="amount">
-          <?php echo format_amount(round($item->amount_weight,2)) ?> kg
+          <?php echo format_amount($item->amount_weight) ?> kg
         </div>
       <?php endif ?>
       <?php if($item->amount_pieces): ?>

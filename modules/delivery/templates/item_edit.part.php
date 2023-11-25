@@ -22,7 +22,7 @@
   <div class="col2">
     <div class="amount_ctrl">
       <div class="amount">
-        <input class="right" type="text" size="4" value="<?php echo format_amount(round($item->amount_weight,2)) ?>" /> kg
+        <input class="right" type="text" size="4" value="<?php echo format_amount($item->amount_weight) ?>" /> kg
       </div>
       <div class="amount">
         <input class="right" type="text" size="4" value="<?php echo format_amount($item->amount_pieces) ?>" /> Stück
