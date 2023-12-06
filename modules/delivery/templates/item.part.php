@@ -1,13 +1,13 @@
 <div class="row product" id="delivery_item<?php echo $item->id ?>">
-  <div class="col1">
+  <div class="col2">
     <div class="image">
       <!--<img src="" />-->
     </div>
   </div>
-  <div class="col2">
+  <div class="col4">
     <div class="info">
       <div class="name">
-        <?php echo $item->product->name ?>
+        <b><?php echo $item->product->name ?></b>
       </div>
       <?php if($item->product->producer->id != $delivery->supplier->id): ?>
         <div class="producer">
@@ -16,7 +16,7 @@
       <?php endif ?>
     </div>
   </div>
-  <div class="col2">
+  <div class="col4">
     <div class="amount_ctrl">
       <?php if($item->amount_weight): ?>
         <div class="amount">
@@ -41,18 +41,20 @@
       <?php endif ?>
     </div>
   </div>
-  <div class="col2 right">
+  <div class="col4">
     <div class="amount">
-      <?php echo format_money($item->price) ?>&nbsp;EUR&nbsp;/&nbsp;<?php echo translate_product_type($item->price_type) ?>
+      <?php echo format_money($item->price) ?> EUR /
+      <br>
+      <?php echo translate_product_type($item->price_type) ?>
     </div>
   </div>
-  <div class="col2 right">
+  <div class="col3 right">
     <div class="price_sum">
-      <?php echo format_money($item->price_sum) ?>&nbsp;EUR
+      <?php echo format_money($item->price_sum) ?> EUR
     </div>
   </div>
   <div class="col1 right last">
-    <span class="button" onclick="alert('NOCH NICHT IMPLEMENTIERT');return false;ajax_id_replace('delivery_item<?php echo $item->id ?>', '/delivery/item_ajax?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>&edit=1')">
+    <span class="button" onclick="location.href='/delivery/item_edit?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>';">
       <i class="fa-solid fa-pencil"></i>
     </span>
   </div>

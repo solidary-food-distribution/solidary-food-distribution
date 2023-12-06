@@ -34,11 +34,11 @@ $base_cost=28.0;
   $price_sum=floatval($op->product->price)*floatval($op->amount);
   if($op->amount=='0.00'){
     if($op->product->type!='b'){
-      $price_detail=str_replace('.',',',$op->product->price).'&nbsp;EUR<br>/&nbsp;'.$type;
+      $price_detail=format_money($op->product->price).'&nbsp;EUR<br>/&nbsp;'.$type;
       $price_detail_class='grey';
     }
   }elseif($op->product->type!='b'){
-    $price_detail='x&nbsp;'.str_replace('.',',',$op->product->price).'&nbsp;EUR';
+    $price_detail='x&nbsp;'.format_money($op->product->price).'&nbsp;EUR';
   }
   if($op->amount!='0.00' && $op->product->period!='m'){
     $price_detail.=($price_detail==''?'':'<br>').'x 52&nbsp;Wochen<br>/ 12&nbsp;Monate';
@@ -57,31 +57,31 @@ $base_cost=28.0;
       $price_sum=round($price_sum*(100+$op->product->tax)/100,2);
     }
     $sum_price_sum+=round($price_sum,2);
-    $price_sum=number_format($price_sum,2,',','').' EUR';
+    $price_sum=format_money($price_sum).' EUR';
   }else{
     $price_sum='';
   }
 ?>
   <div class="row product" data-product_id="<?php echo $op->product->id ?>">
-    <div class="col1">
+    <div class="col2">
       <div class="image">
         <!--<img src="" />-->
       </div>
     </div>
-    <div class="col3">
+    <div class="col6">
       <div class="info">
         <div class="name">
-          <?php echo $name ?>
+          <b><?php echo $name ?></b>
         </div>
         <div class="producer">
           <?php echo $producer_name ?>
         </div>
       </div>
     </div>
-    <div class="col2">
+    <div class="col4">
       <div class="amount_ctrl">
         <div class="amount">
-          <?php echo $amount.'&nbsp;'.$unit ?>
+          <b><?php echo $amount.'&nbsp;'.$unit ?></b>
         </div>
         <div class="ctrl" data-amount="<?php echo $op->amount ?>">
           <div class="button <?php echo $class_less ?>" <?php echo $attr_less ?> >-</div>
@@ -89,7 +89,7 @@ $base_cost=28.0;
         </div>
       </div>
     </div>
-    <div class="col3 last">
+    <div class="col6 right last">
       <div class="price_detail <?php echo $price_detail_class ?>">
         <?php echo $price_detail ?>
       </div>
@@ -123,13 +123,11 @@ $base_cost=28.0;
     </div>
   <?php endforeach*/ ?>
   <div class="inner_row mb1">
-    <div class="col1"></div>
-    <div class="col2">
+    <div class="col2"></div>
+    <div class="col4">
       <div>Grundbeitrag</div>
     </div>
-    <div class="col1">
-    </div>
-    <div class="col3 last">
+    <div class="col6 last">
       <div class="price_detail"></div>
       <div class="price_sum">
         <?php echo number_format($base_cost,2,',','') ?>&nbsp;EUR
@@ -137,13 +135,11 @@ $base_cost=28.0;
     </div>
   </div>
   <div class="inner_row">
-    <div class="col1"></div>
-    <div class="col2">
+    <div class="col2"></div>
+    <div class="col4">
       <div><b>Monatsbetrag</b></div>
     </div>
-    <div class="col1">
-    </div>
-    <div class="col3 last">
+    <div class="col6 last">
       <div class="price_detail"></div>
       <div class="price_sum">
         <b><?php echo number_format($sum_price_sum+$base_cost,2,',','') ?>&nbsp;EUR</b>

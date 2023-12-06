@@ -1,7 +1,7 @@
 html{
   margin: 0;
   padding: 0;
-  font-size: 18px;
+  font-size: 19px;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -9,17 +9,17 @@ html{
   height: 100%;
 }
 body{
-  margin: 0 auto;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0;
   font-size: 1em;
   font-family: Garamond,Arial,sans-serif;
   color: #000000;
-  position: fixed;
-  top: 0px;
-  left: 0px;
+  position: relative;
   width: 100%;
   height: 100%;
-  max-width: 1024px;
+  max-width: 42em;
 }
 
 header{
@@ -96,6 +96,8 @@ input[type="radio"],input[type="checkbox"],label{
   height: 8em;
 }
 
+
+
 h2{
   padding: 0.2em;
   margin: 0.2em;
@@ -107,6 +109,7 @@ h2 a{
   color: #000000;
 }
 
+/*TOP WHERE - WHO START*/
 .pathbar{
   display: inline-block;
 }
@@ -139,21 +142,30 @@ h2 a{
 .logout{
   float:right;
 }
+/*TOP WHERE - WHO END*/
 
-.version{
-  font-size: 0.9em;
+div.mt0_5{
+  margin-top: 0.5em;
+}
+div.mt1{
+  margin-top: 1em;
+}
+div.mb1{
+  margin-bottom: 1em;
 }
 
+/*SELECTION START*/
 .selection{
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0.5em;
 }
 .selection .item{
-  margin: 0.5em;
-  margin-right: 0;
+  margin: 0em;
   display: inline-block;
-  width: 7em;
-  height: 7em;
+  width: 6em;
+  height: 6em;
   border: 2px solid black;
   border-radius: 1em;
   text-align: center;
@@ -167,12 +179,13 @@ h2 a{
 .selection .item .label{
   display: block;
   margin-top: 40%;
+  font-size: 0.8em;
 }
-
 .selection .break {
   flex-basis: 100%;
-  height: 0;
+  height: 0.5em;
 }
+/*SELECTION END*/
 
 .controls{
   margin-top: 0.5em;
@@ -186,13 +199,41 @@ h2 a{
   margin: 0.2em;
   padding: 0.2em;
   cursor: pointer;
-  min-width: 1.5em;
+  min-width: 1.2em;
   text-align: center;
 }
 .input{
   border: 1px solid black;
   border-radius: unset;
   margin: 0;
+  margin-bottom: 0.2em;
+  padding: 0.2em;
+  min-width: 2em;
+}
+.input.radio{
+  padding: 0;
+}
+.input.radio .option{
+  padding: 0.2em;
+  border-right: 1px solid black;
+  display: inline-block;
+}
+.input.radio .option:last-child{
+  border-right: none;
+}
+.input.money, .input.amount_weight, .input.amount_pieces, .input.string{
+  text-align: right;
+  padding: 0;
+  padding-right: 0.1em;
+  min-width: 3em;
+  min-height: 1.2em;
+}
+.input.string{
+  text-align: left;
+  min-width: 6em;
+}
+.input.active{
+  box-shadow: 0 0 0 2px black;
 }
 .control_l{
   margin-right: 0;
@@ -224,9 +265,7 @@ h2 a{
 .main_button{
   margin-left: 0.5em;
 }
-.button.trash{
-  margin-right: 1em;
-}
+
 
 .center{
   text-align: center;
@@ -242,6 +281,8 @@ h2 a{
   font-size: 0.8em;
 }
 
+
+/*ROW START*/
 .row{
   border: 1px solid black;
   border-radius: 1em;
@@ -250,7 +291,10 @@ h2 a{
   display: flex;
   flex-flow: row wrap;
   background-color: white;
-  max-width: 65em;
+}
+.row.bottom_no_radius{
+  border-bottom-left-radius: unset;
+  border-bottom-right-radius: unset;
 }
 .inner_row{
   margin: 0;
@@ -259,119 +303,227 @@ h2 a{
   flex-flow: row wrap;
   width: 100%;
 }
-
-
-div.mt0_5{
-  margin-top: 0.5em;
-}
-div.mt1{
-  margin-top: 1em;
-}
-div.mb1{
-  margin-bottom: 1em;
-}
-
-.row .col,.row .col1,.row .col2,.row .col3,.row .col4,.row .col5{
+.row .col,
+.row .col1,
+.row .col2,
+.row .col3,
+.row .col4,
+.row .col5,
+.row .col6,
+.row .col7,
+.row .col8{
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
 }
 .row .col1{
-  width: 5em;
+  width: 2.2em;
 }
 .row .col2{
-  width: 10em;
+  width: 4.4em;
 }
 .row .col3{
-  width: 15em;
+  width: 6.6em;
 }
 .row .col4{
-  width: 20em;
+  width: 8.8em;
 }
 .row .col5{
-  width: 25em;
+  width: 11em;
 }
-.row .col > div,.row .col1 > div,.row .col2 > div,.row .col3 > div,.row .col4 > div,.row .col5 > div{
-  padding: 0.5em;
+.row .col6{
+  width: 13.2em;
 }
-.col.right,.col1.right,.col2.right,.col3.right,.col4.right,.col5.right{
-  justify-content: right;
+.row .col7{
+  width: 15.4em;
 }
-.col.center,.col1.center,.col2.center,.col3.center,.col4.center,.col5.center{
-  justify-content: center;
+.row .col8{
+  width: 17.6em;
 }
-.row .inner_row .col > div,
-.row .inner_row .col1 > div,
-.row .inner_row .col2 > div,
-.row .inner_row .col3 > div,
-.row .inner_row .col4 > div,
-.row .inner_row .col5 > div{
-  padding-top: 0em;
-  padding-bottom: 0em;
+/*ROW END*/
+
+.right{
+  justify-content: right!important;
+}
+.center{
+  justify-content: center!important;
 }
 .row .last{
   margin-left: auto;
 }
-.row.product .image{
+.row .image{
   display: inline-block;
   padding: 0em;
-  width: 5em;
-  height: 5em;
+  width: 4.4em;
+  height: 4.4em;
   border: 1px solid black;
   border-radius: 0.5em;
   background-color: #cccccc;
 }
-.product .info{
+.row .info{
   display: inline-block;
   width: 13em;
-  height: 4em;
-  padding: 0.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
 }
-.product .info .producer{
+.row .info .producer{
   margin-top: 0.5em;
   font-style: italic;
   font-size: 0.8em;
 }
-.row .extended{
-  width: auto;
-  height: 5em;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
 .row .amount_ctrl{
   display: inline-block;
   width: 10em;
-  height: 4em;
-  padding: 0.5em;
+  padding-right: 0.5em;
 }
 .row .ctrl{
   margin-top: 0.2em;
   white-space:nowrap;
 }
 .row .amount_ctrl .button{
-  width: 1.5em;
+  width: 1.2em;
   font-size: 2em;
-  line-height: 1.5em;
-  height: 1.5em;
+  line-height: 1.2em;
+  height: 1.2em;
   padding: 0;
   margin: 0;
   background-color: white;
 }
-.row .col3 .price_detail{
+.row .price_detail{
   display: inline-block;
-  width: 8em;
-  padding: 0.5em;
-  padding-top: 0.7em;
+  padding-right: 0.5em;
   font-size: 0.8em;
+  width: calc(100% - 7em);
 }
 .row .price_detail.grey{
   color: #888888;
 }
 .row .price_sum{
   display: inline-block;
-  width: 6em;
-  padding: 0.5em;
+  width: 7em;
   text-align: right;
 }
 
+
+
+
+
+
+
+/*KEYBOARD START*/
+#keyboard{
+  top:0px;
+  left:0px;
+  width:100%;
+  height: 100%;
+}
+#keyboard_window{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  top:10%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 3px solid black;
+  border-radius: 1em;
+  width: 20em;
+}
+#keyboard_window.string{
+  width: calc(100% - 1em);
+}
+#keyboard_header{
+  margin: 0.5em;
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+}
+#keyboard_header .button{
+  min-width: 2em;
+  min-height: 6em;
+}
+#keyboard_header .button span{
+  position: relative;
+  top: calc(50% - 0.5em);
+  font-size: 1.5em;
+}
+#keyboard_info{
+  display: inline-block;
+  font-size: 1.5em;
+  margin: 0em;
+  text-align: center;
+}
+#keyboard_fields{
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  text-align: right;
+  margin-bottom: 0.5em;
+}
+#keyboard .field{
+  margin-bottom: 0.5em;
+}
+#keyboard .field .input{
+  background-color: white;
+  border: 1px solid black;
+  font-size: 2em;
+  text-align: right;
+  min-width: 4em;
+  display: inline-block;
+}
+#keyboard .field.type_select{
+  display: flex;
+  justify-content: space-evenly;
+  text-align: unset;
+}
+#keyboard .field .input.option{
+  min-width: unset;
+}
+#keyboard .field .unit{
+  font-size: 2em;
+  margin-left: 0;
+  display: inline-block;
+  min-width: 2.5em;
+  text-align: left;
+}
+
+.keyboard_keys > div{
+  display: flex;
+  justify-content: space-evenly;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+.keyboard_keys > div > div{
+  display: inline-flex;
+  width: 4em;
+  height: 4em;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 1em;
+  justify-content: space-around;
+  cursor: pointer;
+}
+.keyboard_keys > div > div.none{
+  background-color: unset;
+  border: unset;
+  cursor: unset;
+}
+.keyboard_keys > div > div.none span{
+  display: none;
+}
+#keyboard_options.keyboard_keys > div > div{
+  min-width: 16em;
+}
+#keyboard_options .checked{
+  box-shadow: 0 0 0 2px black;
+}
+.keyboard_keys > div > div.active{
+  box-shadow: 0 0 0 2px black;
+}
+.keyboard_keys > div > div > span{
+  font-size: 2em;
+  margin-top: 0.4em;
+}
+#keyboard_ctrl{
+  margin-top: 1em;
+}
+/*KEYBOARD END*/

@@ -1,5 +1,9 @@
 <?php
-$PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen','/delivery?id='.$delivery->id => format_date($delivery->created,'j.n.Y H:i').' '.$delivery->supplier->name, '' => ($item_id?'Produkt wählen':'Neue Position') );
+$PROPERTIES['pathbar']=array(
+  '/deliveries' => 'Lieferungen',
+  '/delivery?delivery_id='.$delivery->id => format_date($delivery->created,'j.n.Y').' '.$delivery->supplier->name,
+  '' => ($item_id?'Produkt wählen':'Neue Position') 
+);
 $PROPERTIES['body_class']='header_h5';
 ?>
 
@@ -30,7 +34,7 @@ $PROPERTIES['body_class']='header_h5';
         <!--<img src="" />-->
       </div>
       <div class="info">
-        <div class="name">
+        <div class="label">
           <?php echo $product->name ?>
         </div>
         <?php if($product->producer->id != $delivery->supplier->id): ?>
@@ -44,5 +48,11 @@ $PROPERTIES['body_class']='header_h5';
 </div>
 
 <div class="button main_button" onclick="location.href='/product/new?delivery_id=<?php echo $delivery->id.($item_id?'&item_id='.$item_id:'') ?>'">Neues Produkt aufnehmen</div>
-<div class="button main_button" onclick="location.href='/delivery?id=<?php echo $delivery->id.($item_id?'&item_id='.$item_id:'') ?>'">Abbrechen</div>
+<?php
+  $cancel_url = '/delivery?delivery_id='.$delivery->id;
+  if($item_id){
+    $cancel_url = '/delivery/item_edit?delivery_id='.$delivery->id.'&item_id='.$item_id;
+  }
+?>
+<div class="button main_button" onclick="location.href='<?php echo $cancel_url ?>'">Abbrechen</div>
 

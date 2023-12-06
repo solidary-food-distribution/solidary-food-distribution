@@ -19,4 +19,22 @@ class Product{
   public float $tax;
   public bool $tax_incl;
 
+  public function update( array $updates = array() ){
+    require_once('sql.class.php');
+    $qry = 
+      "UPDATE msl_products SET ";
+    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= "WHERE pid='".intval($this->id)."'";
+    SQL::update($qry);
+  }
+
+}
+
+function product_get($id){
+  require_once('products.class.php');
+  $products = new Products(array('product_id' => $id));
+  if(!empty($products)){
+    return $products->first();
+  }
+  return null;
 }

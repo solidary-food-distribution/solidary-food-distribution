@@ -35,4 +35,31 @@ class Delivery{
     SQL::update($qry);
     return true;
   }
+
+  public function update( array $updates = array() ){
+    require_once('sql.class.php');
+    $qry = 
+      "UPDATE msl_deliveries SET ";
+    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= "WHERE id='".intval($this->id)."'";
+    SQL::update($qry);
+  }
+
+  public function delete(){
+    require_once('sql.class.php');
+    $qry = 
+      "DELETE FROM msl_deliveries ";
+    $qry .= "WHERE id='".intval($this->id)."'";
+    SQL::update($qry);
+  }
+}
+
+
+function delivery_get($id){
+  require_once('deliveries.class.php');
+  $deliveries = new Deliveries(array('id' => $id));
+  if(!empty($deliveries)){
+    return $deliveries->first();
+  }
+  return null;
 }

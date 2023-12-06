@@ -23,3 +23,11 @@
   max-width: 20em;
   margin-top:2em;
 }
+
+.center.login .col1{
+  width: 5em;
+}
+
+.center.login input{
+  width: 100%;
+}

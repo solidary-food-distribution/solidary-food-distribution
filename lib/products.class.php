@@ -5,6 +5,16 @@ require_once('product.class.php');
 
 class Products extends ArrayObject{
 
+  public static function create($producer_id){
+    require_once('sql.class.php');
+    $qry = 
+      "INSERT INTO msl_products ".
+        "(producer_id, type, status) VALUES ".
+        "('" . intval($producer_id) . "', 'v', 'o')";
+    $product_id = SQL::insert($qry);
+    return $product_id;
+  }
+
   public function __construct(array $filters=array(), array $orderby=array(), int $limit_start=0, int $limit_count=-1){
     $array = $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
     parent::__construct($array);
@@ -56,7 +66,7 @@ class Products extends ArrayObject{
       $product->amount_steps = floatval($row['amount_steps']);
       $product->amount_min = floatval($row['amount_min']);
       $product->amount_max = floatval($row['amount_max']);
-      $product->orders_lock_date = new DateTime($row['orders_lock_date']);
+      $product->orders_lock_date = $row['orders_lock_date']; //REFACTOR new DateTime($row['orders_lock_date']);
       $product->price = floatval($row['price']);
       $product->tax = floatval($row['tax']);
       $product->tax_incl = boolval($row['tax_incl']);

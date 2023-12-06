@@ -8,12 +8,14 @@ main{
 }
 
 #background{
-  position:fixed;
+  position: fixed;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
   top:5em;
-  left:0px;
+  bottom:3em;
   width: 100%;
-  max-width: 1024px;
-  height: 100%;
+  max-width: 42em;
   background-image: url('/img/Mit-Sinn-Leben-Logo-1030x579.png');
   background-repeat: no-repeat;
   background-position: 50% 0;

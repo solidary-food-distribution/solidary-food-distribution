@@ -11,13 +11,17 @@ $PROPERTIES['body_class']='header_h5';
 
 <?php foreach($deliveries as $delivery): ?>
   <div class="row">
-    <div class="col3">
-      <div><?php echo format_date($delivery->created,'j.n.Y H:i') ?></div>
+    <div class="col4">
+      <div>
+        <b><?php echo format_date($delivery->created,'j.n.Y') ?></b>
+        <br>
+        <?php echo format_date($delivery->created,'H:i', false) ?>
+      </div>
     </div>
-    <div class="col1">
-      <div><?php echo $delivery->supplier->name ?></div>
-    </div>
     <div class="col3">
+      <div><b><?php echo $delivery->supplier->name ?></b></div>
+    </div>
+    <div class="col7">
       <div>
         <?php /*echo count($delivery->items) ?> Position<?php echo count($delivery->items)==1?'':'en'*/ 
           $items = '';
@@ -28,11 +32,11 @@ $PROPERTIES['body_class']='header_h5';
         ?>
       </div>
     </div>
-    <div class="col2 right">
+    <div class="col3 right">
       <div><?php echo number_format($delivery->price_total,2,',','') ?> EUR</div>
     </div>
     <div class="col1 right last">
-      <span class="button" onclick="location.href='/delivery?id=<?php echo $delivery->id ?>';">
+      <span class="button" onclick="location.href='/delivery?delivery_id=<?php echo $delivery->id ?>';">
         <i class="fa-solid fa-arrow-up-right-from-square"></i>
       </span>
     </div>

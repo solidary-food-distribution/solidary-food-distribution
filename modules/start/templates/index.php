@@ -1,7 +1,7 @@
 <div class="selection">
   <?php if(user_has_access('deliveries')): ?>
     <div class="item" onclick="location.href='/deliveries'">
-      <span class="label">Lieferung</span>
+      <span class="label">Lieferungen</span>
     </div>
   <?php endif ?>
   <?php if(0): ?>

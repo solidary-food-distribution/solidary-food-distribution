@@ -74,7 +74,7 @@ function translate_product_type($type){
     'b'=>'EUR',
   );
   if(!isset($translate[$type])){
-    return $type;
+    return '?';
   }
   return $translate[$type];
 }
@@ -129,26 +129,49 @@ function translate_month($month){
 }
 
 function format_money($value){
-  return number_format(floatval($value),2,',','');
+  $return = number_format(floatval($value),2,',','');
+  if($return === '0,00'){
+    $return = '&nbsp;';
+  }
+  return $return;
 }
 
 function format_amount($value){
-  if(round(floatval($value),3)==0){
-    return '';
+  $return = str_replace('.', ',', round($value,3));
+  if($return === '0'){
+    $return = '&nbsp;';
   }
-  return str_replace('.', ',', round($value,3));
+  return $return;
 }
 
-function format_date($date,$format='j.n.Y'){
+function format_weight($value){
+  $return = number_format(floatval($value),3,',','');
+  if($return == '0,000'){
+    $return = '&nbsp;';
+  }elseif(substr($return, -4) == ',000'){
+    $return = number_format(floatval($value),1,',','');
+  }elseif(substr($return, -1) == '0'){
+    $return = number_format(floatval($value),2,',','');
+  }elseif(substr($return, -2) == '00'){
+    $return = number_format(floatval($value),1,',','');
+  }
+  return $return;
+}
+
+function format_date($date, $format='j.n.Y', $weekday=true){
   if(gettype($date)=='object' && get_class($date)=='DateTime'){
     $time=$date->getTimestamp();
   }else{
     $time=strtotime($date);
   }
-  $weekdays=array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag');
-  $weekday=date('w',$time);
-  $weekday=$weekdays[$weekday];
-  return substr($weekday,0,2).'., '.date($format,$time);
+  $ret = date($format,$time);
+  if($weekday){
+    $weekdays=array('Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag');
+    $weekday=date('w',$time);
+    $weekday=$weekdays[$weekday];
+    $ret = substr($weekday,0,2).'., '.$ret;
+  }
+  return $ret;
 }
 
 function send_email($to,$subject,$text){
