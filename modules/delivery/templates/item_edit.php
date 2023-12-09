@@ -71,7 +71,7 @@ $PROPERTIES['pathbar']=array(
   </div>
   <div class="col1 right last">
     <div class="buttons">
-      <div class="button" onclick="active_input_post_value_goto('/delivery?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>')">
+      <div class="button ok" onclick="active_input_post_value_goto('/delivery?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>')">
         <i class="fa-solid fa-check"></i>
       </div>
       <br>

@@ -38,7 +38,7 @@ class Deliveries extends ArrayObject{
     $qry=
       "SELECT d.id AS delivery_id, ms.id AS supplier_id, ms.name AS supplier_name, d.price_total AS d_price_total, d.created AS d_created, u.id AS creator_id, u.name AS creator_name, ".
         "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_weight, di.price_type, di.price, di.price_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
-        "p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name ".
+        "p.pid AS p_id,p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name ".
       "FROM msl_members ms, msl_users u, msl_deliveries d ".
         "LEFT JOIN msl_delivery_items di ON (d.id=di.delivery_id) ".
         "LEFT JOIN msl_products p ON (di.product_id=p.pid) ".
@@ -71,7 +71,7 @@ class Deliveries extends ArrayObject{
         }
         $item = new DeliveryItem();
         $item->id = intval($di_id);
-        $item->product_id = intval($di['product_id']);
+        $item->product_id = intval($di['p_id']);
         $item->amount_pieces = intval($di['amount_pieces']);
         $item->amount_weight = floatval($di['amount_weight']);
         $item->price_type = $di['price_type'];
@@ -84,13 +84,18 @@ class Deliveries extends ArrayObject{
         $item->weight_min = floatval($di['weight_min']);
         $item->weight_max = floatval($di['weight_max']);
         $item->weight_avg = floatval($di['weight_avg']);
+        $item->product = new Product();
+        $item->product->id = $item->product_id;
         if($item->product_id){
-          $item->product = new Product();
-          $item->product->id = intval($di['product_id']);
           $item->product->name = $di['p_name'];
           $item->product->producer = new Member();
           $item->product->producer->id = intval($di['p_producer_id']);
           $item->product->producer->name = $di['p_producer_name'];
+        }else{
+          $item->product->name = '[gelöschtes Produkt]';
+          $item->product->producer = new Member();
+          $item->product->producer->id = 0;
+          $item->product->producer->name = '';
         }
         $delivery->items[$di_id]=$item;
       }

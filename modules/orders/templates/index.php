@@ -8,13 +8,13 @@ $taxes=array();
 <?php foreach($orders as $product_id=>$product): ?>
   <div class="row product">
     <div class="inner_row mb1">
-      <div class="col3">
+      <div class="col6">
         <div class="info">
           <div class="name"><?php echo $product['name'] ?></div>
           <div class="producer"><?php echo $product['producer_name'] ?></div>
         </div>
       </div>
-      <div class="col1 right">
+      <div class="col2 right">
         <div>
           <?php 
             echo number_format($product['amount'],2,',','');
@@ -24,7 +24,7 @@ $taxes=array();
           ?>
         </div>
       </div>
-      <div class="col2">
+      <div class="col3">
         <div>
           <?php 
             echo translate_product_type($product['type']).'/'.translate_product_period($product['period']);
@@ -34,7 +34,7 @@ $taxes=array();
           ?>
         </div>
       </div>
-      <div class="col2">
+      <div class="col3">
         <div>
           <?php
             if($product['type']!='b'){
@@ -53,7 +53,7 @@ $taxes=array();
           ?>
         </div>
       </div>
-      <div class="col2 right last">
+      <div class="col4 right last">
         <div>
           <?php 
             $rowsum=round($factor*$product['amount']*$product['price'],2);
@@ -69,13 +69,13 @@ $taxes=array();
     </div>
     <?php foreach($product['members'] as $member): ?>
       <div class="inner_row member<?php echo $product_id ?>" style="display:none;">
-        <div class="col3">
+        <div class="col6">
           <div><?php echo $member['name'] ?></div>
         </div>
-        <div class="col1 right">
+        <div class="col2 right">
           <div><?php echo number_format($member['amount'],2,',','') ?></div>
         </div>
-        <div class="col1">
+        <div class="col2">
           <div><?php echo translate_product_type($product['type']).'/'.translate_product_period($product['period']) ?></div>
         </div>
       </div>
@@ -121,7 +121,7 @@ $taxes=array();
     </div>
   <?php endforeach*/ ?>
   <div class="inner_row">
-    <div class="col2 right last">
+    <div class="col4 right last">
       <div>
         <?php echo number_format($sum,2,',',''); ?> EUR/Monat
       </div>

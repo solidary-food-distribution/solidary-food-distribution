@@ -11,10 +11,10 @@ $totalsum=0;
 ?>
   <?php foreach($member['products'] as $pid=>$product): ?>
     <div class="inner_row product<?php echo $member_id ?>" style="display:none;">
-      <div class="col4">
+      <div class="col8">
         <div><?php echo $product['name'] ?></div>
       </div>
-      <div class="col3">
+      <div class="col6">
         <div>
           <?php
             echo str_replace('.',',',round($product['amount'],2));
@@ -35,7 +35,7 @@ $totalsum=0;
           ?>
         </div>
       </div>
-      <div class="col2 right last">
+      <div class="col4 right last">
         <div><?php echo number_format($rowsum,2,',','') ?> EUR/Monat</div>
       </div>
     </div>
@@ -45,12 +45,12 @@ $totalsum=0;
 ?>
 
     <div class="inner_row mb1">
-      <div class="col5">
+      <div class="col8">
         <div>
           <div><?php echo $member['name'] ?> (<?php echo $member['identification'] ?>)</div>
         </div>
       </div>
-      <div class="col5 right last">
+      <div class="col4 right last">
         <div>
           <div><?php echo number_format($sum,2,',','') ?> EUR/Monat</div>
         </div>
@@ -72,7 +72,7 @@ $totalsum=0;
 ?>
 <div class="row">
   <div class="inner_row">
-    <div class="col3 right last">
+    <div class="col6 right last">
       <div>
         <?php echo number_format($totalsum,2,',',''); ?> EUR/Monat
       </div>

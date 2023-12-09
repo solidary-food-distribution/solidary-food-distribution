@@ -33,34 +33,34 @@ $sum=0;
   <div class="row entry">
     <?php if($edit_id==$id): ?>
       <div class="inner_row">
-        <div class="col2 center">
+        <div class="col4 center">
           <div>
             <div id="input_date" data-value="<?php echo $entry['date'] ?>"><?php echo format_date($entry['date']) ?></div>
             <div class="button" onclick="timesheet_date_change(-1)"><i class="fa-solid fa-caret-left"></i></div>
             <div class="button" onclick="timesheet_date_change(1)"><i class="fa-solid fa-caret-right"></i></div>
           </div>
         </div>
-        <div class="col2 right">
+        <div class="col4 right mr1">
           <div><input id="input_mins" maxlength="3" type="text" value="<?php echo $entry['mins'] ?>" /> min</div>
         </div>
-        <div class="col5">
+        <div class="col8">
           <div class="what"><input id="input_what" type="text" value="<?php echo htmlentities($entry['what']) ?>" /></div>
         </div>
       </div>
       <div class="inner_row mt1">
-        <div class="col5 right last">
+        <div class="col8 right last">
           <div class="button" onclick="location.href='/timesheet?month=<?php echo $month ?>';">Abbrechen</div>
           <div class="button" onclick="timesheet_save(this,'<?php echo $id ?>')">Speichern</div>
         </div>
       </div>
     <?php else: ?>
-      <div class="col2 center">
+      <div class="col4 center">
         <div><?php echo format_date($entry['date']) ?></div>
       </div>
-      <div class="col2 right">
+      <div class="col4 right mr1">
         <div><?php echo $entry['mins'] ?> min</div>
       </div>
-      <div class="col5">
+      <div class="col8">
         <div><?php echo htmlentities($entry['what']) ?></div>
       </div>
       <div class="col1 right last">
@@ -82,12 +82,12 @@ $sum=0;
 
 <?php ob_start(); ?>
   <div class="row">
-    <div class="col2 center">
+    <div class="col4 center">
       <div>
         <?php echo $months[$month] ?>
       </div>
     </div>
-    <div class="col2 right">
+    <div class="col4 right">
       <div><?php echo $sum ?> min = <?php echo number_format($sum/60,1,',','') ?> Std</div>
     </div>
   </div>

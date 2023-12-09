@@ -67,6 +67,9 @@ function validate_money(id){
 }
 
 function input_onfocus(el){
+  if($(el).hasClass('active')){
+    return;
+  }
   active_input_post_value();
   $('.input.active').removeClass('active');
   $(el).addClass('active');
@@ -93,6 +96,13 @@ function active_input_post_value(){
     value = input.find('input[type="radio"]').val();
   }else{
     value = input.text().trim();
+  }
+  if(input.data('regexp')){
+    var regexp = new RegExp(input.data('regexp'));
+    if( !regexp.test(value) ){
+      alert(input.data('regexp_fail'));
+      return;
+    }
   }
   $.ajax({
     type: 'POST',
@@ -172,13 +182,13 @@ function keyboard_show(el){
   if(inputs.length<=1){
     $('#keyboard_header .button').hide();
   }
+
   $('body').off('keydown');
   $('body').keydown(keyboard_keydown);
   $('#keyboard').show();
 }
 
 function keyboard_keydown(event){
-  console.log(event);
   var key = event.originalEvent.key;
   var shiftKey = event.originalEvent.shiftKey;
   if(shiftKey && key.length>1){
@@ -200,7 +210,7 @@ function keyboard_key(key){
   }else if('| |-|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
   }else if(key == 'Ok'){
-    keyboard_next_input(); //active_input_post_value();
+    keyboard_ok();
   }else if(key == 'Shift Tab'){
     keyboard_prev_input();
   }else if(key == 'Tab'){
@@ -219,6 +229,10 @@ function keyboard_key(key){
   return true;
 }
 
+function keyboard_ok(){
+  $('.button.ok').click();
+}
+
 function keyboard_option(radio_id){
   $('#'+radio_id).click();
   keyboard_next_input();
@@ -226,7 +240,12 @@ function keyboard_option(radio_id){
 
 function keyboard_input_change(key){
   //console.log("keyboard_input_change "+key);
-  var value = $('.input.active').text().trim();
+  var value = $('.input.active').html().trim();
+  if(value == '&nbsp;'){
+    value = '';
+  }else{
+    value = value.replace('&nbsp;', ' ');
+  }
   var type = $('.input.active').data('type');
   if(key == 'Backspace'){
     if(type == 'options'){
@@ -254,10 +273,22 @@ function keyboard_input_change(key){
   }else{
     value += key;
   }
-  if(value.trim() == ''){
-    value = '&nbsp;';
+  if($('#key_shift').hasClass('active')){
+    //after upper letter deactivate Shift
+    if(value.length >= 1  && value.substr(-2,1).toUpperCase() == value.substr(-2,1)){
+      keyboard_toggle_shift();
+    }
+  }else{
+    if(value.length == 0 || (value.length >= 1  && value.substr(-1) == ' ')){
+      //at start or after space activate Shift
+      keyboard_toggle_shift();
+    }
   }
-  $('.input.active').html(value);
+
+  if(value.trim() == ''){
+    value = ' ';
+  }
+  $('.input.active').html(value.replace(' ','&nbsp;'));
 }
 
 function keyboard_toggle_shift(){
