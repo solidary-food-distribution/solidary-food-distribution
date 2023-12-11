@@ -43,14 +43,20 @@
   </div>
   <div class="col4">
     <div class="amount">
-      <?php echo format_money($item->price) ?> EUR /
-      <br>
-      <?php echo translate_product_type($item->price_type) ?>
+      <?php if($item->price): ?>
+        <?php echo format_money($item->price) ?> EUR
+      <?php endif ?>
+      <?php if($item->price_type): ?>
+        /<br>
+        <?php echo translate_product_type($item->price_type) ?>
+      <?php endif ?>
     </div>
   </div>
   <div class="col3 right">
     <div class="price_sum">
-      <?php echo format_money($item->price_sum) ?> EUR
+      <?php if($item->price_sum): ?>
+        <?php echo format_money($item->price_sum) ?> EUR
+      <?php endif ?>
     </div>
   </div>
   <div class="col1 right last">

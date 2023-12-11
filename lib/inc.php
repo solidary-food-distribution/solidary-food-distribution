@@ -182,3 +182,40 @@ function send_email($to,$subject,$text){
   mail($to,$subject,$text,$header);
 }
 
+function html_input($data){
+  $return = '<div class="input';
+  if(isset($data['class'])){
+    $return .= ' '.$data['class'];
+  }
+  if(isset($data['type'])){
+    $return .= ' '.$data['type'];
+  }
+  $return .= '"';
+  if(isset($data['type'])){
+    $return .= ' data-type="'.$data['type'].'"';
+  }
+  if(isset($data['info'])){
+    $return .= ' data-info="'.htmlentities($data['info']).'"';
+  }
+  if(isset($data['url'])){
+    $return .= ' data-url="'.$data['url'].'"';
+  }
+  if(isset($data['field'])){
+    $return .= ' data-field="'.$data['field'].'" onclick="input_onfocus(this)"';
+  }
+  $return .= '>';
+  if(isset($data['options'])){
+    foreach($data['options'] as $value => $label){
+      $id = $data['field'].'_'.$value;
+      $return .= '<div class="option"><input type="radio" name="'.$data['field'].'" id="'.$id.'" value="'.$value.'"';
+      if($data['value'] == $value){
+        $return .= ' checked="checked"';
+      }
+      $return .= ' /><label for="'.$id.'">'.htmlentities($label).'</label></div>';
+    }
+  }elseif(isset($data['value'])){
+    $return .= $data['value'];
+  }
+  $return .= '</div>';
+  return $return;
+}

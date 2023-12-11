@@ -21,7 +21,7 @@ $PROPERTIES['body_class']='header_h5';
     <div class="col3">
       <div><b><?php echo $delivery->supplier->name ?></b></div>
     </div>
-    <div class="col7">
+    <div class="col10">
       <div>
         <?php /*echo count($delivery->items) ?> Position<?php echo count($delivery->items)==1?'':'en'*/ 
           $items = '';
@@ -31,9 +31,6 @@ $PROPERTIES['body_class']='header_h5';
           echo rtrim($items, ', ');
         ?>
       </div>
-    </div>
-    <div class="col3 right">
-      <div><?php echo number_format($delivery->price_total,2,',','') ?> EUR</div>
     </div>
     <div class="col1 right last">
       <span class="button" onclick="location.href='/delivery?delivery_id=<?php echo $delivery->id ?>';">

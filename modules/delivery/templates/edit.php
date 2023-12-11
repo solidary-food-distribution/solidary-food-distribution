@@ -12,19 +12,23 @@ $PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen','/delivery?delivery_id
   <div class="col4">
     <div>
       <div><b><?php echo $delivery->supplier->name ?></b></div>
-      <!--
-      <select id="delivery_supplier_id" <?php echo count($delivery->items)?'disabled="disabled"':'' ?> onchange="ajax_field_update($(this).attr('id'), '/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>')" >
-        <option value=""></option>
-        <?php foreach($suppliers as $supplier): ?>
-          <option value="<?php echo $supplier->id ?>" <?php echo $delivery->supplier->id==$supplier->id?'selected="selected"':'' ?> ><?php echo $supplier->name ?></option>
-        <?php endforeach ?>
-      </select>
-    -->
     </div>
   </div>
   <div class="col4"></div>
   <div class="col3 right">
-    <div><div class="input money" onclick="input_onfocus(this)" data-info="Lieferung Betrag gemäß Lieferschein" data-url="/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>" data-field="price_total" data-type="money" data-value="<?php echo $delivery->price_total ?>"><?php echo format_money($delivery->price_total) ?></div> EUR</div>
+    <div>
+      <?php 
+        if($type_v){
+          echo html_input(array(
+            'field' => 'price_total', 
+            'type' => 'money',
+            'info' => 'Lieferung Betrag gemäß Lieferschein',
+            'url' => '/delivery/update_ajax?delivery_id='.$delivery->id,
+            'value' => format_money($delivery->price_total)
+          )).' EUR';
+        }
+      ?>
+    </div>
   </div>
   <div class="col1 right last">
     <div class="buttons">

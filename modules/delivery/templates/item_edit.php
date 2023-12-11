@@ -29,15 +29,28 @@ $PROPERTIES['pathbar']=array(
   <div class="col4">
     <div class="amount_ctrl">
       <div class="left">
-        <div class="input amount_weight" data-info="Gelieferte Menge <?php echo $item->product->name ?> kg" data-field="amount_weight" data-type="weight" data-unit="kg" data-url="/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>" data-value="<?php echo $item->amount_weight ?>" onclick="input_onfocus(this)">
-          <?php echo format_weight($item->amount_weight) ?>
-        </div> kg
-        <br>
-        <div class="input amount_pieces" data-info="Gelieferte Menge <?php echo $item->product->name ?> Stück" data-field="amount_pieces" data-type="pieces" data-url="/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>" data-value="<?php echo $item->amount_pieces ?>" onclick="input_onfocus(this)">
-          <?php echo format_amount($item->amount_pieces) ?>
-        </div> Stück
+        <?php
+          if($item->product->type != 'p'){
+            echo html_input(array(
+              'field' => 'amount_weight', 
+              'type' => 'weight',
+              'info' => 'Gelieferte Menge '.$item->product->name.' kg',
+              'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
+              'value' => format_weight($item->amount_weight)
+            )).' kg<br>';
+          }
+          if($item->product->type != 'k'){
+            echo html_input(array(
+              'field' => 'amount_pieces', 
+              'type' => 'pieces',
+              'info' => 'Gelieferte Menge '.$item->product->name.' Stück',
+              'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
+              'value' => format_amount($item->amount_pieces)
+            )).' Stück';
+          }
+        ?>
       </div>
-      <!--
+      <?php /*
       <div class="left mt0_5">
         <span class="input amount smaller">
           <?php echo format_amount($item->weight_min) ?>
@@ -49,24 +62,47 @@ $PROPERTIES['pathbar']=array(
           <br>
           &Oslash; <span class="input amount smaller"><?php echo format_amount($item->weight_avg) ?></span> kg
       </div>
-    -->
+      */ ?>
     </div>
   </div>
   <div class="col4">
     <div class="amount">
-      <div class="input money" data-info="Grundpreis <?php echo $item->product->name ?> gemäß Lieferschein" data-field="price" data-type="money" data-url="/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>" data-value="<?php echo $item->price ?>" onclick="input_onfocus(this)"><?php echo format_money($item->price) ?></div> EUR / 
-      <div class="input radio" data-info="Grundpreis Einheit <?php echo $item->product->name ?> gemäß Lieferschein" data-url="/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>" data-field="price_type" data-type="options" data-value="<?php echo $item->price_type ?>" onclick="input_onfocus(this)">
-        <div class="option">
-          <input type="radio" name="price_type<?php echo $item->id ?>" id="price_type_k<?php echo $item->id ?>" value="k" <?php echo $item->price_type=='k'?'checked="checked"':'' ?> /><label for="price_type_k<?php echo $item->id ?>"> kg</label>
-        </div><div class="option">
-          <input type="radio" name="price_type<?php echo $item->id ?>" id="price_type_p<?php echo $item->id ?>" value="p" <?php echo $item->price_type=='p'?'checked="checked"':'' ?> /><label for="price_type_p<?php echo $item->id ?>"> Stück</label>
-        </div>
-      </div>
+      <?php 
+        if($item->product->type == 'v'){
+          echo html_input(array(
+            'field' => 'price',
+            'type' => 'money',
+            'info' => 'Grundpreis '.$item->product->name.' gemäß Lieferschein',
+            'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
+            'value' => format_money($item->price)
+          )). ' EUR / ';
+          echo html_input(array(
+            'field' => 'price_type',
+            'type' => 'options',
+            'info' => 'Grundpreis Einheit '.$item->product->name.' gemäß Lieferschein',
+            'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
+            'value' => $item->price_type,
+            'options' => array('k' => 'kg', 'p' => 'Stück'),
+          ));
+        }else{
+          //print_r($item);
+        }
+      ?>
     </div> 
   </div>
   <div class="col3 right">
     <div>
-      <div class="input money" onclick="input_onfocus(this)" data-info="Zeilensumme <?php echo $item->product->name ?> gemäß Lieferschein" data-url="/delivery/update_ajax?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>" data-field="price_sum" data-type="money" data-value="<?php echo $item->price_sum ?>"><?php echo format_money($item->price_sum) ?></div> EUR
+      <?php
+        if($item->product->type == 'v'){
+          echo html_input(array(
+            'field' => 'price_sum',
+            'type' => 'money',
+            'info' => 'Zeilensumme '.$item->product->name.' gemäß Lieferschein',
+            'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
+            'value' => format_money($item->price_sum)
+          )). ' EUR';
+        }
+      ?>
     </div>
   </div>
   <div class="col1 right last">

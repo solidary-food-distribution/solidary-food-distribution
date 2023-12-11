@@ -17,13 +17,16 @@ $PROPERTIES['body_class']='header_h5';
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
 <div class="selection">
-  <?php $type=''; ?>
+  <?php $type=''; $type_v=false; ?>
   <?php foreach($products as $product): ?>
     <?php if($product->type!=$type && $type!=''): ?>
       <div class="break"></div>
     <?php endif ?>
     <?php 
       $type=$product->type;
+      if($type == 'v'){
+        $type_v = true;
+      }
       $selected='';
       if($item_id && isset($delivery->items[$item_id]) && $delivery->items[$item_id]->product->id == $product->id){
         $selected='selected';
@@ -47,7 +50,9 @@ $PROPERTIES['body_class']='header_h5';
   <?php endforeach ?>
 </div>
 
-<div class="button main_button" onclick="location.href='/product/new?delivery_id=<?php echo $delivery->id.($item_id?'&item_id='.$item_id:'') ?>'">Neues Produkt aufnehmen</div>
+<?php if($type_v): ?>
+  <div class="button main_button" onclick="location.href='/product/new?delivery_id=<?php echo $delivery->id.($item_id?'&item_id='.$item_id:'') ?>'">Neues Produkt aufnehmen</div>
+<?php endif ?>
 <?php
   $cancel_url = '/delivery?delivery_id='.$delivery->id;
   if($item_id){

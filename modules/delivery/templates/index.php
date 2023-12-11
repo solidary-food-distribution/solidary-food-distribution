@@ -16,7 +16,9 @@ $PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen','/delivery?delivery_id
   </div>
   <div class="col4"></div>
   <div class="col3 right">
-    <div><?php echo number_format($delivery->price_total,2,',','') ?> EUR</div>
+    <?php if($delivery->price_total): ?>
+      <div><?php echo number_format($delivery->price_total,2,',','') ?> EUR</div>
+    <?php endif ?>
   </div>
   <div class="col1 right last">
     <div class="buttons">

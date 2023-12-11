@@ -87,6 +87,9 @@ function active_input_post_value_goto(url){
 function active_input_post_value(){
   var input = $('.input.active');
   if(!input.length){
+    if(active_input_post_value_goto_url.length){
+      location.href = active_input_post_value_goto_url;
+    }
     return;
   }
   console.log("active_input_post_value "+input.data('field'));

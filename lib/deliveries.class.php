@@ -38,7 +38,7 @@ class Deliveries extends ArrayObject{
     $qry=
       "SELECT d.id AS delivery_id, ms.id AS supplier_id, ms.name AS supplier_name, d.price_total AS d_price_total, d.created AS d_created, u.id AS creator_id, u.name AS creator_name, ".
         "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_weight, di.price_type, di.price, di.price_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
-        "p.pid AS p_id,p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name ".
+        "p.pid AS p_id,p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type ".
       "FROM msl_members ms, msl_users u, msl_deliveries d ".
         "LEFT JOIN msl_delivery_items di ON (d.id=di.delivery_id) ".
         "LEFT JOIN msl_products p ON (di.product_id=p.pid) ".
@@ -91,11 +91,13 @@ class Deliveries extends ArrayObject{
           $item->product->producer = new Member();
           $item->product->producer->id = intval($di['p_producer_id']);
           $item->product->producer->name = $di['p_producer_name'];
+          $item->product->type = $di['p_type'];
         }else{
           $item->product->name = '[gelöschtes Produkt]';
           $item->product->producer = new Member();
           $item->product->producer->id = 0;
           $item->product->producer->name = '';
+          $item->product->type = '';
         }
         $delivery->items[$di_id]=$item;
       }

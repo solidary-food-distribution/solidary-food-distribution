@@ -214,15 +214,15 @@ div.mr1{
   padding: 0.2em;
   min-width: 2em;
 }
-.input.radio{
+.input.options{
   padding: 0;
 }
-.input.radio .option{
+.input.options .option{
   padding: 0.2em;
   border-right: 1px solid black;
   display: inline-block;
 }
-.input.radio .option:last-child{
+.input.options .option:last-child{
   border-right: none;
 }
 .input.money, .input.amount_weight, .input.amount_pieces, .input.string{
@@ -316,7 +316,9 @@ div.mr1{
 .row .col5,
 .row .col6,
 .row .col7,
-.row .col8{
+.row .col8,
+.row .col9,
+.row .col10{
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -344,6 +346,12 @@ div.mr1{
 }
 .row .col8{
   width: 17.6em;
+}
+.row .col9{
+  width: 19.8em;
+}
+.row .col10{
+  width: 22em;
 }
 /*ROW END*/
 

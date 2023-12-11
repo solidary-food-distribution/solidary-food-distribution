@@ -16,12 +16,11 @@ function execute_index(){
 function execute_edit(){
   $delivery_id = get_request_param('delivery_id');
   $delivery = delivery_get($delivery_id);
-  $suppliers = '';
-  require_once('members.class.php');
-  $suppliers = new Members(array('producer' => 1));
+  require_once('products.class.php');
+  $products = new Products(array('producer_id' => $delivery->supplier->id, 'type' => array('v')));
   return array(
     'delivery' => $delivery,
-    'suppliers' => $suppliers
+    'type_v' => count($products),
   );
 }
 
@@ -41,7 +40,6 @@ function execute_products(){
   $item_id=get_request_param('item_id');
   $delivery=delivery_get($id);
   require_once('products.class.php');
-  $filter=array();
   $products=new Products(array('producer_id' => $delivery->supplier->id, 'type' => array('v','p','k')));
   return array('delivery'=>$delivery,'products'=>$products,'item_id'=>$item_id);
 }
