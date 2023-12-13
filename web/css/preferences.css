@@ -1,0 +1,19 @@
+.preferences > div{
+  padding: 0.5em;
+  border: 2px solid black;
+  border-right: none;
+  background-color: white;
+  color: #aaa;
+  cursor: pointer;
+}
+.preferences > div:last-child{
+  border-right: 2px solid black;
+}
+.preferences > div.checked{
+  box-shadow: 0 0 0 2px black;
+  border-right: 2px solid black;
+  color: #000;
+}
+.preferences > div > i{
+  font-size: 2em;
+}

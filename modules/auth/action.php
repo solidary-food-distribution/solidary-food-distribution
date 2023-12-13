@@ -11,15 +11,22 @@ function execute_login(){
 }
 
 function execute_login_ajax(){
+  $email = trim(get_request_param('email'));
+  $password = trim(get_request_param('password'));
   $error='';
-  require('users.class.php');
-  $users = new Users(array('email' => get_request_param('email')));
-  if(empty($users)){
-    $error='Unbekannte E-Mail-Adresse.';
-  }else{
-    $user = $users->first();
-    if(!$user->password_verify(trim(get_request_param('password')))){
-      $error='Falsches Passwort.';
+  if($email == '' || $password == ''){
+    $error = 'Bitte E-Mail-Adresse und Passwort eingeben.';
+  }
+  if(empty($error)){
+    require('users.class.php');
+    $users = new Users(array('email' => $email));
+    if(empty($users)){
+      $error='Unbekannte E-Mail-Adresse.';
+    }else{
+      $user = $users->first();
+      if(!$user->password_verify($password)){
+        $error='Falsches Passwort.';
+      }
     }
   }
   if(empty($error)){

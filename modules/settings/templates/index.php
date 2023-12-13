@@ -2,11 +2,9 @@
 $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen');
 ?>
 <div class="selection">
-  <?php if(0): ?>
   <div class="item" onclick="location.href='/preferences'">
     <span class="label">Präferenzen</span>
   </div>
-  <?php endif ?>
   <div class="item" onclick="location.href='/order'">
     <span class="label">Abholmengen</span>
   </div>
