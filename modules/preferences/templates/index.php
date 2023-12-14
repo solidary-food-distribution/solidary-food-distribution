@@ -3,6 +3,10 @@ $PROPERTIES['pathbar']=array(
   '/settings' => 'Einstellungen',
   '/preferences' => 'Präferenzen'
 );
+if(isset($delivery)){
+  unset($PROPERTIES['pathbar']['/settings']);
+  $PROPERTIES['pathbar'][''] = format_date($delivery->created,'j.n.Y').' '.$delivery->supplier->name;
+}
 $PROPERTIES['body_class']='header_h5';
 ?>
 
@@ -26,10 +30,10 @@ $PROPERTIES['body_class']='header_h5';
     <div class="col6 preferences">
       <?php
         $select = array(
-          3 => 'fa-regular fa-face-grin-stars',
-          2 => 'fa-regular fa-face-smile',
+          0 => 'fa-solid fa-ban',
           1 => 'fa-regular fa-face-meh',
-          0 => 'fa-solid fa-ban'
+          2 => 'fa-regular fa-face-smile',
+          3 => 'fa-regular fa-face-grin-stars'
         );
         if(!isset($preferences[$product->id])){
           $preferences[$product->id] = 2;

@@ -2,7 +2,10 @@ function auth_login(){
   $('#login').hide();
   $.ajax({
     type: 'POST',
-    data: {email: $('#email').val(), password: $('#password').val() },
+    data: {
+      email: $('#email').val(),
+      password: $('#password').val(),
+    },
     url: '/auth/login_ajax?ts='+get_ts(),
     dataType: "json",
     success: function(data) {
@@ -10,7 +13,14 @@ function auth_login(){
         $('#out').html(data.error);
         $('#out').show();
       }else{
-        location.href='/';
+        var url = '/';
+        if($('#_forward').val().trim().length){
+          url = $('#_forward').val();
+        }
+        if($('#_query').val().trim().length){
+          url += '?'+$('#_query').val();
+        }
+        location.href=url;
       }
       $('#login').show();
     }

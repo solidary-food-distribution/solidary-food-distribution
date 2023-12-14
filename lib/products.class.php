@@ -50,7 +50,6 @@ class Products extends ArrayObject{
     }else{
       $qry .= "ORDER BY status DESC,type,p.name";
     }
-    logger($qry);
     $res = SQL::selectID($qry, 'pid');
 
     $array = array();

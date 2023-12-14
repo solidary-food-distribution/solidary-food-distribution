@@ -7,7 +7,11 @@ function execute_login(){
     forward_to_page('/');
   }
   //_forward/_query: see inc.php ensure_authed_user() - TODO to be implemented
-  return array('email'=>get_request_param('email'), 'forward'=>get_request_param('_forward'), 'query'=>get_request_param('_query'));
+  return array(
+    'email' => get_request_param('email'), 
+    '_forward' => get_request_param('_forward'), 
+    '_query' => get_request_param('_query')
+  );
 }
 
 function execute_login_ajax(){

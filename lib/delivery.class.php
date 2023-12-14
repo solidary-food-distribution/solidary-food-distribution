@@ -53,13 +53,3 @@ class Delivery{
     SQL::update($qry);
   }
 }
-
-
-function delivery_get($id){
-  require_once('deliveries.class.php');
-  $deliveries = new Deliveries(array('id' => $id));
-  if(!empty($deliveries)){
-    return $deliveries->first();
-  }
-  return null;
-}

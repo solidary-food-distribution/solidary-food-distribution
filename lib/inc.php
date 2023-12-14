@@ -29,6 +29,7 @@ function user_ensure_authed(){
     if(!empty($_REQUEST)){
       $request=$_REQUEST;
       unset($request['password']); //never expose password
+      unset($request['index_path']); //not needed
       $forward.='&_query='.urlencode(http_build_query($request));
     }
     if(!empty($forward)){
@@ -174,12 +175,13 @@ function format_date($date, $format='j.n.Y', $weekday=true){
   return $ret;
 }
 
-function send_email($to,$subject,$text){
-  $header='From: buchen@mit-sinn-leben.de'."\r\n".
+function send_email($to, $subject, $text){
+  $header='From: "Mit Sinn Leben eG" <buchen@mit-sinn-leben.de>'."\r\n".
     'Reply-To: buchen@mit-sinn-leben.de'."\r\n".
     'Content-Type: text/plain;charset=UTF-8'."\r\n".
     'X-Mailer: PHP/' . phpversion();
-  mail($to,$subject,$text,$header);
+  logger("send_email $to $subject");
+  mail($to, $subject, $text, $header);
 }
 
 function html_input($data){

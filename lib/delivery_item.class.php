@@ -18,6 +18,9 @@ class DeliveryItem{
   public float $weight_avg;
 
   public function update( array $updates = array() ){
+    global $user;
+    $updates['modified'] = date('Y-m-d H:i:s');
+    $updates['modifier_id'] = $user['user_id'];
     require_once('sql.class.php');
     $qry = 
       "UPDATE msl_delivery_items SET ";
