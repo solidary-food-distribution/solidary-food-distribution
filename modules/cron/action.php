@@ -15,7 +15,6 @@ function execute_run(){
       SQL::update($qry);
     }
   }
-  echo "1";
   exit;
 }
 
