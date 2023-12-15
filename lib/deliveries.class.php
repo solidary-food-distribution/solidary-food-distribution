@@ -111,7 +111,7 @@ class Deliveries extends ArrayObject{
 
 function delivery_get($id){
   require_once('deliveries.class.php');
-  $deliveries = new Deliveries(array('delivery_id' => $id));
+  $deliveries = new Deliveries(array('id' => $id));
   if(!empty($deliveries)){
     return $deliveries->first();
   }
