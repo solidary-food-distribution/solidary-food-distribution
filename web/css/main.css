@@ -63,7 +63,7 @@ select{
   padding: 0;
 }
 
-input{
+input:not([type='radio']):not([type='checkbox']){
   border: 1px solid black;
   font-family: Garamond,Arial,sans-serif;
   font-size: 1em;
@@ -185,6 +185,9 @@ div.mr1{
   margin-top: 40%;
   font-size: 0.8em;
 }
+.selection .item.selected .label{
+  
+}
 .selection .break {
   flex-basis: 100%;
   height: 0.5em;
@@ -193,6 +196,10 @@ div.mr1{
 
 .controls{
   margin-top: 0.5em;
+  display: flex;
+}
+.filters{
+  margin: 0.5em;
   display: flex;
 }
  .button, .input, .controls .control, .control_l, .control_m, .control_r{
@@ -224,6 +231,15 @@ div.mr1{
 }
 .input.options .option:last-child{
   border-right: none;
+}
+.input.options .option:before{
+  font-family: "Font Awesome 6 Free";
+  content: "\f111";
+  display:inline-block;
+  margin-right: 0.2em;
+}
+.input.options .option.selected:before{
+  content: "\f192";
 }
 .input.money, .input.amount_weight, .input.amount_pieces, .input.string{
   text-align: right;
@@ -318,7 +334,10 @@ div.mr1{
 .row .col7,
 .row .col8,
 .row .col9,
-.row .col10{
+.row .col10,
+.row .col11,
+.row .col12,
+.row .col13{
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
@@ -352,6 +371,15 @@ div.mr1{
 }
 .row .col10{
   width: 22em;
+}
+.row .col11{
+  width: 24.2em;
+}
+.row .col12{
+  width: 26.4em;
+}
+.row .col13{
+  width: 28.6em;
 }
 /*ROW END*/
 
@@ -526,7 +554,7 @@ div.mr1{
 #keyboard_options.keyboard_keys > div > div{
   min-width: 16em;
 }
-#keyboard_options .checked{
+#keyboard_options .selected{
   box-shadow: 0 0 0 2px black;
 }
 .keyboard_keys > div > div.active{

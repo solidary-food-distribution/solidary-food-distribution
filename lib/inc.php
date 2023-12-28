@@ -203,17 +203,29 @@ function html_input($data){
     $return .= ' data-url="'.$data['url'].'"';
   }
   if(isset($data['field'])){
-    $return .= ' data-field="'.$data['field'].'" onclick="input_onfocus(this)"';
+    $return .= ' data-field="'.$data['field'].'"';
+    if(!isset($data['onclick'])){
+      $return .= ' onclick="input_onfocus(this)"';
+    }
+  }
+  if(isset($data['onclick']) && !isset($data['options'])){
+    $return .= ' onclick="'.$data['onclick'].'(this)"';
   }
   $return .= '>';
   if(isset($data['options'])){
     foreach($data['options'] as $value => $label){
       $id = $data['field'].'_'.$value;
-      $return .= '<div class="option"><input type="radio" name="'.$data['field'].'" id="'.$id.'" value="'.$value.'"';
+      $return .= '<div class="option';
       if($data['value'] == $value){
-        $return .= ' checked="checked"';
+        $return .= ' selected';
       }
-      $return .= ' /><label for="'.$id.'">'.htmlentities($label).'</label></div>';
+      $return.='"';
+      if(!isset($data['onclick'])){
+        $data['onclick']='input_option_select';
+      }
+      $return .= ' onclick="'.$data['onclick'].'(this)"';
+      $return .= ' data-value="'.htmlentities($value).'">';
+      $return .= '<span>'.htmlentities($label).'</span></div>';
     }
   }elseif(isset($data['value'])){
     $return .= $data['value'];

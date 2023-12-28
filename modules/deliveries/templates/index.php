@@ -23,7 +23,7 @@ $PROPERTIES['body_class']='header_h5';
     </div>
     <div class="col10">
       <div>
-        <?php /*echo count($delivery->items) ?> Position<?php echo count($delivery->items)==1?'':'en'*/ 
+        <?php
           $items = '';
           foreach($delivery->items as $item){
             $items .= $item->product->name.', ';

@@ -106,10 +106,28 @@ function execute_update_ajax(){
     $delivery = delivery_get($delivery_id);
     $item = $delivery->items[$item_id];
     $item->update(array($field => $value));
+    inventory_update($item->id, $item->product_id, array($field => $value));
   }else if($delivery_id){
     $delivery = delivery_get($delivery_id);
     $delivery->update(array($field => $value));
   }
   echo json_encode(array('value' => $value));
   exit;
+}
+
+function inventory_update($delivery_item_id, $product_id, $updates){
+  require_once('inventories.class.php');
+  $objects = new Inventories(array('delivery_item_id' => $delivery_item_id));
+  if(count($objects)){
+    $inventory = $objects->first();
+  }else{
+    $id = Inventories::create($delivery_item_id, $product_id);
+    $inventory = inventory_get($id);
+  }
+  foreach($updates as $field=>$value){
+    if(!isset($inventory->{$field})){
+      unset($updates[$field]);
+    }
+  }
+  $inventory->update($updates);
 }

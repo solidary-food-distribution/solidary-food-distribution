@@ -4,9 +4,9 @@
       <span class="label">Lieferungen</span>
     </div>
   <?php endif ?>
-  <?php if(0): ?>
+  <?php if(user_has_access('pickups')): ?>
   <div class="item" onclick="location.href='/pickups'">
-    <span class="label">Abholung</span>
+    <span class="label">Abholungen</span>
   </div>
   <?php endif ?>
   <div class="item" onclick="location.href='/activities'">

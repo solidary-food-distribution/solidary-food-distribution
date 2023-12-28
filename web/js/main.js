@@ -92,11 +92,11 @@ function active_input_post_value(){
     }
     return;
   }
-  console.log("active_input_post_value "+input.data('field'));
+  //console.log("active_input_post_value "+input.data('field'));
   var type = input.data('type');
   var value = '';
   if(type == 'options'){
-    value = input.find('input[type="radio"]').val();
+    value = input.find('.option.selected').data('value');
   }else{
     value = input.text().trim();
   }
@@ -129,7 +129,15 @@ function active_input_post_value(){
   });
 }
 
-
+function input_option_select(el){
+  var input = $(el).closest('.input');
+  input.find('.option.selected').removeClass('selected');
+  $(el).addClass('selected');
+  event.stopPropagation();
+  active_input_post_value();
+  input.removeClass('active');
+  input.click();
+}
 
 var highlight_inputs=[];
 function highlight_input(el){
@@ -158,7 +166,6 @@ function highlight_input_timer(){
 }
 
 
-
 function keyboard_show(el){
   var type = $(el).data('type');
   $('#keyboard_window').removeClass().addClass(type);
@@ -170,9 +177,10 @@ function keyboard_show(el){
   }else if(type == 'options'){
     $('#keyboard_options').html('');
     $(el).find('.option').each(function(){
-      var input = $(this).find('input[type="radio"]');
-      var label = $(this).find('label');
-      var option = $('<div><div onclick="keyboard_option(\''+$(input).attr('id')+'\')" class="'+($(input).is(':checked')?'checked':'')+'"><span>'+$(label).html()+'</span></div></div>');
+      var value = $(this).data('value');
+      var selected = $(this).hasClass('selected');
+      var label = $(this).find('span');
+      var option = $('<div><div onclick="keyboard_option(this)" data-value="'+value+'" class="option '+(selected?'selected':'')+'"><span>'+$(label).html()+'</span></div></div>');
       $('#keyboard_options').append(option);
     });
     $('#keyboard_options').show();
@@ -236,8 +244,11 @@ function keyboard_ok(){
   $('.button.ok').click();
 }
 
-function keyboard_option(radio_id){
-  $('#'+radio_id).click();
+function keyboard_option(el){
+  var input = $('.input.active');
+  $(input).find('.option[data-value="'+$(el).data('value')+'"]').click();
+  $('#keyboard_options').find('.option.selected').removeClass('selected');
+  $(el).addClass('selected');
   keyboard_next_input();
 }
 
@@ -349,7 +360,4 @@ function keyboard_next_input(){
   }
   inputs[index].click();
 }
-
-
-
 
