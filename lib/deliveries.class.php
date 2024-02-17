@@ -47,8 +47,20 @@ class Deliveries extends ArrayObject{
     if(!empty($filters)){
       $qry .= "AND ".SQL::buildFilterQuery($filters);
     }
-    $qry .=
-      "ORDER BY d.id,di.id";
+    if(empty($orderby)){
+      $orderby = array('d.id' => 'ASC', 'di.id' => 'ASC');
+    }
+    $qry .= 
+      " ORDER BY ".SQL::buildOrderbyQuery($orderby);
+
+    if($limit_start > 0 || $limit_count >= 0){
+      if($limit_count < 0){
+        $limit_count = 9999;
+      }
+      $qry .=
+        " LIMIT ".intval($limit_start).", ".intval($limit_count);
+    }
+
     $ds=SQL::selectID2($qry,'delivery_id','di_id');
     $deliveries = array();
     foreach($ds as $d_id=>$d){

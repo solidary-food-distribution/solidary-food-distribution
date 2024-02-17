@@ -1,0 +1,47 @@
+.row .inner_row{
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+}
+
+
+#pin{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#pin_window{
+  position: relative;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 3px solid black;
+  border-radius: 1em;
+}
+
+#pin_header{
+  margin: 0.5em;
+  display: flex;
+  position: relative;
+  justify-content: center;
+}
+
+#pin_title{
+  display: inline-block;
+  font-size: 1.5em;
+  margin: 0em;
+  text-align: center;
+}
+
+.keyboard_keys.icons i{
+  font-size: 2.5em;
+  margin: 0.25em;
+  color: #37662d;
+}
+.keyboard_keys.icons div.disabled{
+  border-color: #aaaaaa;
+  cursor: unset;
+}
+.keyboard_keys.icons div.disabled i{
+  color: #aaaaaa;
+}

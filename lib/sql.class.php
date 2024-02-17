@@ -14,12 +14,13 @@ if(mysqli_connect_errno()){
 class SQL{
   static function update($qry){
     global $mysqli, $MODULE, $ACTION, $user;
+    file_put_contents(__DIR__.'/../log/sql_update.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']." update\n$qry\n\n",FILE_APPEND);
     $res=mysqli_query($mysqli,$qry);
     if(!$res){
       self::log($qry);
       return false;
     }
-    file_put_contents(__DIR__.'/../log/sql_update.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']." update\n$qry\n\n",FILE_APPEND);
+    
     return self::affected_rows();
   }
   static function insert($qry){
@@ -123,8 +124,12 @@ class SQL{
       if(is_array($value)){
         $qry .= ' IN ('.SQL::escapeArray($value).') ';
       }else{
-        if(strpos($field, '%') !== false){
+        if(strpos($value, '%') !== false){
           $qry .= " LIKE ";
+        }elseif(substr($field, -2, 2) == '<=' || substr($field, -2, 2) == '>=' || substr($field, -2, 2) == '!='){
+          $qry .= substr($field, -2, 2);
+        }elseif(substr($field, -1, 1) == '<' || substr($field, -1, 1) == '>'){
+          $qry .= substr($field, -1, 1);
         }else{
           $qry .= " = ";
         }

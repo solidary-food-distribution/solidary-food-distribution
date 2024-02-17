@@ -15,7 +15,7 @@
     </div>
     <div class="inner_row mt1">
       <div class="col4">
-        <div id="login" class="button" onclick="location.href='/auth/login?email='+$('#email').val();">Abbrechen</div>
+        <div id="login" class="button" onclick="location.href='<?php echo $cancel ?>';">Abbrechen</div>
       </div>
       <div class="col4 right last">
         <div id="password_lost" class="button" onclick="auth_password_lost()">Passwort zurücksetzen</div>

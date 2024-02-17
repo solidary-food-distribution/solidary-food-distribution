@@ -13,9 +13,7 @@ $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen');
     <span class="label">Zugriff</span>
   </div>
   <?php endif ?>
-  <?php if(0): ?>
-  <div class="item" onclick="location.href='/account'">
-    <span class="label">Konto</span>
+  <div class="item" onclick="location.href='/user'">
+    <span class="label">Zugangsdaten</span>
   </div>
-  <?php endif ?>
 </div>

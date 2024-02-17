@@ -48,8 +48,12 @@ function execute_logout(){
 }
 
 function execute_password_lost(){
-  $email=trim(get_request_param('email'));
-  return array('email'=>$email);
+  $email = trim(get_request_param('email'));
+  $cancel = get_request_param('cancel');
+  if($cancel == ''){
+    $cancel = '/auth/login?email='.urlencode($email);
+  }
+  return array('email' => $email, 'cancel' => $cancel);
 }
 
 function execute_password_lost_ajax(){

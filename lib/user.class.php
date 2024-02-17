@@ -11,6 +11,9 @@ class User{
   public $members=array();
 
   public function password_verify($password){
+    if($this->password == $password && trim($password)!==''){
+      return true;
+    }
     return password_verify($password, $this->password);
   }
 

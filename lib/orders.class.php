@@ -48,10 +48,10 @@ class Orders extends ArrayObject{
     }else{
       $qry .= "ORDER BY status DESC,period DESC,type,p.name";
     }
-    $recset = SQL::selectID($qry, 'pid');
+    $recset = SQL::select($qry);
 
     $array = array();
-    foreach($recset as $pid => $row){
+    foreach($recset as $row){
       $order = new Order();
       $order->product = new Product();
       $order->product->id = intval($row['pid']);
@@ -78,7 +78,7 @@ class Orders extends ArrayObject{
         $order->member->id = intval($member_ids[0]);
       }
       $order->amount = floatval($row['amount']);
-      $order->lock_date = $row['lock_date']; //REFACTOR new DateTime($row['lock_date']);
+      $order->lock_date = (string)$row['lock_date']; //REFACTOR new DateTime($row['lock_date']);
       $array[$row['pid'].'-'.$row['member_id']]=$order;
     }
     return $array;

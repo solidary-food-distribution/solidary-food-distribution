@@ -1,16 +1,15 @@
 <div class="selection">
-  <?php if(user_has_access('deliveries')): ?>
-    <div class="item" onclick="location.href='/deliveries'">
-      <span class="label">Lieferungen</span>
+  <?php if(user_has_access('deliveries') || user_has_access('inventory')): ?>
+    <div class="item" onclick="location.href='/store'">
+      <span class="label">Abholraum</span>
+    </div>
+  <?php elseif(user_has_access('pickups')): ?>
+    <div class="item" onclick="location.href='/pickups'">
+      <span class="label">Abholungen</span>
     </div>
   <?php endif ?>
-  <?php if(user_has_access('pickups')): ?>
-  <div class="item" onclick="location.href='/pickups'">
-    <span class="label">Abholungen</span>
-  </div>
-  <?php endif ?>
-  <div class="item" onclick="location.href='/activities'">
-    <span class="label">Aktivitäten</span>
+  <div class="item" onclick="location.href='/timesheet'">
+    <span class="label">Arbeitszeiten</span>
   </div>
   <div class="item" onclick="location.href='/settings'">
     <span class="label">Einstellungen</span>

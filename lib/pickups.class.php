@@ -43,7 +43,8 @@ class Pickups extends ArrayObject{
       "SELECT pu.id AS pickup_id, pu.status AS pu_status, m.id AS member_id, m.name AS member_name, pu.created AS pu_created, u.id AS user_id, u.name AS user_name, ".
         "pui.id AS pui_id, pui.delivery_id, pui.product_id, pui.amount_pieces, pui.amount_weight, ".
         "pui.price_type, pui.price, pui.price_sum, pui.best_before, pui.preference_value, ".
-        "p.pid AS p_id, p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type ".
+        "p.pid AS p_id, p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type, ".
+        "(SELECT amount FROM msl_orders o WHERE o.member_id=m.id AND o.pid=pui.product_id) AS amount_order ".
       "FROM msl_members m, msl_users u, msl_pickups pu ".
         "LEFT JOIN msl_pickup_items pui ON (pu.id = pui.pickup_id) ".
         "LEFT JOIN msl_products p ON (pui.product_id = p.pid) ".
@@ -53,7 +54,7 @@ class Pickups extends ArrayObject{
       $qry .= "AND ".SQL::buildFilterQuery($filters);
     }
     $qry .=
-      "ORDER BY pu.id,pui.id";
+      "ORDER BY pu.id, (CASE WHEN p_type='v' THEN 2 WHEN p_type='k' THEN 1 ELSE 0 END), p_name, pui.id";
     $pus=SQL::selectID2($qry,'pickup_id','pui_id');
     $pickups = array();
     foreach($pus as $pu_id=>$pu){
@@ -77,6 +78,7 @@ class Pickups extends ArrayObject{
         $item = new PickupItem();
         $item->id = intval($pui_id);
         $item->product_id = intval($pui['p_id']);
+        $item->amount_order = floatval($pui['amount_order']);
         $item->amount_pieces = floatval($pui['amount_pieces']);
         $item->amount_weight = floatval($pui['amount_weight']);
         $item->price_type = $pui['price_type'];
@@ -110,8 +112,8 @@ class Pickups extends ArrayObject{
 }
 
 
-function pickup_get($id){
-  $objects = new Pickups(array('id' => $id));
+function pickup_get($id, $member_id){
+  $objects = new Pickups(array('id' => $id, 'member_id' => $member_id));
   if(!empty($objects)){
     return $objects->first();
   }

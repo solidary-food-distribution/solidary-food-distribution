@@ -1,5 +1,6 @@
 function document_ready(){
   //var mobile=is_mobile();
+  //calc_scroll_filler();
 }
 
 function is_mobile(){
@@ -31,35 +32,31 @@ function replace_header_main_footer(html){
   $('#main').html(html);
 }
 
-
-
-function ajax_id_replace(id, url){
-  $.ajax({
-    type: 'POST',
-    url: url,
-    dataType: 'html',
-    success: function(html){
-      $('#'+id).replaceWith(html);
-    }
-  });
+/*
+var calc_scroll_filler_do = false;
+function calc_scroll_filler(){
+  if(!calc_scroll_filler_do){
+    return;
+  }
+  calc_scroll_filler_do = false;
+  var scroll_filler = $('#scroll_filler');
+  if(!scroll_filler.length){
+    return;
+  }
+  var rows = $('#main .row:visible');
+  if(!rows.length){
+    return;
+  }
+  var main_sec_height = $('main').height();
+  var last_row = rows.last();
+  var last_row_height = (last_row.outerHeight()*1.95) - last_row.height();
+  var height = main_sec_height - last_row_height;
+  scroll_filler.height(height);
 }
+*/
 
-function ajax_field_update(id, field, url){
-  var value = $('#'+id).val();
-  $.ajax({
-    type: 'POST',
-    data: {
-      field: field,
-      value: value
-    },
-    url: url,
-    dataType: 'json',
-    success: function(data){
-      if(data && data.value){
-        $('#'+id).val(data.value);
-      }
-    }
-  });
+function format_money(value){
+  return value.toFixed(2).toString().replace('.', ',');
 }
 
 function validate_money(id){
@@ -222,6 +219,8 @@ function keyboard_key(key){
     keyboard_input_change(key);
   }else if(key == 'Ok'){
     keyboard_ok();
+  }else if(key == 'Close'){
+    keyboard_close();
   }else if(key == 'Shift Tab'){
     keyboard_prev_input();
   }else if(key == 'Tab'){
@@ -240,8 +239,19 @@ function keyboard_key(key){
   return true;
 }
 
+var keyboard_ok_func = 0;
 function keyboard_ok(){
+  if(keyboard_ok_func){
+    keyboard_ok_func();
+  }
   $('.button.ok').click();
+}
+
+var keyboard_close_func = 0;
+function keyboard_close(){
+  if(keyboard_close_func){
+    keyboard_close_func();
+  }
 }
 
 function keyboard_option(el){
