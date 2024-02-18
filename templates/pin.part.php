@@ -3,7 +3,11 @@
 require_once('pin.include.php');
 
 $icons = PIN_ICONS;
-shuffle($icons); //0-31, no key preserve
+if(!isset($noshuffle)){
+  shuffle($icons); //0-31, no key preserve
+}else{
+  $icons=array_values($icons);
+}
 $pin_ids = array_flip(PIN_ICONS);
 
 ?>
@@ -24,7 +28,7 @@ $pin_ids = array_flip(PIN_ICONS);
     <?php endfor ?>
     <div class="keyboard_keys">
       <div>
-        <div onclick="pin_cancel()"><span><i class="fa-solid fa-xmark"></i></span></div>
+        <div id="pin_cancel_button" onclick="pin_cancel()"><span><i class="fa-solid fa-xmark"></i></span></div>
         <div id="pin_backspace_button" onclick="pin_backspace()"><span><i class="fa-solid fa-delete-left"></i></span></div>
         <div id="pin_ok_button" onclick="pin_ok()"><span><i class="fa-solid fa-check"></i></span></div>
       </div>

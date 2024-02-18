@@ -18,6 +18,18 @@ class User{
   }
 
   public function set_session(){
+    if($_SESSION['scale']){
+      $scale_access = array(
+        'deliveries' => 1,
+        'pickups' => 1,
+        'inventory' => 1
+      );
+      foreach($this->access as $access => $data){
+        if(!isset($scale_access[$access])){
+          unset($this->access[$access]);
+        }
+      }
+    }
     $_SESSION['user']=array(
       'user_id'=>$this->id,
       'name'=>$this->name,

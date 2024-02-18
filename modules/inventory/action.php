@@ -2,7 +2,7 @@
 
 require_once('inc.php');
 user_ensure_authed();
-user_needs_access('deliveries');
+user_needs_access('inventory');
 
 require_once('deliveries.class.php');
 

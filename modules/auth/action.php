@@ -6,7 +6,13 @@ function execute_login(){
   if(isset($_SESSION['user'])){
     forward_to_page('/');
   }
-  //_forward/_query: see inc.php ensure_authed_user() - TODO to be implemented
+  $scale = get_request_param('scale');
+  if($scale == '1'){
+    $_SESSION['scale'] = 1;
+  }elseif($scale == '0'){ //explicit!
+    $_SESSION['scale'] = 0;
+  }
+  //_forward/_query: see inc.php ensure_authed_user()
   return array(
     'email' => get_request_param('email'), 
     '_forward' => get_request_param('_forward'), 
@@ -24,7 +30,8 @@ function execute_login_ajax(){
   if(empty($error)){
     require('users.class.php');
     $users = new Users(array('email' => $email));
-    if(empty($users)){
+    logger(print_r($users, 1));
+    if(empty($users->keys())){
       $error='Unbekannte E-Mail-Adresse.';
     }else{
       $user = $users->first();
@@ -42,8 +49,41 @@ function execute_login_ajax(){
   exit;
 }
 
+function execute_login_pin_ajax(){
+  $pickup_pin = get_request_param('pickup_pin');
+  $pickup_pin = explode(',', $pickup_pin);
+  if(count($pickup_pin)<3 || count($pickup_pin)>6){
+    exit;
+  }
+  $pin = '';
+  foreach($pickup_pin as $id){
+    $id = intval($id);
+    if($id<=0 || $id>32){
+      exit;
+    }
+    $pin .= str_pad($id, 2, '0', STR_PAD_LEFT);
+  }
+  $error = '';
+  require('users.class.php');
+  $users = new Users(array('pickup_pin' => $pin));
+  logger(print_r($users, 1));
+  if(empty($users->keys())){
+    $error = 'Unbekannte PIN';
+  }
+  if(empty($error)){
+    $_SESSION['scale'] = 1;
+    $user = $users->first();
+    $user->set_session();
+    logger(print_r($_SESSION['user'],1));
+  }
+  echo json_encode(array('error' => $error));
+  exit;
+}
+
 function execute_logout(){
+  $scale = $_SESSION['scale'];
   session_unset();
+  $_SESSION['scale'] = $scale;
   forward_to_page('/');
 }
 
