@@ -11,7 +11,8 @@ function execute_index(){
   $users=user_has_access('users');
   $orders=user_has_access('orders');
   $debits=user_has_access('debits');
-  if(!$products && !$members && !$users && !$orders && !$debits){
+  $remote=user_has_access('remote');
+  if(!$products && !$members && !$users && !$orders && !$debits && !$remote){
     forward_to_noaccess();
   }
   return array(
@@ -19,5 +20,7 @@ function execute_index(){
     'members'=>$members,
     'users'=>$users,
     'orders'=>$orders,
-    'debits'=>$debits);
+    'debits'=>$debits,
+    'remote'=>$remote,
+  );
 }
