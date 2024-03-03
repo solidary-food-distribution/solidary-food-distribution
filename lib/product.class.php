@@ -18,7 +18,7 @@ class Product{
   public float $price;
   public float $tax;
   public bool $tax_incl;
-  public float $price_sale;
+  public float $purchase;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

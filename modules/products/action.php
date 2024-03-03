@@ -37,6 +37,7 @@ function execute_update_ajax(){
     $value = number_format(floatval($value), 2, '.', '');
   }
   $product = product_get($product_id);
+  
   $updates = array($field => $value);
   $product->update($updates);
   echo json_encode(array('value' => $value));

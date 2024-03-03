@@ -50,11 +50,11 @@ $PROPERTIES['pathbar']=array(
     <div class="amount">
       EK <?php 
         echo html_input(array(
-          'field' => 'price',
+          'field' => 'purchase',
           'type' => 'money',
           'info' => 'EK-Preis ohne Steuer',
           'url' => '/products/update_ajax?product_id='.$product->id,
-          'value' => $product->price,
+          'value' => $product->purchase,
         )).' EUR';
       ?>
       <br>
@@ -74,11 +74,11 @@ $PROPERTIES['pathbar']=array(
     <div>
       VK <?php 
         echo html_input(array(
-          'field' => 'price_sale',
+          'field' => 'price',
           'type' => 'money',
           'info' => 'VK-Preis inkl. Steuer',
           'url' => '/products/update_ajax?product_id='.$product->id,
-          'value' => $product->price_sale,
+          'value' => $product->price,
         )).' EUR';
       ?>
     </div>

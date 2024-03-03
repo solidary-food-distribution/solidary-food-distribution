@@ -25,18 +25,24 @@
   </div>
   <div class="col3">
     <div class="amount">
-      <span title="EK ohne Steuer"><?php echo format_money($product->price) ?> EUR</span><br>
+      <span title="EK ohne Steuer"><?php echo format_money($product->purchase) ?> EUR</span><br>
       <span title="Steuer"><?php echo $product->tax ?>%</span><br>
-      <span title="EK inkl. Steuer"><?php $price_incl_tax = $product->price * (100 + $product->tax)/100;
-        echo format_money($price_incl_tax) 
+      <span title="EK inkl. Steuer"><?php $purchase_incl_tax = $product->purchase * (100 + $product->tax)/100;
+        echo format_money($purchase_incl_tax) 
       ?> EUR</span>
     </div>
   </div>
   <div class="col3 right">
     <div class="amount">
-      <span title="VK inkl. Steuer"><?php echo format_money($product->price_sale) ?> EUR</span><br>
+      <span title="VK inkl. Steuer"><?php echo format_money($product->price) ?> EUR</span><br>
       <br>
-      <span title="Marge"><?php echo round(round($product->price_sale / $price_incl_tax, 2) * 100, 2)-100 ?>%</span>
+      <span title="Marge"><?php
+        $margin = 0;
+        if($purchase_incl_tax){
+          $margin = round(round($product->price / $purchase_incl_tax, 2) * 100, 2)-100;
+        }
+        echo $margin;
+      ?>%</span>
     </div>
   </div>
   <div class="col1 right last">
