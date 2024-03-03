@@ -18,13 +18,14 @@ class Product{
   public float $price;
   public float $tax;
   public bool $tax_incl;
+  public float $price_sale;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');
     $qry = 
-      "UPDATE msl_products SET ";
+      "UPDATE msl_products p, msl_prices pr SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';
-    $qry .= "WHERE pid='".intval($this->id)."'";
+    $qry .= "WHERE p.pid=pr.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE() AND p.pid='".intval($this->id)."'";
     SQL::update($qry);
   }
 

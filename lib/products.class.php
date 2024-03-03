@@ -37,7 +37,7 @@ class Products extends ArrayObject{
     require_once('sql.class.php');
     $qry = 
       "SELECT p.*, ".
-        "pr.price, pr.tax, pr.tax_incl, ".
+        "pr.price, pr.tax, pr.tax_incl, pr.price_sale, ".
         "mp.name AS mp_name ".
       "FROM msl_members mp, msl_products p LEFT JOIN msl_prices pr ON (pr.pid=p.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE()) ".
       "WHERE mp.id=p.producer_id ".
@@ -50,6 +50,7 @@ class Products extends ArrayObject{
     }else{
       $qry .= "ORDER BY status DESC,type,p.name";
     }
+    #logger($qry);
     $res = SQL::selectID($qry, 'pid');
 
     $array = array();
@@ -69,6 +70,7 @@ class Products extends ArrayObject{
       $product->price = floatval($row['price']);
       $product->tax = floatval($row['tax']);
       $product->tax_incl = boolval($row['tax_incl']);
+      $product->price_sale = floatval($row['price_sale']);
       $array[$pid]=$product;
     }
     return $array;
