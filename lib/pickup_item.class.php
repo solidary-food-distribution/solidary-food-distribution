@@ -5,7 +5,7 @@ require_once('product.class.php');
 
 class PickupItem{
   public int $id;
-  public int $delivery_id;
+  public int $delivery_item_id;
   public Product $product;
   public float $amount_pieces;
   public float $amount_weight;

@@ -44,7 +44,7 @@ function update_pickup_items($pickup_id){
   require_once('sql.class.php');
   $qry = "SELECT o.pid, p.type, p.producer_id, o.amount, ".
     "SUM(i.amount_pieces) AS i_amount_pieces, SUM(i.amount_weight) AS i_amount_weight, ".
-    "MAX(di.price_type) AS di_price_type, MAX(di.price) AS di_price ".
+    "i.delivery_item_id, MAX(di.price_type) AS di_price_type, MAX(di.price) AS di_price ".
     "FROM msl_orders o, msl_products p ".
       "LEFT JOIN msl_inventory i ON (p.pid=i.product_id) ".
       "LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
@@ -58,7 +58,7 @@ function update_pickup_items($pickup_id){
       continue;
     }
     if(!isset($pickup_items[$o['pid']])){
-      $item = $pickup->item_create($o['pid']);
+      $item = $pickup->item_create($o['pid'], $o['delivery_item_id']);
       $item->update(array(
         'price_type' => $o['type'],
         'price' => $o['di_price'],
@@ -69,7 +69,7 @@ function update_pickup_items($pickup_id){
   #logger(print_r($type_b_producer_ids,true));
 
   $qry = "SELECT i.product_id, p.producer_id, i.amount_weight, i.amount_pieces, ".
-      "di.price_type di_price_type, di.price AS di_price ".
+      "i.delivery_item_id, di.price_type di_price_type, di.price AS di_price ".
     "FROM msl_products p, msl_inventory i ".
     " LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
     "WHERE i.product_id=p.pid AND p.type='v' AND p.producer_id IN (".SQL::escapeArray(array_keys($type_b_producer_ids)).") ".
@@ -77,7 +77,7 @@ function update_pickup_items($pickup_id){
   $vproducts = SQL::select($qry);
   foreach($vproducts as $p){
     if(!isset($pickup_items[$p['product_id']])){
-      $item = $pickup->item_create($p['product_id']);
+      $item = $pickup->item_create($p['product_id'], $p['delivery_item_id']);
       $item->update(array(
         'price_type' => $p['di_price_type'],
         'price' => $p['di_price'],
@@ -118,11 +118,38 @@ function execute_update_ajax(){
       'price_sum' => round($value * $item->price, 2)
     );
     $item->update($updates);
+    inventory_update($item->id, $item->product_id, array($field => $value));
   }
   $return = execute_index();
   $return['template']='index.php';
   $return['layout']='layout_null.php';
   return $return;
+}
+
+function inventory_update($pickup_item_id, $product_id, $updates){
+  require_once('inventories.class.php');
+  $objects = new Inventories(array('pickup_item_id' => $pickup_item_id));
+  if(count($objects)){
+    $inventory = $objects->first();
+  }else{
+    $id = Inventories::create(0, $pickup_item_id, $product_id);
+    $inventory = inventory_get($id);
+  }
+  foreach($updates as $field=>$value){
+    if(!isset($inventory->{$field})){
+      unset($updates[$field]);
+    }
+  }
+  if(!empty($updates)){
+    if(isset($updates['amount_pieces'])){
+      $updates['amount_pieces'] *= -1;
+    }
+    if(isset($updates['amount_weight'])){
+      $updates['amount_weight'] *= -1;
+    }
+    #logger(print_r($updates,1));
+    $inventory->update($updates);
+  }
 }
 
 function get_info_others(){

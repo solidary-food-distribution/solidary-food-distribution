@@ -40,6 +40,7 @@ $pickup_variable_sum = 0;
           'class' => 'filter',
           'onclick' => 'filter_options',
           'type' => 'options',
+          'field' => 'product_type',
           'value' => $product_type,
           'options' => $options,
         ));

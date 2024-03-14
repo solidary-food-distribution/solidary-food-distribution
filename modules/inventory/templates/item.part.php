@@ -9,11 +9,9 @@
       <div class="name">
         <b><?php echo $item->product->name ?></b>
       </div>
-      <?php if($item->product->producer->id != $delivery->supplier->id): ?>
-        <div class="producer">
-          <?php echo $item->product->producer->name ?>
-        </div>
-      <?php endif ?>
+      <div class="producer">
+        <?php echo $item->product->producer->name ?>
+      </div>
     </div>
   </div>
   <div class="col4">
@@ -60,7 +58,7 @@
     </div>
   </div>
   <div class="col1 right last">
-    <span class="button" onclick="location.href='/delivery/item_edit?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>';">
+    <span class="button large" onclick="location.href='/inventory/edit?product_id=<?php echo $item->product->id ?>';">
       <i class="fa-solid fa-pencil"></i>
     </span>
   </div>

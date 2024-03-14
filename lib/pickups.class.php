@@ -41,7 +41,7 @@ class Pickups extends ArrayObject{
     require_once('sql.class.php');
     $qry=
       "SELECT pu.id AS pickup_id, pu.status AS pu_status, m.id AS member_id, m.name AS member_name, pu.created AS pu_created, u.id AS user_id, u.name AS user_name, ".
-        "pui.id AS pui_id, pui.delivery_id, pui.product_id, pui.amount_pieces, pui.amount_weight, ".
+        "pui.id AS pui_id, pui.delivery_item_id, pui.product_id, pui.amount_pieces, pui.amount_weight, ".
         "pui.price_type, pui.price, pui.price_sum, pui.best_before, pui.preference_value, ".
         "p.pid AS p_id, p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type, ".
         "(SELECT amount FROM msl_orders o WHERE o.member_id=m.id AND o.pid=pui.product_id) AS amount_order ".
@@ -77,6 +77,7 @@ class Pickups extends ArrayObject{
         }
         $item = new PickupItem();
         $item->id = intval($pui_id);
+        $item->delivery_item_id = intval($pui['delivery_item_id']);
         $item->product_id = intval($pui['p_id']);
         $item->amount_order = floatval($pui['amount_order']);
         $item->amount_pieces = floatval($pui['amount_pieces']);

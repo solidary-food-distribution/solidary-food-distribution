@@ -12,18 +12,19 @@ class Pickup{
   public DateTime $created;
   public $price_total;
   public $status;
-  public array $items = array(); //class DeliveryItem
+  public array $items = array(); //class PickupItem
 
-  public function item_create( $product_id ) {
+  public function item_create( $product_id, $delivery_item_id ) {
     require_once('sql.class.php');
     $qry =
       "INSERT INTO msl_pickup_items ".
-        "(pickup_id, product_id) VALUES ".
-        "('" . intval($this->id) . "', '" . intval($product_id) . "')";
+        "(pickup_id, product_id, delivery_item_id) VALUES ".
+        "('" . intval($this->id) . "', '" . intval($product_id) . "', '" . intval($delivery_item_id) . "')";
     $item_id = SQL::insert($qry);
     $item = new PickupItem();
     $item->id = $item_id;
     $item->product_id = intval($product_id);
+    $item->delivery_item_id = intval($delivery_item_id);
     $items[$item->id] = $item;
     return $item;
   }
@@ -32,7 +33,7 @@ class Pickup{
     require_once('sql.class.php');
     $qry =
       "DELETE FROM msl_pickup_items " .
-        "WHERE delivery_id='" . intval($this->id) . "' AND id='" . intval($item_id) . "'";
+        "WHERE pickup_id='" . intval($this->id) . "' AND id='" . intval($item_id) . "'";
     SQL::update($qry);
     return true;
   }

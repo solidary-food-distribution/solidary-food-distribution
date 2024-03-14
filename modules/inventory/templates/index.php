@@ -5,14 +5,9 @@ $PROPERTIES['pathbar']=array(
 ?>
 
 <?php 
-  foreach($delivery->items as $di_id=>$item){
+  foreach($inventories as $i_id=>$item){
     require('item.part.php');
   }
 ?>
 
-Folgt...
-
-
-<!--
-<div class="main_button button" onclick="location.href='/inventory/products';">Neue Position anlegen</div>
--->
+<div class="main_button button" onclick="location.href='/inventory/products';">Produkt hinzufügen</div>

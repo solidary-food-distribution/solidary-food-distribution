@@ -1,17 +1,23 @@
 function filter_options(el){
   var value = $(el).data('value');
+  var field = $(el).data('field');
+  if($(el).hasClass('option')){
+    field = $(el).closest('.options').data('field');
+  }
   var pickup_id = $('.row.product').first().data('pickup_id');
-  location.href = '/pickup?pickup_id='+pickup_id+'&product_type='+value;
+  location.href = '/pickup?pickup_id='+pickup_id+'&'+field+'='+value;
 }
 
 
 function pickup_change(el, value){
   var pickup_id = $(el).closest('.product').data('pickup_id');
   var item_id = $(el).closest('.product').data('item_id');
+  var product_type = $(el).closest('.product').data('product_type');
   $.ajax({
     type: 'POST',
     data: {
       pickup_id: pickup_id,
+      product_type: product_type,
       item_id: item_id,
       value: value
     },

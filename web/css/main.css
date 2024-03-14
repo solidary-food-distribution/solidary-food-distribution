@@ -220,6 +220,12 @@ div.mr1{
   min-width: 1.2em;
   text-align: center;
 }
+.button.large{
+  width: 1.2em;
+  font-size: 2em;
+  line-height: 1.2em;
+  height: 1.2em;
+}
 .input{
   border: 1px solid black;
   border-radius: unset;
@@ -411,7 +417,7 @@ div.mr1{
   height: 4.4em;
   border: 1px solid black;
   border-radius: 0.5em;
-  background-color: #cccccc;
+  background-color: #dddddd;
 }
 .row .info{
   display: inline-block;

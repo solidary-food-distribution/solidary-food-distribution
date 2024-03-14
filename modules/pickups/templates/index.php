@@ -23,7 +23,9 @@ $PROPERTIES['body_class']='header_h5';
         <?php
           $items = '';
           foreach($pickup->items as $item){
-            $items .= $item->product->name.', ';
+            if($item->amount_pieces || $item->amount_weight){
+              $items .= $item->product->name.', ';
+            }
           }
           echo rtrim($items, ', ');
         ?>

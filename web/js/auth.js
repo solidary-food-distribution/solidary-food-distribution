@@ -96,8 +96,10 @@ function user_show_pickup_pin(){
     if(user_pickup_pin.length-1 >= index){
       var icon_id = user_pickup_pin[index];
       var icon_name = PIN_ICONS[icon_id-1];
+      if(user_pickup_pin.length-1 > index){
+        icon_name = 'asterisk disabled';
+      }
       $(this).html('<i class="fas fa-'+icon_name+'"></i>');
-      $('#pin .keyboard_keys.icons div[data-id='+icon_id+']').addClass('disabled');
     }else{
       $(this).html('');
     }
