@@ -38,6 +38,7 @@ var scale_price_sum = 0;
 var scale_price_sum_pickup = 0;
 var scale_pickup_id = 0;
 var scale_item_id = 0;
+var scale_product_type = '';
 function scale_show(el){
   var row = $(el).closest('.row');
   $('#scale_title').text($(el).data('title'));
@@ -51,6 +52,7 @@ function scale_show(el){
   scale_price_sum_pickup = $(el).data('price_sum_pickup');
   scale_pickup_id = row.data('pickup_id');
   scale_item_id = row.data('item_id');
+  scale_product_type = row.data('product_type');
   $('#scale_ok').hide();
   scale_show_price(0);
   scale_show_bar(0);
@@ -69,9 +71,12 @@ function scale_ok(){
   $.ajax({
     type: 'POST',
     data: {
-      value: value
+      pickup_id: scale_pickup_id,
+      product_type: scale_product_type,
+      item_id: scale_item_id,
+      value: value,
     },
-    url: '/pickup/update_ajax?pickup_id='+scale_pickup_id+'&item_id='+scale_item_id,
+    url: '/pickup/update_ajax',
     dataType: 'html',
     success: function(html){
       replace_header_main_footer(html);

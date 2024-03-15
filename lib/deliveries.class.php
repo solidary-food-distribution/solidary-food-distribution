@@ -43,7 +43,7 @@ class Deliveries extends ArrayObject{
         "LEFT JOIN msl_delivery_items di ON (d.id=di.delivery_id) ".
         "LEFT JOIN msl_products p ON (di.product_id=p.pid) ".
         "LEFT JOIN msl_members mp ON (p.producer_id=mp.id) ".
-      "WHERE d.supplier_id=ms.id AND d.creator_id=u.id ";
+      "WHERE d.id>0 AND d.supplier_id=ms.id AND d.creator_id=u.id ";
     if(!empty($filters)){
       $qry .= "AND ".SQL::buildFilterQuery($filters);
     }

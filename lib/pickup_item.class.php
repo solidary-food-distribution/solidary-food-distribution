@@ -18,6 +18,9 @@ class PickupItem{
     global $user;
     $updates['modified'] = date('Y-m-d H:i:s');
     $updates['modifier_id'] = $user['user_id'];
+    if($updates['price'] == ''){
+      $updates['price'] = '0';
+    }
     require_once('sql.class.php');
     $qry = 
       "UPDATE msl_pickup_items SET ";
