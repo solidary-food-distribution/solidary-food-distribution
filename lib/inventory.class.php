@@ -19,15 +19,9 @@ class Inventory{
   public function update( array $updates = array() ){
     $updates['modified'] = date('Y-m-d H:i:s');
     require_once('sql.class.php');
-    if($updates['amount_pieces'] == 0 && $updates['amount_weight'] == 0){
-      $qry =
-        "DELETE FROM msl_inventory WHERE id='".intval($this->id)."'";
-    }else{
-      $qry = 
-        "UPDATE msl_inventory SET ";
-      $qry .= SQL::buildUpdateQuery($updates).' ';
-      $qry .= "WHERE id='".intval($this->id)."'";
-    }
+    $qry = "UPDATE msl_inventory SET ";
+    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= "WHERE id='".intval($this->id)."'";
     SQL::update($qry);
   }
 }

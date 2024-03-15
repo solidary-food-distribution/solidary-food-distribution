@@ -23,9 +23,9 @@ class Product{
   public function update( array $updates = array() ){
     require_once('sql.class.php');
     $qry = 
-      "UPDATE msl_products p, msl_prices pr SET ";
+      "UPDATE msl_products p LEFT JOIN msl_prices pr ON (p.pid=pr.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE()) SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';
-    $qry .= "WHERE p.pid=pr.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE() AND p.pid='".intval($this->id)."'";
+    $qry .= "WHERE p.pid='".intval($this->id)."'";
     SQL::update($qry);
   }
 
