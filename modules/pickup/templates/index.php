@@ -94,7 +94,9 @@ $pickup_variable_sum = 0;
           <div class="ctrl">
             <div class="button <?php echo $item->amount_pieces<=0?'disabled':'' ?>" onclick="pickup_change(this,'-')">-</div>
             <div class="button"  onclick="pickup_change(this,'+')">+</div>
-            <div class="button amount <?php echo $item->amount_pieces==$item->amount_order?'disabled':'' ?>"  onclick="pickup_change(this,'<?php echo $item->amount_order ?>')"><span><?php echo $item->amount_order ?></span></div>
+            <?php if($item->amount_order): ?>
+              <div class="button amount <?php echo $item->amount_pieces==$item->amount_order?'disabled':'' ?>"  onclick="pickup_change(this,'<?php echo $item->amount_order ?>')"><span><?php echo $item->amount_order ?></span></div>
+            <?php endif ?>
           </div>
         <?php elseif($item->price_type == 'k'): ?>
           <div class="amount">

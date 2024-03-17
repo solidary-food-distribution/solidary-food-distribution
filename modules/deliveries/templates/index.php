@@ -33,7 +33,7 @@ $PROPERTIES['body_class']='header_h5';
       </div>
     </div>
     <div class="col1 right last">
-      <span class="button" onclick="location.href='/delivery?delivery_id=<?php echo $delivery->id ?>';">
+      <span class="button large" onclick="location.href='/delivery?delivery_id=<?php echo $delivery->id ?>';">
         <i class="fa-solid fa-arrow-up-right-from-square"></i>
       </span>
     </div>

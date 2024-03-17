@@ -18,7 +18,7 @@ $PROPERTIES['body_class']='header_h5';
         <?php echo format_date($pickup->created,'H:i', false) ?>
       </div>
     </div>
-    <div class="col13">
+    <div class="col12">
       <div>
         <?php
           $items = '';
@@ -31,8 +31,13 @@ $PROPERTIES['body_class']='header_h5';
         ?>
       </div>
     </div>
-    <div class="col1 right last">
-      <span class="button" onclick="location.href='/pickup?pickup_id=<?php echo $pickup->id ?>';">
+    <div class="col2 right last">
+      <?php if(empty($items)): ?>
+        <span class="button large" onclick="pickups_delete('<?php echo $pickup->id ?>')">
+          <i class="fa-regular fa-trash-can"></i>
+        </span>
+      <?php endif ?>
+      <span class="button large" onclick="location.href='/pickup?pickup_id=<?php echo $pickup->id ?>';">
         <i class="fa-solid fa-arrow-up-right-from-square"></i>
       </span>
     </div>

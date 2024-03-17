@@ -65,7 +65,7 @@ function execute_product_select(){
 function execute_delete_ajax(){
   $id=get_request_param('delivery_id');
   $delivery=delivery_get($id);
-  $updates = array( 'amount_pieces' => 0, 'amount_weight' => 0);
+  $updates = array( 'delete' => 1 );
   foreach($delivery->items as $item){
     inventory_update($item->id, $item->product_id, $updates);
   }
@@ -78,7 +78,7 @@ function execute_item_delete_ajax(){
   $item_id=get_request_param('item_id');
   $delivery=delivery_get($id);
   $item = $delivery->items[$item_id];
-  $updates = array( 'amount_pieces' => 0, 'amount_weight' => 0);
+  $updates = array( 'delete' => 1 );
   inventory_update($item_id, $item->product_id, $updates);
   $delivery->item_delete($item_id);
   exit;
@@ -136,9 +136,13 @@ function inventory_update($delivery_item_id, $product_id, $updates){
   $objects = new Inventories(array('delivery_item_id' => $delivery_item_id));
   if(count($objects)){
     $inventory = $objects->first();
-  }else{
+  }elseif(!isset($updates['delete'])){
     $id = Inventories::create($delivery_item_id, 0, $product_id);
     $inventory = inventory_get($id);
+  }
+  if(isset($inventory) && isset($updates['delete'])){
+    $inventory->delete();
+    return;
   }
   foreach($updates as $field=>$value){
     if(!isset($inventory->{$field})){
@@ -146,7 +150,6 @@ function inventory_update($delivery_item_id, $product_id, $updates){
     }
   }
   if(!empty($updates)){
-    #logger(print_r($updates,1));
     $inventory->update($updates);
   }
 }

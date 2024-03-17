@@ -24,4 +24,13 @@ class Inventory{
     $qry .= "WHERE id='".intval($this->id)."'";
     SQL::update($qry);
   }
+
+  public function delete() {
+    require_once('sql.class.php');
+    $qry =
+      "DELETE FROM msl_inventory " .
+        "WHERE id='" . intval($this->id) . "'";
+    SQL::update($qry);
+    return true;
+  }
 }

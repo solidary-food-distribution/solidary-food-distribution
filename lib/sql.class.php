@@ -1,7 +1,7 @@
 <?php
 global $mysqli;
 if(strpos($_SERVER['HTTP_HOST'],'.local')){
-  $mysqli=mysqli_connect('mysqlsrv','root','deepinform','msl_buchen');
+  $mysqli=mysqli_connect('mysqlsrv','root','***LOCAL_DB_PWD***','msl_buchen');
 }else{
   $mysqli=mysqli_connect('***PROD_DB_HOST***','***PROD_DB_USER***','***PROD_DB_PWD***','***PROD_DB_DATABASE***');
 }
@@ -10,28 +10,29 @@ if(mysqli_connect_errno()){
 }else{
   mysqli_set_charset($mysqli,"UTF8");
 }
+mysqli_report(MYSQLI_REPORT_ERROR);
 
 class SQL{
   static function update($qry){
-    global $mysqli, $MODULE, $ACTION, $user;
-    file_put_contents(__DIR__.'/../log/sql_update.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']." update\n$qry\n\n",FILE_APPEND);
+    global $mysqli;
     $res=mysqli_query($mysqli,$qry);
+    self::log_info($qry,$res);
     if(!$res){
-      self::log($qry);
+      self::log_error($qry);
       return false;
     }
     
     return self::affected_rows();
   }
   static function insert($qry){
-    global $mysqli, $MODULE, $ACTION, $user;
+    global $mysqli;
     $res=mysqli_query($mysqli,$qry);
     if(!$res){
-      self::log($qry);
+      self::log_error($qry);
       return false;
     }
     $ret=mysqli_insert_id($mysqli);
-    file_put_contents(__DIR__.'/../log/sql_update.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']." insert\n$qry -> $ret\n\n",FILE_APPEND);
+    self::log_info($qry,$ret);
     return $ret;
   }
   static function affected_rows(){
@@ -42,7 +43,7 @@ class SQL{
     global $mysqli;
     $res=mysqli_query($mysqli,$qry);
     if(empty($res)){
-      self::log($qry);
+      self::log_error($qry);
     }
     $ret=array();
     while ($row = mysqli_fetch_assoc($res)) {
@@ -58,14 +59,14 @@ class SQL{
     if(!empty($res)){
       return $ret[0];
     }else{
-      self::log($qry);
+      self::log_error($qry);
     }
   }
   static function selectKey2Val($qry,$key,$val){
     global $mysqli;
     $res=mysqli_query($mysqli,$qry);
     if(empty($res)){
-      self::log($qry);
+      self::log_error($qry);
     }
     $ret=array();
     while ($row = mysqli_fetch_assoc($res)) {
@@ -78,7 +79,7 @@ class SQL{
     global $mysqli;
     $res=mysqli_query($mysqli,$qry);
     if(empty($res)){
-      self::log($qry);
+      self::log_error($qry);
     }
     $ret=array();
     while ($row = mysqli_fetch_assoc($res)) {
@@ -90,7 +91,7 @@ class SQL{
     global $mysqli;
     $res=mysqli_query($mysqli,$qry);
     if(empty($res)){
-      self::log($qry);
+      self::log_error($qry);
     }
     $ret=array();
     while ($row = mysqli_fetch_assoc($res)) {
@@ -113,10 +114,15 @@ class SQL{
     //nur A-Z0-9 und _
     return preg_replace('/[^\w\-\.]/', '', $str);
   }
-  static function log($qry){
+  static function log_info($qry,$info){
+    global $mysqli, $MODULE, $ACTION, $user;
+    file_put_contents(__DIR__.'/../log/sql_info.'.date('Ymd').'.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['id']."\n$qry\n$info\n",FILE_APPEND);
+  }
+  static function log_error($qry){
     global $mysqli, $MODULE, $ACTION, $user;
     file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['id']."\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
   }
+
   static function buildFilterQuery($filters){
     $qry='';
     foreach($filters as $field => $value){

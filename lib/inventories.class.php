@@ -73,6 +73,9 @@ class Inventories extends ArrayObject{
   }
 }
 
+
+
+
 function inventory_get($id){
   $objects = new Inventories(array('id' => $id));
   if(!empty($objects)){

@@ -37,8 +37,10 @@ function update_pickup_items($pickup_id){
     return;
   }
   $pickup_items = array();
+  $pickup_item_ids = '';
   foreach($pickup->items as $item){
     $pickup_items[$item->product->id] = $item;
+    $pickup_item_ids .= ','.$item->id;
   }
   $type_b_producer_ids = array();
   require_once('sql.class.php');
@@ -46,7 +48,7 @@ function update_pickup_items($pickup_id){
     "SUM(i.amount_pieces) AS i_amount_pieces, SUM(i.amount_weight) AS i_amount_weight, ".
     "i.delivery_item_id, MAX(di.price_type) AS di_price_type, MAX(di.price) AS di_price ".
     "FROM msl_orders o, msl_products p ".
-      "LEFT JOIN msl_inventory i ON (p.pid=i.product_id) ".
+      "LEFT JOIN msl_inventory i ON (p.pid=i.product_id AND i.pickup_item_id IN (0 $pickup_item_ids)) ".
       "LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
     "WHERE o.pid=p.pid AND o.amount>0 AND o.member_id='".intval($user['member_id'])."' ".
     "GROUP BY o.pid, p.type, p.producer_id, o.amount";
@@ -72,8 +74,8 @@ function update_pickup_items($pickup_id){
       "i.delivery_item_id, di.price_type di_price_type, di.price AS di_price ".
     "FROM msl_products p, msl_inventory i ".
     " LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
-    "WHERE i.product_id=p.pid AND p.type='v' AND p.producer_id IN (".SQL::escapeArray(array_keys($type_b_producer_ids)).") ".
-    "ORDER BY p.name";
+    "WHERE i.product_id=p.pid  AND i.pickup_item_id IN (0 $pickup_item_ids) AND p.type='v' AND p.producer_id IN (".SQL::escapeArray(array_keys($type_b_producer_ids)).") ".
+    "ORDER BY p.name, i.delivery_item_id DESC";
   $vproducts = SQL::select($qry);
   foreach($vproducts as $p){
     if(!isset($pickup_items[$p['product_id']])){
@@ -82,6 +84,8 @@ function update_pickup_items($pickup_id){
         'price_type' => $p['di_price_type'],
         'price' => $p['di_price'],
       ));
+      $pickup_items[$p['product_id']] = $item;
+      $pickup_item_ids .= ','.$item->id;
     }
   }
 }

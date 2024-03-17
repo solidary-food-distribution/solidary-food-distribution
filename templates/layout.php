@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202403151625';
+$version='202403171321';
 $body_class='';
 $header='';
 $footer='';
@@ -49,7 +49,7 @@ if($authed){
               }
             ?>
           </div>
-          <div class="logout" onclick="location.href='/auth/logout';"><?php echo $_SESSION['scale']?($user['name'].' - '):'' ?>Logout</div>
+          <div class="logout" onclick="location.href='/auth/logout';"><?php echo isset($_SESSION['scale'])?($user['name'].' - '):'' ?>Logout</div>
       <?php else: ?>
           <div class="center headline">
             <div class="image">
