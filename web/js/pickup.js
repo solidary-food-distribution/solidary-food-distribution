@@ -3,8 +3,11 @@ function filter_options(el){
   var field = $(el).data('field');
   if($(el).hasClass('option')){
     field = $(el).closest('.options').data('field');
+    $(el).closest('.options').find('.selected').removeClass('selected');
+    $(el).addClass('selected');
   }
   var pickup_id = $('.row.product').first().data('pickup_id');
+  $('#main').html('');
   location.href = '/pickup?pickup_id='+pickup_id+'&'+field+'='+value;
 }
 

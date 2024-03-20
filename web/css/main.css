@@ -206,7 +206,7 @@ div.mr1{
   display: flex;
 }
 .filters{
-  margin: 0.5em;
+  margin: 0.2em;
   display: flex;
 }
  .button, .input, .controls .control, .control_l, .control_m, .control_r{
@@ -235,7 +235,7 @@ div.mr1{
   min-width: 2em;
 }
 .input.options{
-  padding: 0;
+  padding: 0.2em;
 }
 .input.options .option{
   padding: 0.2em;
