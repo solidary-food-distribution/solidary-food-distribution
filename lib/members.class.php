@@ -5,6 +5,16 @@ require_once('member.class.php');
 
 class Members extends ArrayObject{
 
+  public static function create($name){
+    require_once('sql.class.php');
+    $qry = 
+      "INSERT INTO msl_members ".
+        "(name) VALUES ".
+        "('".SQL::escapeString($name)."')";
+    $member_id = SQL::insert($qry);
+    return $member_id;
+  }
+
   public function __construct(array $filters = array(), array $orderby = array(), int $limit_start = 0, int $limit_count = -1){
     $array = $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
     parent::__construct($array);
@@ -48,4 +58,12 @@ class Members extends ArrayObject{
     return $members;
   }
 
+}
+
+function member_get($id){
+  $objects = new Members(array('id' => $id));
+  if(!empty($objects)){
+    return $objects->first();
+  }
+  return null;
 }

@@ -2,7 +2,12 @@
 $PROPERTIES['pathbar']=array('/admin'=>'Administration');
 ?>
 <div class="selection">
-  <?php if(0 && $members): ?>
+  <?php if($products): ?>
+    <div class="item" onclick="location.href='/products'">
+      <span class="label">Produkte</span>
+    </div>
+  <?php endif ?>
+  <?php if($members): ?>
     <div class="item" onclick="location.href='/members'">
       <span class="label">Mitglieder</span>
     </div>
@@ -10,11 +15,6 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration');
   <?php if($users): ?>
     <div class="item" onclick="location.href='/users'">
       <span class="label">Benutzer</span>
-    </div>
-  <?php endif ?>
-  <?php if($products): ?>
-    <div class="item" onclick="location.href='/products'">
-      <span class="label">Produkte</span>
     </div>
   <?php endif ?>
   <?php if($orders): ?>

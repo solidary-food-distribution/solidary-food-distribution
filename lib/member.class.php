@@ -8,4 +8,14 @@ class Member{
   public string $identification;
   public bool $producer;
   public bool $consumer;
+
+  public function update( array $updates = array() ){
+    require_once('sql.class.php');
+    $qry = 
+      "UPDATE msl_members SET ";
+    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= "WHERE id='".intval($this->id)."'";
+    SQL::update($qry);
+  }
+
 }

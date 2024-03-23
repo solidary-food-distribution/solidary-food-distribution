@@ -71,6 +71,9 @@ function input_onfocus(el){
   $('.input.active').removeClass('active');
   $(el).addClass('active');
   var value = $(el).data('value');
+  if($(el).data('type') == 'options'){
+    active_input_post_value();
+  }
   keyboard_show(el);
 }
 
@@ -82,6 +85,7 @@ function active_input_post_value_goto(url){
 
 
 function active_input_post_value(){
+  //console.log("active_input_post_value1");
   var input = $('.input.active');
   if(!input.length){
     if(active_input_post_value_goto_url.length){
@@ -89,7 +93,7 @@ function active_input_post_value(){
     }
     return;
   }
-  //console.log("active_input_post_value "+input.data('field'));
+  //console.log("active_input_post_value2 "+input.data('field'));
   var type = input.data('type');
   var value = '';
   if(type == 'options'){
@@ -127,12 +131,14 @@ function active_input_post_value(){
 }
 
 function input_option_select(el){
+  //console.log("input_option_select");
   var input = $(el).closest('.input');
   input.find('.option.selected').removeClass('selected');
   $(el).addClass('selected');
   event.stopPropagation();
   active_input_post_value();
   input.removeClass('active');
+  //console.log("input_option_select2");
   input.click();
 }
 

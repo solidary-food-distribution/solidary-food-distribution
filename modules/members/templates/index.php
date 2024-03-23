@@ -11,22 +11,21 @@ $PROPERTIES['body_class']='header_h5';
 </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
-<?php foreach($members as $member_id=>$member): ?>
+<?php foreach($members as $member): ?>
   <div class="row">
-    <div class="inner_row mb1">
-      <div class="col5">
-        <div>
-          <div>Name: <?php echo $member['name'] ?></div>
-          <div>Mitglied-Nr: <?php echo $member['identification'] ?></div>
-        </div>
-      </div>
-      <div class="col5">
-        <div>
-          <div>Hersteller: <?php echo $member['producer']?'ja':'nein' ?></div>
-          <div>Abholer: <?php echo $member['consumer']?'ja':'nein' ?></div>
-        </div>
+    <div class="col5">
+      <div>
+        <div>Name: <?php echo $member->name ?></div>
+        <div>Mitglied-Nr: <?php echo $member->identification ?></div>
       </div>
     </div>
+    <div class="col5">
+      <div>
+        <div>Hersteller: <?php echo $member->producer?'ja':'nein' ?></div>
+        <div>Abholer: <?php echo $member->consumer?'ja':'nein' ?></div>
+      </div>
+    </div>
+    <?php /* ?>
     <div class="inner_row">
       <div class="col5">
         <div>
@@ -34,7 +33,7 @@ $PROPERTIES['body_class']='header_h5';
         </div>
       </div>
     </div>
-    <?php foreach($member['access_users'] as $user_id=>$user): ?>
+    <?php Wforeach($member['access_users'] as $user_id=>$user): ?>
       <div class="inner_row mb1">
         <div class="col5">
           <div>
@@ -53,12 +52,11 @@ $PROPERTIES['body_class']='header_h5';
         </div>
       </div>
     <?php endforeach ?>
-    <div class="inner_row">
-      <div class="col right last">
-        <div>
-          <div class="button" onclick="alert('NOCH NICHT UMGESETZT');">Bearbeiten</div>
-        </div>
-      </div>
+    <?php */ ?>
+    <div class="col1 right last">
+      <span class="button large" onclick="location.href='/members/edit?member_id=<?php echo $member->id ?>';">
+        <i class="fa-solid fa-pencil"></i>
+      </span>
     </div>
   </div>
 <?php endforeach ?>

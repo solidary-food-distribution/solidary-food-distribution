@@ -69,6 +69,9 @@ function update_pickup_items($pickup_id){
   }
 
   #logger(print_r($type_b_producer_ids,true));
+  if(empty($type_b_producer_ids)){
+    $type_b_producer_ids=array(0);
+  }
 
   $qry = "SELECT i.product_id, p.producer_id, i.amount_weight, i.amount_pieces, ".
       "i.delivery_item_id, di.price_type di_price_type, di.price AS di_price ".

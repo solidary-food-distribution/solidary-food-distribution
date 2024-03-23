@@ -88,12 +88,6 @@ $PROPERTIES['pathbar']=array(
       <div class="button ok" onclick="active_input_post_value_goto('/products/?product_id=<?php echo $product->id ?>')">
         <i class="fa-solid fa-check"></i>
       </div>
-      <?php /*
-      <br>
-      <div class="button trash mt0_5" onclick="active_input_post_value();products_delete('<?php echo $product->id ?>')">
-        <i class="fa-regular fa-trash-can"></i>
-      </div>
-      */ ?>
     </div>
   </div>
 </div>
