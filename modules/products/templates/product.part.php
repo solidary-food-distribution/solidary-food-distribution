@@ -16,33 +16,44 @@
       <?php endif ?>
     </div>
   </div>
-  <div class="col4">
+  <div class="col2">
     <div>
       <div>
-        <?php echo translate_product_type($product->type) ?>
+        <?php echo translate_product_type($product->type) ?><br>
+        <span title="Steuer"><?php echo $product->tax ?>%</span><br>
       </div>
     </div>
   </div>
-  <div class="col3">
+  <div class="col3 right">
     <div class="amount">
       <span title="EK ohne Steuer"><?php echo format_money($product->purchase) ?> EUR</span><br>
-      <span title="Steuer"><?php echo $product->tax ?>%</span><br>
-      <span title="EK inkl. Steuer"><?php $purchase_incl_tax = $product->purchase * (100 + $product->tax)/100;
-        echo format_money($purchase_incl_tax) 
-      ?> EUR</span>
+      <span title="EK MwSt"><?php $purchase_tax = $product->purchase * $product->tax/100;
+        echo format_money($purchase_tax) 
+      ?> EUR</span><br>
     </div>
   </div>
   <div class="col3 right">
     <div class="amount">
       <span title="VK inkl. Steuer"><?php echo format_money($product->price) ?> EUR</span><br>
-      <br>
-      <span title="Marge"><?php
+      <span title="VK Steuer"><?php $price_tax = $product->price - $product->price / ((100 + $product->tax)/100);
+        echo format_money($price_tax);
+      ?> EUR</span><br>
+      <span title="Steuer Finanzamt"><?php echo format_money($price_tax-$purchase_tax);
+      ?> EUR</span><br>
+      
+    </div>
+  </div>
+  <div class="col2 right">
+    <div class="amount">
+      <span title="Marge nach Steuerverrechnung"><?php
         $margin = 0;
-        if($purchase_incl_tax){
-          $margin = round(round($product->price / $purchase_incl_tax, 2) * 100, 2)-100;
+        $in = $product->price - $price_tax + $purchase_tax;
+        $out = $product->purchase + $purchase_tax;
+        if($in){
+          $margin = 100-round($out / $in, 2) * 100;
         }
         echo $margin;
-      ?>%</span>
+      ?>%</span><br>
     </div>
   </div>
   <div class="col1 right last">
