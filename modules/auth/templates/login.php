@@ -26,6 +26,7 @@
       user_show_pickup_pin();
     </script>
     <br>
+    <div class="button large" style="width:auto" onclick="auth_shutdown()">Herunterfahren</div>
   <?php else: ?>
     <div class="row" id="login_form">
       <div class="inner_row">

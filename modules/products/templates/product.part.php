@@ -27,18 +27,19 @@
   <div class="col3 right">
     <div class="amount">
       <span title="EK ohne Steuer"><?php echo format_money($product->purchase) ?> EUR</span><br>
-      <span title="EK MwSt"><?php $purchase_tax = $product->purchase * $product->tax/100;
-        echo format_money($purchase_tax) 
+      <?php $purchase_tax = $product->purchase * $product->tax/100; ?>
+      <span title="EK MwSt: <?php echo round($purchase_tax,5) ?>, EK+MwSt: <?php echo round($product->purchase + $purchase_tax,5) ?>"><?php 
+        echo format_money($purchase_tax);
       ?> EUR</span><br>
     </div>
   </div>
   <div class="col3 right">
     <div class="amount">
       <span title="VK inkl. Steuer"><?php echo format_money($product->price) ?> EUR</span><br>
-      <span title="VK Steuer"><?php $price_tax = $product->price - $product->price / ((100 + $product->tax)/100);
-        echo format_money($price_tax);
+      <?php $price_tax = $product->price - $product->price / ((100 + $product->tax)/100); ?>
+      <span title="VK Steuer: <?php echo round($price_tax,5) ?>"><?php echo format_money($price_tax);
       ?> EUR</span><br>
-      <span title="Steuer Finanzamt"><?php echo format_money($price_tax-$purchase_tax);
+      <span title="Steuer Finanzamt: <?php echo round($price_tax-$purchase_tax,5) ?>"><?php echo format_money($price_tax-$purchase_tax);
       ?> EUR</span><br>
       
     </div>

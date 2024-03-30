@@ -148,3 +148,23 @@ function pin_ok(){
     }
   });
 }
+
+
+function auth_shutdown(){
+  $('#main').html('<div class="row">Wird heruntergefahren...</div>');
+  $.ajax({
+    type: 'GET',
+    url: 'http://127.0.0.1:8008/scale?do=shutdown',
+    dataType: "json",
+    timeout: 3000,
+    success: function(data) {
+      console.log(data);
+      if(data.out != 'shutdown'){
+        location.href='/';
+      }
+    },
+    error: function (xhr, ajaxOptions, thrownError){
+      location.href='/';
+    }
+  });
+}
