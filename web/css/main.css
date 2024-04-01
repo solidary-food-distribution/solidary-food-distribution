@@ -455,7 +455,7 @@ div.mr1{
   font-size: 0.8em;
   width: calc(100% - 7em);
 }
-.row .price_detail.grey{
+.grey{
   color: #888888;
 }
 .row .price_sum{

@@ -1,12 +1,16 @@
 <?php
 $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen',''=>'Abholmengen');
-//$PROPERTIES['body_class']='footer_h8';
+$PROPERTIES['body_class']='footer_h8';
 $sum_price_sum=0.0;
-$taxes=array();
+$sum_purchase=0;
+$sum_supplier=0;
+$sum_geno_fa=0;
+$sum_geno=0;
 $base_cost=0; //28.0;
 ?>
 <?php foreach($orders as $op): ?>
 <?php
+  logger(print_r($op,1));
   $name=$op->product->name;
   $producer_name=$op->product->producer->name;
   $amount=$op->get_amount_formated();
@@ -32,6 +36,7 @@ $base_cost=0; //28.0;
   $price_detail='';
   $price_detail_class='';
   $price_sum=floatval($op->product->price)*floatval($op->amount);
+  $purchase_sum=floatval($op->product->purchase)*floatval($op->amount);
   if($op->amount=='0.00'){
     if($op->product->type!='b'){
       $price_detail=format_money($op->product->price).'&nbsp;EUR<br>/&nbsp;'.$type;
@@ -43,58 +48,90 @@ $base_cost=0; //28.0;
   if($op->amount!='0.00' && $op->product->period!='m'){
     $price_detail.=($price_detail==''?'':'<br>').'x 52&nbsp;Wochen<br>/ 12&nbsp;Monate';
     $price_sum*=52/12;
-  }
-  if($price_sum){
-    if($op->product->tax_incl){
-      $price_detail.=($price_detail==''?'':'<br>').'('.str_replace('.',',',round($op->product->tax,2)).'% MwSt inkl)';
-    }else{
-      $price_detail.=($price_detail==''?'':'<br>').'+ '.str_replace('.',',',round($op->product->tax,2)).'% MwSt';
-    }
+    $purchase_sum*=52/12;
   }
   if(floatval($price_sum)){
-    //$taxes[$op->product->tax]=$taxes[$op->product->tax]+round($price_sum,2);
-    if(!$op->product->tax_incl){
-      $price_sum=round($price_sum*(100+$op->product->tax)/100,2);
-    }
     $sum_price_sum+=round($price_sum,2);
-    $price_sum=format_money($price_sum).' EUR';
-  }else{
-    $price_sum='';
   }
 ?>
   <div class="row product" data-product_id="<?php echo $op->product->id ?>">
-    <div class="col2">
-      <div class="image">
-        <!--<img src="" />-->
+    <div class="inner_row">
+      <div class="col2">
+        <div class="image">
+          <!--<img src="" />-->
+        </div>
+      </div>
+      <div class="col6">
+        <div class="info">
+          <div class="name">
+            <b><?php echo $name ?></b>
+          </div>
+          <div class="producer">
+            <?php echo $producer_name ?>
+          </div>
+        </div>
+      </div>
+      <div class="col4">
+        <div class="amount_ctrl">
+          <div class="amount">
+            <b><?php echo $amount.'&nbsp;'.$unit ?></b>
+          </div>
+          <div class="ctrl" data-amount="<?php echo $op->amount ?>">
+            <div class="button <?php echo $class_less ?>" <?php echo $attr_less ?> >-</div>
+            <div class="button <?php echo $class_more ?>" <?php echo $attr_more ?> >+</div>
+          </div>
+        </div>
+      </div>
+      <div class="col6 right last">
+        <div class="price_detail <?php echo $price_detail_class ?>">
+          <?php echo $price_detail ?>
+        </div>
+        <div class="price_sum">
+          <?php echo $price_sum?format_money($price_sum).' EUR':''; ?>
+        </div>
       </div>
     </div>
-    <div class="col6">
-      <div class="info">
-        <div class="name">
-          <b><?php echo $name ?></b>
+    <div class="inner_row <?php echo $price_detail_class ?>">
+      <div class="col6 right last">
+        <div class="price_detail">
+          Erzeuger erhält
         </div>
-        <div class="producer">
-          <?php echo $producer_name ?>
-        </div>
-      </div>
-    </div>
-    <div class="col4">
-      <div class="amount_ctrl">
-        <div class="amount">
-          <b><?php echo $amount.'&nbsp;'.$unit ?></b>
-        </div>
-        <div class="ctrl" data-amount="<?php echo $op->amount ?>">
-          <div class="button <?php echo $class_less ?>" <?php echo $attr_less ?> >-</div>
-          <div class="button <?php echo $class_more ?>" <?php echo $attr_more ?> >+</div>
+        <div class="price_detail">
+          <?php
+            $supplier_tax = $purchase_sum*($op->product->tax/100);
+            $supplier_sum = $purchase_sum+$supplier_tax;
+            $sum_supplier += $supplier_sum;
+            echo format_money($supplier_sum);
+          ?> EUR
         </div>
       </div>
     </div>
-    <div class="col6 right last">
-      <div class="price_detail <?php echo $price_detail_class ?>">
-        <?php echo $price_detail ?>
+    <div class="inner_row <?php echo $price_detail_class ?>">
+      <div class="col6 right last">
+        <div class="price_detail">
+          Geno -&gt; FA
+        </div>
+        <div class="price_detail">
+          <?php
+            $fa_sum = $price_sum - $price_sum/(($op->product->tax+100)/100) - $supplier_tax;
+            $sum_geno_fa += $fa_sum;
+            echo format_money($fa_sum);
+          ?> EUR
+        </div>
       </div>
-      <div class="price_sum">
-        <?php echo $price_sum ?>
+    </div>
+    <div class="inner_row <?php echo $price_detail_class ?>">
+      <div class="col6 right last">
+        <div class="price_detail">
+          Geno erhält
+        </div>
+        <div class="price_detail">
+          <?php
+            $geno_sum =  $price_sum-$supplier_sum-$fa_sum;
+            $sum_geno += $geno_sum;
+            echo format_money($geno_sum);
+          ?> EUR
+        </div>
       </div>
     </div>
   </div>
@@ -145,6 +182,30 @@ $base_cost=0; //28.0;
       <div class="price_detail"></div>
       <div class="price_sum">
         <b><?php echo number_format($sum_price_sum+$base_cost,2,',','') ?>&nbsp;EUR</b>
+      </div>
+    </div>
+  </div>
+  <div class="inner_row">
+    <div class="col6 last">
+      <div class="price_detail">Erzeuger erhält</div>
+      <div class="price_detail right">
+        <?php echo format_money($sum_supplier); ?>&nbsp;EUR
+      </div>
+    </div>
+  </div>
+  <div class="inner_row">
+    <div class="col6 last">
+      <div class="price_detail">Geno->FA</div>
+      <div class="price_detail right">
+        <?php echo format_money($sum_geno_fa); ?>&nbsp;EUR
+      </div>
+    </div>
+  </div>
+  <div class="inner_row">
+    <div class="col6 last">
+      <div class="price_detail">Geno erhält</div>
+      <div class="price_detail right">
+        <?php echo format_money($sum_price_sum-$sum_supplier-$sum_geno_fa); ?>&nbsp;EUR
       </div>
     </div>
   </div>

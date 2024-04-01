@@ -27,7 +27,7 @@ class Orders extends ArrayObject{
     require_once('sql.class.php');
     $qry = 
       "SELECT p.*, o.member_id, o.amount, o.lock_date, ".
-        "pr.price, pr.tax, pr.tax_incl, ".
+        "pr.price, pr.tax, pr.purchase, ".
         "mp.name AS mp_name, ".
         "mo.name AS mo_name, mo.identification AS mo_identification ".
       "FROM msl_members mp, msl_prices pr, msl_products p ".
@@ -67,7 +67,8 @@ class Orders extends ArrayObject{
       $order->product->orders_lock_date = $row['orders_lock_date']; //REFACTOR new DateTime($row['orders_lock_date']);
       $order->product->price = floatval($row['price']);
       $order->product->tax = floatval($row['tax']);
-      $order->product->tax_incl = boolval($row['tax_incl']);
+      $order->product->purchase = floatval($row['purchase']);
+      $order->product->tax_incl = true; //deprecated
       if($row['member_id']){
         $order->member = new Member();
         $order->member->id = intval($row['member_id']);
