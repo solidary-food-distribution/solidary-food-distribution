@@ -44,9 +44,9 @@ class Orders extends ArrayObject{
       $qry .= "AND ".SQL::buildFilterQuery($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY (CASE WHEN p.pid=59 THEN 0 ELSE 1 END),".SQL::buildOrderbyQuery($orderby);
     }else{
-      $qry .= "ORDER BY status DESC,period DESC,type,p.name";
+      $qry .= "ORDER BY (CASE WHEN p.pid=59 THEN 0 ELSE 1 END),status DESC,period DESC,type,p.name";
     }
     $recset = SQL::select($qry);
 
