@@ -222,7 +222,7 @@ $pickup_variable_sum = 0;
       <div>
         <div>
           <?php if($product_type == 'v'): ?>
-            <small style="color:#888;">Noch <?php echo ($others['orders_count']-$others['pickup_count']) ?> weitere (<?php echo ($others['orders_sum']-$others['pickup_sum']) ?> EUR) von inkl. <?php echo ($others['orders_count']+1) ?> Gemüseanteil-Abholern (<?php echo ($others['orders_sum']+$variable_sum) ?> EUR)
+            <small style="color:#888;"><?php echo ($others['orders_count']+1) ?> Abholer mit <?php echo $others['orders_sum']+$variable_sum ?> EUR. Du (<?php echo $variable_sum ?> EUR) und weitere <?php echo ($others['orders_count']-$others['pickup_count']) ?> (<?php echo ($others['open_sum']) ?> EUR) teilen sich verbleibende <?php echo $others['orders_sum']+$variable_sum-$others['pickup_sum'] ?> EUR.
             </small>
            <?php else: ?>
             &nbsp;

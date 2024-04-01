@@ -188,9 +188,13 @@ function get_info_others(){
   $orders = new Orders(array('o.member_id!=' => $user['member_id'], 'p.type' => 'b'));
   $orders_sum = 0;
   $orders_count = 0;
+  $open_sum = 0;
   foreach($orders as $order){
     if($order->product->type == 'b' && $order->amount > 0){
       $orders_sum += $order->amount;
+      if(!isset($pickup_count[$order->member->id])){
+        $open_sum += $order->amount;
+      }
       $orders_count++;
     }
   }
@@ -198,7 +202,8 @@ function get_info_others(){
     'pickup_sum' => $pickup_sum,
     'pickup_count' => count($pickup_count),
     'orders_sum' => $orders_sum,
-    'orders_count' => $orders_count);
+    'orders_count' => $orders_count,
+    'open_sum' => $open_sum);
 }
 
 function get_pickup_history($pickup){
