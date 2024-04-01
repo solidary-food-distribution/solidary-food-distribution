@@ -26,10 +26,18 @@
   </div>
   <div class="col3 right">
     <div class="amount">
-      <span title="EK ohne Steuer"><?php echo format_money($product->purchase) ?> EUR</span><br>
+      <span title="EK ohne Steuer"><?php 
+        $purchase = $product->purchase;
+        if(round($purchase, 2) != round($purchase, 3)){
+          $purchase = format_money($purchase, 3);
+        }else{
+          $purchase = format_money($purchase);
+        }
+        echo $purchase;
+      ?> EUR</span><br>
       <?php $purchase_tax = $product->purchase * $product->tax/100; ?>
       <span title="EK MwSt: <?php echo round($purchase_tax,5) ?>, EK+MwSt: <?php echo round($product->purchase + $purchase_tax,5) ?>"><?php 
-        echo format_money($purchase_tax);
+        echo format_money($purchase_tax, 2);
       ?> EUR</span><br>
     </div>
   </div>

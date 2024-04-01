@@ -34,7 +34,7 @@ function execute_update_ajax(){
     $value = number_format(floatval($value), 2, '.', '');
   }elseif($type == 'money'){
     $value = str_replace(',', '.', $value);
-    $value = number_format(floatval($value), 2, '.', '');
+    $value = number_format(floatval($value), 3, '.', '');
   }
   $product = product_get($product_id);
   

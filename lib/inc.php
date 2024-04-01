@@ -129,9 +129,9 @@ function translate_month($month){
   return $months[intval($month)-1];
 }
 
-function format_money($value){
-  $return = number_format(floatval($value),2,',','');
-  if($return === '0,00'){
+function format_money($value, $decimals=2){
+  $return = number_format(floatval($value), $decimals, ',', '');
+  if($return === '0,'.str_repeat($decimals, '0')){
     $return = '&nbsp;';
   }
   return $return;
