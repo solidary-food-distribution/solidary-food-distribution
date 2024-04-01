@@ -119,7 +119,7 @@ h2 a{
   border-radius: 0.5em;
   background-color: white;
   margin: 0.2em;
-  padding: 0.2em 0.4em 0.2em 0.4em;
+  padding: 0.4em;
   cursor: pointer;
 }
 .path{
@@ -127,6 +127,7 @@ h2 a{
   border-radius: 0em;
   margin-right: 0em;
   margin-left: 0em;
+  margin-bottom: 0em;
 }
 .path:first-child{
   border-top-left-radius: 0.5em;
@@ -215,10 +216,12 @@ div.mr1{
   border-radius: 0.5em;
   background-color: white;
   margin: 0.2em;
-  padding: 0.2em;
   cursor: pointer;
   min-width: 1.2em;
   text-align: center;
+}
+.button{
+  padding: 0.2em;
 }
 .button.large{
   width: 1.2em;
@@ -231,14 +234,10 @@ div.mr1{
   border-radius: unset;
   margin: 0;
   margin-bottom: 0.2em;
-  padding: 0.2em;
   min-width: 2em;
 }
-.input.options{
-  padding: 0.2em;
-}
 .input.options .option{
-  padding: 0.2em;
+  padding: 0.4em;
   border-right: 1px solid black;
   display: inline-block;
 }
@@ -433,7 +432,7 @@ div.mr1{
 }
 .row .amount_ctrl{
   display: inline-block;
-  width: 10em;
+  width:100%;
   padding-right: 0.5em;
 }
 .row .ctrl{
@@ -442,7 +441,7 @@ div.mr1{
   text-align: center;
 }
 .row .amount_ctrl .button{
-  width: 1.2em;
+  width: 1.8em;
   font-size: 2em;
   line-height: 1.2em;
   height: 1.2em;

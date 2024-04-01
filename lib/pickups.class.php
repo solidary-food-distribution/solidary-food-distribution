@@ -43,7 +43,7 @@ class Pickups extends ArrayObject{
       "SELECT pu.id AS pickup_id, pu.status AS pu_status, m.id AS member_id, m.name AS member_name, pu.created AS pu_created, u.id AS user_id, u.name AS user_name, ".
         "pui.id AS pui_id, pui.delivery_item_id, pui.product_id, pui.amount_pieces, pui.amount_weight, ".
         "pui.price_type, pui.price, pui.price_sum, pui.best_before, pui.preference_value, ".
-        "p.pid AS p_id, p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type, ".
+        "p.pid AS p_id, p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type, p.period AS p_period, ".
         "(SELECT amount FROM msl_orders o WHERE o.member_id=m.id AND o.pid=pui.product_id) AS amount_order ".
       "FROM msl_members m, msl_users u, msl_pickups pu ".
         "LEFT JOIN msl_pickup_items pui ON (pu.id = pui.pickup_id) ".
@@ -53,8 +53,18 @@ class Pickups extends ArrayObject{
     if(!empty($filters)){
       $qry .= "AND ".SQL::buildFilterQuery($filters);
     }
-    $qry .=
-      "ORDER BY pu.id, (CASE WHEN p_type='v' THEN 2 WHEN p_type='k' THEN 1 ELSE 0 END), p_name, pui.id";
+    if(!empty($orderby)){
+      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+    }else{
+      $qry .= "ORDER BY pu.id, (CASE WHEN p_type='v' THEN 2 WHEN p_type='k' THEN 1 ELSE 0 END), p_name, pui.id";
+    }
+    if($limit_start > 0 || $limit_count >= 0){
+      if($limit_count < 0){
+        $limit_count = 9999;
+      }
+      $qry .=
+        " LIMIT ".intval($limit_start).", ".intval($limit_count);
+    }
     $pus=SQL::selectID2($qry,'pickup_id','pui_id');
     $pickups = array();
     foreach($pus as $pu_id=>$pu){
@@ -96,12 +106,14 @@ class Pickups extends ArrayObject{
           $item->product->producer->id = intval($pui['p_producer_id']);
           $item->product->producer->name = $pui['p_producer_name'];
           $item->product->type = $pui['p_type'];
+          $item->product->period = $pui['p_period'];
         }else{
           $item->product->name = '[gelöschtes Produkt]';
           $item->product->producer = new Member();
           $item->product->producer->id = 0;
           $item->product->producer->name = '';
           $item->product->type = '';
+          $item->product->period = '';
         }
         $pickup->items[$pui_id] = $item;
       }

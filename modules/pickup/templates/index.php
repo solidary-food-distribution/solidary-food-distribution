@@ -79,12 +79,21 @@ $pickup_variable_sum = 0;
       <div class="amount">
         <?php if($item->amount_order): ?>
           <div>
-            <?php echo format_amount($item->amount_order).' '.translate_product_type($item->product->type); ?>
+            <?php echo format_amount($item->amount_order).' '.translate_product_type($item->product->type).' / '.translate_product_period($item->product->period); ?>
+          </div>
+        <?php endif ?>
+        <?php if(!empty($pickup_history[$item->product->id])): ?>
+          <div style="color:grey;font-size:0.8em;margin-top: 0.5em;">
+            <?php $dateCount=0; ?>
+            <?php foreach($pickup_history[$item->product->id] as $date=>$amount): ?>
+              <?php echo $date.': '.format_amount($amount) ?><br>
+              <?php if($dateCount++>=2){break;} ?>
+            <?php endforeach ?>
           </div>
         <?php endif ?>
       </div>
     </div>
-    <div class="col4">
+    <div class="col6">
       <div class="amount_ctrl">
         <?php //print_r($item); ?>
         <?php if($item->price_type == 'p'): ?>
@@ -127,7 +136,7 @@ $pickup_variable_sum = 0;
         <?php endif ?>
       </div>
     </div>
-    <div class="col4 right result">
+    <div class="col2 right last result">
       <?php
         if($item->price_type == 'p'){
           $amount = $item->amount_pieces;

@@ -14,12 +14,19 @@ function execute_index(){
   $pickup = pickup_get($pickup_id, $user['member_id']);
   require_once('orders.class.php');
   $orders = new Orders(array('member_id' => $user['member_id']));
-  $others = get_info_others();
+  $others = array();
+  $last_pickup = array();
+  if($product_type == 'v'){
+    $others = get_info_others();
+  }else{
+    $pickup_history = get_pickup_history($pickup);
+  }
   return array(
     'pickup' => $pickup,
     'product_type' => $product_type,
     'orders' => $orders,
-    'others' => $others);
+    'others' => $others,
+    'pickup_history' => $pickup_history);
 }
 
 function execute_new(){
@@ -167,12 +174,13 @@ function get_info_others(){
   $last = $delivery->created->format('Y-m-d H:i');
   $pickups = new Pickups(array('created>' => $last, 'm.id!=' => $user['member_id']));
   $pickup_sum = 0;
-  $pickup_count = 0;
+  $pickup_count = array();
+  #logger(print_r($pickups,1));
   foreach($pickups as $pickup){
     foreach($pickup->items as $item){
-      if($item->product->type == 'b' && $pickup->price_sum > 0){
-        $pickup_sum += $pickup->price_sum;
-        $pickup_count++;
+      if($item->product->type == 'v' && $item->price_sum > 0){
+        $pickup_sum += $item->price_sum;
+        $pickup_count[$pickup->member->id]=1;
       }
     }
   }
@@ -188,7 +196,28 @@ function get_info_others(){
   }
   return array(
     'pickup_sum' => $pickup_sum,
-    'pickup_count' => $pickup_count,
+    'pickup_count' => count($pickup_count),
     'orders_sum' => $orders_sum,
     'orders_count' => $orders_count);
+}
+
+function get_pickup_history($pickup){
+  global $user;
+  $pickup_history = array();
+  foreach($pickup->items as $item){
+    if($item->product->type != 'v'){
+      $pickup_history[$item->product->id] = array();
+    }
+  }
+
+  $pickups = new Pickups(array('member_id' => $user['member_id'], 'pu.id!=' => $pickup->id, 'pui.product_id' => array_keys($pickup_history)), array('pu.id' => 'DESC'));
+  foreach($pickups as $p){
+    foreach($p->items as $item){
+      if($item->product->type != 'v' && ($item->amount_pieces>0 ||$item->amount_weight>0)){
+        $date = $p->created->format('d.m.y');
+        $pickup_history[$item->product->id][$date] = ($item->amount_pieces?$item->amount_pieces:$item->amount_weight);
+      }
+    }
+  }
+  return $pickup_history;
 }

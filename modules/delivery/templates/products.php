@@ -7,14 +7,14 @@ $PROPERTIES['pathbar']=array(
 $PROPERTIES['body_class']='header_h5';
 ?>
 
-<?php ob_start(); ?>
+<?php /*ob_start(); ?>
   <div class="controls">
     <div class="control filter search">
       <i class="fa-solid fa-magnifying-glass"></i>
       <input class="filter" type="text" />
     </div>
   </div>
-<?php $PROPERTIES['header']=ob_get_clean(); ?>
+<?php $PROPERTIES['header']=ob_get_clean();*/ ?>
 
 <div class="selection">
   <?php $type=''; $type_v=false; ?>

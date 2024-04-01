@@ -12,9 +12,6 @@
 .amount_ctrl .ctrl.weight{
   text-align: center;
 }
-.amount_ctrl .ctrl .button.scale{
-  width: auto;
-}
 .amount_ctrl .ctrl .button.scale div{
   font-size: 0.7em;
   position: relative;

@@ -30,19 +30,19 @@ function execute_login_ajax(){
   if(empty($error)){
     require('users.class.php');
     $users = new Users(array('email' => $email));
-    logger(print_r($users, 1));
+    #logger(print_r($users, 1));
     if(empty($users->keys())){
-      $error='Unbekannte E-Mail-Adresse.';
+      $error = 'Unbekannte E-Mail-Adresse.';
     }else{
       $user = $users->first();
       if(!$user->password_verify($password)){
-        $error='Falsches Passwort.';
+        $error = 'Falsches Passwort.';
       }
     }
   }
   if(empty($error)){
     $user->set_session();
-    logger(print_r($_SESSION['user'],1));
+    #logger(print_r($_SESSION['user'],1));
   }
 
   echo json_encode(array('error'=>$error));
@@ -66,7 +66,7 @@ function execute_login_pin_ajax(){
   $error = '';
   require('users.class.php');
   $users = new Users(array('pickup_pin' => $pin));
-  logger(print_r($users, 1));
+  #logger(print_r($users, 1));
   if(empty($users->keys())){
     $error = 'Unbekannte PIN';
   }
@@ -74,7 +74,7 @@ function execute_login_pin_ajax(){
     $_SESSION['scale'] = 1;
     $user = $users->first();
     $user->set_session();
-    logger(print_r($_SESSION['user'],1));
+    #logger(print_r($_SESSION['user'],1));
   }
   echo json_encode(array('error' => $error));
   exit;

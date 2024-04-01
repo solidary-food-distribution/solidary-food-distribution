@@ -1,9 +1,9 @@
 <?php
 $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen',''=>'Abholmengen');
-$PROPERTIES['body_class']='footer_h8';
+//$PROPERTIES['body_class']='footer_h8';
 $sum_price_sum=0.0;
 $taxes=array();
-$base_cost=28.0;
+$base_cost=0; //28.0;
 ?>
 <?php foreach($orders as $op): ?>
 <?php
@@ -122,6 +122,7 @@ $base_cost=28.0;
       </div>
     </div>
   <?php endforeach*/ ?>
+  <?php /*
   <div class="inner_row mb1">
     <div class="col2"></div>
     <div class="col4">
@@ -134,6 +135,7 @@ $base_cost=28.0;
       </div>
     </div>
   </div>
+  */ ?>
   <div class="inner_row">
     <div class="col2"></div>
     <div class="col4">
