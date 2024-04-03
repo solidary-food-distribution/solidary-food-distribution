@@ -46,9 +46,9 @@ $base_cost=0; //28.0;
     $price_detail='x&nbsp;'.format_money($op->product->price).'&nbsp;EUR';
   }
   if($op->amount!='0.00' && $op->product->period!='m'){
-    $price_detail.=($price_detail==''?'':'<br>').'x 52&nbsp;Wochen<br>/ 12&nbsp;Monate';
-    $price_sum*=52/12;
-    $purchase_sum*=52/12;
+    $price_detail.=($price_detail==''?'':'<br>').'x 4 Wochen im April 24';
+    $price_sum*=4;
+    $purchase_sum*=4;
   }
   if(floatval($price_sum)){
     $sum_price_sum+=round($price_sum,2);

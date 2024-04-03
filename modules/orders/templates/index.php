@@ -1,8 +1,10 @@
 <?php
 $PROPERTIES['pathbar']=array('/admin'=>'Administration','/orders'=>'Abholmengen');
-$PROPERTIES['body_class']='footer_h4';
+$PROPERTIES['body_class']='footer_h8';
 $sum=0;
+$sum_su=0;
 $taxes=array();
+$month_factor=4;
 ?>
 
 <?php foreach($orders as $product_id=>$product): ?>
@@ -19,7 +21,7 @@ $taxes=array();
           <?php 
             echo number_format($product['amount'],2,',','');
             if($product['period']=='w'){
-              echo '<br><small>'.number_format($product['amount']*52/12,2,',','').'</small>';
+              echo '<br><small>'.number_format($product['amount']*$month_factor,2,',','').'</small>';
             }
           ?>
         </div>
@@ -38,17 +40,12 @@ $taxes=array();
         <div>
           <?php
             if($product['type']!='b'){
-              echo 'x&nbsp;'.number_format($product['price'],2,',','').' ';
+              echo 'x&nbsp;'.number_format($product['price'],2,',','').' EUR ';
             }
             $factor=1;
             if($product['period']=='w'){
-              $factor=52/12;
-              echo 'x&nbsp;52/12 ';
-            }
-            if($product['tax_incl']){
-              echo '<br>('.str_replace('.',',',round($product['tax'],2)).'% MwSt inkl)';
-            }else{
-              echo '<br>+ '.str_replace('.',',',round($product['tax'],2)).'% MwSt';
+              $factor=$month_factor;
+              echo 'x&nbsp;'.$month_factor.' Wo.';
             }
           ?>
         </div>
@@ -57,13 +54,25 @@ $taxes=array();
         <div>
           <?php 
             $rowsum=round($factor*$product['amount']*$product['price'],2);
-            if(!$product['tax_incl']){
-              $rowsum=round($rowsum*(100+$product['tax'])/100,2);
-            }
             echo number_format($rowsum,2,',','');
             $sum+=$rowsum;
-            #$taxes[$product['tax']]=$taxes[$product['tax']]+$rowsum;
-          ?> EUR/Monat
+          ?> EUR<br>
+          <br>
+          Erz.:
+          <?php
+            $rowsum_su=round($factor*$product['amount']*$product['purchase'],2);
+            echo ' '.number_format($rowsum_su,2,',','');
+          ?> EUR<br>
+          +MwSt:
+          <?php
+            $rowsum_tax=round($factor*$product['amount']*$product['purchase']*$product['tax']/100,2);
+            echo ' '.number_format($rowsum_tax,2,',','');
+          ?> EUR<br>
+          =
+          <?php
+            echo ' '.number_format($rowsum_su+$rowsum_tax,2,',','');
+            $sum_su+=round($rowsum_su+$rowsum_tax,2);
+          ?> EUR<br>
         </div>
       </div>
     </div>
@@ -123,7 +132,21 @@ $taxes=array();
   <div class="inner_row">
     <div class="col4 right last">
       <div>
-        <?php echo number_format($sum,2,',',''); ?> EUR/Monat
+        In: <?php echo number_format($sum,2,',',''); ?> EUR
+      </div>
+    </div>
+  </div>
+  <div class="inner_row">
+    <div class="col4 right last">
+      <div>
+        Out: <?php echo number_format($sum_su,2,',',''); ?> EUR
+      </div>
+    </div>
+  </div>
+  <div class="inner_row">
+    <div class="col4 right last">
+      <div>
+        = <?php echo number_format($sum-$sum_su,2,',',''); ?> EUR
       </div>
     </div>
   </div>

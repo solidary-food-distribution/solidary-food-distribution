@@ -8,7 +8,7 @@ function execute_index(){
   require_once('sql.class.php');
   $qry=
     "SELECT p.pid,p.name,p.type,p.period, ".
-      "o.amount,pr.price,pr.tax,pr.tax_incl, ".
+      "o.amount,pr.price,pr.tax,pr.purchase, ".
       "m.id AS member_id,m.name AS m_name, ".
       "(SELECT mp.name FROM msl_members mp WHERE mp.id=p.producer_id) AS producer_name ".
     "FROM msl_orders o, msl_products p, msl_prices pr, msl_members m ".
@@ -23,7 +23,7 @@ function execute_index(){
     $orders[$v['pid']]['period']=$v['period'];
     $orders[$v['pid']]['price']=$v['price'];
     $orders[$v['pid']]['tax']=$v['tax'];
-    $orders[$v['pid']]['tax_incl']=$v['tax_incl'];
+    $orders[$v['pid']]['purchase']=$v['purchase'];
     $orders[$v['pid']]['producer_name']=$v['producer_name'];
     if(!isset($orders[$v['pid']]['amount'])){
       $orders[$v['pid']]['amount']=0;
