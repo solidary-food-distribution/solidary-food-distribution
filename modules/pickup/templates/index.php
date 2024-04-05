@@ -8,7 +8,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
 $order_sum = 0;
 $variable_sum = 0;
 foreach($orders as $order){
-  if($order->product->type == 'b'){
+  if($order->product->id == 59){
+    continue;
+  }elseif($order->product->type == 'b'){
     $variable_sum += $order->amount;
   }else{
     $order_sum += $order->product->price * $order->amount;

@@ -62,7 +62,9 @@ function update_pickup_items($pickup_id){
   $orders = SQL::select($qry);
   #logger(print_r($orders,1));
   foreach($orders as $o){
-    if($o['type'] == 'b'){
+    if($o['pid'] == 59){
+      continue;
+    }elseif($o['type'] == 'b'){
       $type_b_producer_ids[ $o['producer_id'] ] = 1;
       continue;
     }
@@ -75,9 +77,11 @@ function update_pickup_items($pickup_id){
     }
   }
 
-  #logger(print_r($type_b_producer_ids,true));
+  #logger("update_pickup_items ".print_r($type_b_producer_ids,true));
   if(empty($type_b_producer_ids)){
     $type_b_producer_ids=array(0);
+  }else{
+    $type_b_producer_ids[ 20 ] = 1; //HACK Carmen
   }
 
   $qry = "SELECT i.product_id, p.producer_id, i.amount_weight, i.amount_pieces, ".
@@ -87,6 +91,7 @@ function update_pickup_items($pickup_id){
     "WHERE i.product_id=p.pid  AND i.pickup_item_id IN (0 $pickup_item_ids) AND p.type='v' AND p.producer_id IN (".SQL::escapeArray(array_keys($type_b_producer_ids)).") ".
     "ORDER BY p.name, i.delivery_item_id DESC";
   $vproducts = SQL::select($qry);
+  #logger("vproducts ".print_r($vproducts,1));
   foreach($vproducts as $p){
     if(!isset($pickup_items[$p['product_id']])){
       $item = $pickup->item_create($p['product_id'], $p['delivery_item_id']);
@@ -108,7 +113,7 @@ function execute_update_ajax(){
   $pickup = pickup_get($pickup_id, $user['member_id']);
   $item = $pickup->items[$item_id];
   $field = '';
-  logger("item ".print_r($item, true));
+  #logger("item ".print_r($item, true));
   if($item->price_type == 'k'){
     $field = 'amount_weight';
     $value = str_replace(',', '.', $value);
@@ -169,7 +174,7 @@ function inventory_update($pickup_item_id, $product_id, $updates){
 function get_info_others(){
   global $user;
   require_once('deliveries.class.php');
-  $deliveries = new Deliveries(array('supplier_id' => 11 /*Sigi Klein*/), array('d.id' => 'DESC'), 0, 1);
+  $deliveries = new Deliveries(array('supplier_id' => array(11 /*Sigi Klein*/)), array('d.id' => 'DESC'), 0, 1);
   $delivery = $deliveries->first();
   $last = $delivery->created->format('Y-m-d H:i');
   $pickups = new Pickups(array('created>' => $last, 'm.id!=' => $user['member_id']));
@@ -190,7 +195,7 @@ function get_info_others(){
   $orders_count = 0;
   $open_sum = 0;
   foreach($orders as $order){
-    if($order->product->type == 'b' && $order->amount > 0){
+    if($order->product->type == 'b' && $order->amount > 0 && $order->product->id != 59){
       $orders_sum += $order->amount;
       if(!isset($pickup_count[$order->member->id])){
         $open_sum += $order->amount;
