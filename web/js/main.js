@@ -268,6 +268,7 @@ function keyboard_option(el){
   keyboard_next_input();
 }
 
+keyboard_input_change_func = 0;
 function keyboard_input_change(key){
   //console.log("keyboard_input_change "+key);
   var value = $('.input.active').html().trim();
@@ -319,6 +320,9 @@ function keyboard_input_change(key){
     value = ' ';
   }
   $('.input.active').html(value.replace(' ','&nbsp;'));
+  if(keyboard_input_change_func){
+    keyboard_input_change_func();
+  }
 }
 
 function keyboard_toggle_shift(){

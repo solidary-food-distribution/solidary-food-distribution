@@ -50,7 +50,7 @@
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  top:20%;
+  top:10%;
   background-color: rgba(255, 255, 255, 0.95);
   border: 3px solid black;
   border-radius: 1em;
@@ -83,7 +83,7 @@
 #scale_price_sum{
   margin-top: 1em;
 }
-#scale_display{
+#scale_display, #scale_unit{
   display: inline-block;
   font-size: 1.5em;
   margin: 0em;
@@ -125,4 +125,14 @@
   right:1px;
   height: 1em;
   background-color: #cfc;
+}
+#scale_keyboard{
+  display: none;
+}
+#scale_scale{
+  display: none;
+}
+#scale_unit{
+  display: none;
+  border: none;
 }

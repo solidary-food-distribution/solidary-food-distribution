@@ -42,10 +42,18 @@ var scale_price_sum_pickup = 0;
 var scale_pickup_id = 0;
 var scale_item_id = 0;
 var scale_product_type = '';
+var scale_edit_mode = 0;
+var scale_row = 0;
 function scale_show(el){
-  var row = $(el).closest('.row');
+  scale_row = $(el).closest('.row');
   $('#scale_title').text($(el).data('title'));
-  $('#scale_display').text('Verbindung zur Waage...');
+  if(scale_edit_mode){
+    $('#scale_display').text(scale_row.find('.value').text());
+    $('#scale_ok').show();
+  }else{
+    $('#scale_display').text('Verbindung zur Waage...');
+    $('#scale_ok').hide();
+  }
   $('#scale_title2').text($(el).data('title2'));
   scale_exact = $(el).data('value_exact');
   scale_min = $(el).data('value_min');
@@ -53,14 +61,27 @@ function scale_show(el){
   scale_price = $(el).data('price');
   scale_price_sum = $(el).data('price_sum');
   scale_price_sum_pickup = $(el).data('price_sum_pickup');
-  scale_pickup_id = row.data('pickup_id');
-  scale_item_id = row.data('item_id');
-  scale_product_type = row.data('product_type');
-  $('#scale_ok').hide();
-  scale_show_price(0);
-  scale_show_bar(0);
+  scale_pickup_id = scale_row.data('pickup_id');
+  scale_item_id = scale_row.data('item_id');
+  scale_product_type = scale_row.data('product_type');
   $('#scale').show();
-  scale_read();
+  scale_show_values();
+}
+
+function scale_show_values(){
+  var text = '0';
+  if(scale_edit_mode){
+    text = $('#scale_display').text().replace(',', '.').replace(' kg', '');
+    $('#scale_unit').css('display', 'inline-block');
+  }else{
+    $('#scale_unit').hide();
+  }
+  var value = parseFloat(text);
+  scale_show_price(value);
+  scale_show_bar(value);
+  if(!scale_edit_mode){
+    scale_read();
+  }
 }
 
 function scale_ok(){
@@ -83,9 +104,11 @@ function scale_ok(){
     dataType: 'html',
     success: function(html){
       replace_header_main_footer(html);
+      if(scale_edit_mode){
+        scale_edit();
+      }
     }
   });
-  //filter_options($('.filters .filter[data-field="product_type"] .option.selected'));
 }
 
 var scale_read_timeout = 0;
@@ -129,6 +152,9 @@ function scale_show_price(value){
   $('#scale_price').show();
   value = value.toString().replace(' kg', '');
   value = parseFloat(value);
+  if(isNaN(value)){
+    value = 0;
+  }
   var sum = value * scale_price;
   var text = ' x ' + format_money(scale_price) + ' EUR = ' + format_money(sum) + ' EUR';
   $('#scale_price').text(text);
@@ -181,4 +207,27 @@ function scale_hide(){
   $('#scale').hide();
   //$('.ctrl.weight .button.scale').show();
   //keyboard_ok_func = 0;
+}
+
+function scale_edit(){
+  scale_edit_mode = 1;
+  $('#scale_display').text(scale_row.find('.value').text());
+  $('#scale_display').addClass('input').addClass('active');
+  $('#scale_keyboard').show();
+  $('#scale_edit').css('display', 'none');
+  $('#scale_scale').css('display', 'inline-flex');
+  scale_show_values();
+  $('#scale_ok').show();
+  keyboard_input_change_func = function(){
+    scale_show_values();
+  }
+}
+function scale_scale(){
+  scale_edit_mode = 0;
+  $('#scale_display').removeClass('input').removeClass('active');
+  $('#scale_keyboard').hide();
+  $('#scale_scale').css('display', 'none');
+  $('#scale_edit').css('display', 'inline-flex');
+  $('#scale_ok').hide();
+  scale_show_values();
 }
