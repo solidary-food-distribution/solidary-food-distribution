@@ -24,13 +24,13 @@ $totalsum=0;
               $rowsum*=$product['price'];
             }
             if($product['period']=='w'){
-              echo ' x 52/12';
-              $rowsum=round($rowsum*52/12,2);
+              echo ' x 4 W';
+              $rowsum=round($rowsum*4,2);
             }
-            if(!$product['tax_incl']){
+            /*if(!$product['tax_incl']){
               echo ' + '.str_replace('.',',',round($product['tax'],2)).'% MwSt';
               $rowsum=round($rowsum*(100+$product['tax'])/100,2);
-            }
+            }*/
             $sum+=$rowsum;
           ?>
         </div>

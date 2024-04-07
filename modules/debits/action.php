@@ -30,7 +30,7 @@ function execute_index(){
     $members[$v['member_id']]['products'][$v['pid']]['tax_incl']=$v['tax_incl'];
   }
   foreach($members as $member_id=>$member){
-    $members[$member_id]['products'][0]=array(
+    /*$members[$member_id]['products'][0]=array(
       'name'=>'Grundbeitrag',
       'type'=>'p',
       'period'=>'m',
@@ -38,7 +38,7 @@ function execute_index(){
       'price'=>28,
       'tax'=>7,
       'tax_incl'=>1
-    );
+    );*/
   }
   return array('members'=>$members);
 
