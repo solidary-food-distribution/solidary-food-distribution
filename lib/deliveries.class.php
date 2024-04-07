@@ -36,8 +36,8 @@ class Deliveries extends ArrayObject{
     }
     require_once('sql.class.php');
     $qry=
-      "SELECT d.id AS delivery_id, ms.id AS supplier_id, ms.name AS supplier_name, d.price_total AS d_price_total, d.created AS d_created, u.id AS creator_id, u.name AS creator_name, ".
-        "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_weight, di.price_type, di.price, di.price_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
+      "SELECT d.id AS delivery_id, ms.id AS supplier_id, ms.name AS supplier_name, d.purchase_total AS d_purchase_total, d.created AS d_created, u.id AS creator_id, u.name AS creator_name, ".
+        "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_weight, di.price_type, di.purchase, di.purchase_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
         "p.pid AS p_id,p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type ".
       "FROM msl_members ms, msl_users u, msl_deliveries d ".
         "LEFT JOIN msl_delivery_items di ON (d.id=di.delivery_id) ".
@@ -71,7 +71,7 @@ class Deliveries extends ArrayObject{
       $supplier->id=intval($data['supplier_id']);
       $supplier->name=$data['supplier_name'];
       $delivery->supplier=$supplier;
-      $delivery->price_total=floatval($data['d_price_total']);
+      $delivery->purchase_total=floatval($data['d_purchase_total']);
       $delivery->created=new DateTime($data['d_created']);
       $creator=new User();
       $creator->id=intval($data['creator_id']);
@@ -87,8 +87,8 @@ class Deliveries extends ArrayObject{
         $item->amount_pieces = intval($di['amount_pieces']);
         $item->amount_weight = floatval($di['amount_weight']);
         $item->price_type = $di['price_type'];
-        $item->price = floatval($di['price']);
-        $item->price_sum = floatval($di['price_sum']);
+        $item->purchase = floatval($di['purchase']);
+        $item->purchase_sum = floatval($di['purchase_sum']);
         $item->dividable = floatval($di['dividable']);
         if($di['best_before']!=='0000-00-00'){
           $item->best_before = new DateTime($di['best_before']);

@@ -9,8 +9,8 @@ class DeliveryItem{
   public int $amount_pieces;
   public float $amount_weight;
   public string $price_type;
-  public float $price;
-  public float $price_sum;
+  public float $purchase;
+  public float $purchase_sum;
   public float $dividable;
   public DateTime $best_before;
   public float $weight_min;

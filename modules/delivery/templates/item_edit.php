@@ -70,11 +70,11 @@ $PROPERTIES['pathbar']=array(
       <?php 
         if($item->product->type == 'v'){
           echo html_input(array(
-            'field' => 'price',
+            'field' => 'purchase',
             'type' => 'money',
             'info' => 'Grundpreis '.$item->product->name.' gemäß Lieferschein',
             'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
-            'value' => format_money($item->price)
+            'value' => format_money($item->purchase)
           )). ' EUR / ';
           echo html_input(array(
             'field' => 'price_type',
@@ -93,15 +93,17 @@ $PROPERTIES['pathbar']=array(
   <div class="col3 right">
     <div>
       <?php
+        /*
         if($item->product->type == 'v'){
           echo html_input(array(
-            'field' => 'price_sum',
+            'field' => 'purchase_sum',
             'type' => 'money',
             'info' => 'Zeilensumme '.$item->product->name.' gemäß Lieferschein',
             'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
-            'value' => format_money($item->price_sum)
+            'value' => format_money($item->purchase_sum)
           )). ' EUR';
         }
+        */
       ?>
     </div>
   </div>

@@ -43,8 +43,8 @@
   </div>
   <div class="col4">
     <div class="amount">
-      <?php if($item->price): ?>
-        <?php echo format_money($item->price) ?> EUR
+      <?php if($item->purchase): ?>
+        <?php echo format_money($item->purchase) ?> EUR
       <?php endif ?>
       <?php if($item->price_type): ?>
         /<br>
@@ -54,8 +54,8 @@
   </div>
   <div class="col3 right">
     <div class="price_sum">
-      <?php if($item->price_sum): ?>
-        <?php echo format_money($item->price_sum) ?> EUR
+      <?php if($item->purchase_sum): ?>
+        <?php echo format_money($item->purchase_sum) ?> EUR
       <?php endif ?>
     </div>
   </div>

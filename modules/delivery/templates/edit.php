@@ -20,11 +20,11 @@ $PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen','/delivery?delivery_id
       <?php 
         if($type_v){
           echo html_input(array(
-            'field' => 'price_total', 
+            'field' => 'purchase_total', 
             'type' => 'money',
             'info' => 'Lieferung Betrag gemäß Lieferschein',
             'url' => '/delivery/update_ajax?delivery_id='.$delivery->id,
-            'value' => format_money($delivery->price_total)
+            'value' => format_money($delivery->purchase_total)
           )).' EUR';
         }
       ?>

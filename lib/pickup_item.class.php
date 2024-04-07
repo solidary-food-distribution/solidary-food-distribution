@@ -12,6 +12,8 @@ class PickupItem{
   public string $price_type;
   public float $price;
   public float $price_sum;
+  public float $purchase;
+  public float $purchase_sum;
   public DateTime $best_before;
 
   public function update( array $updates = array() ){
@@ -20,6 +22,9 @@ class PickupItem{
     $updates['modifier_id'] = $user['user_id'];
     if(in_array('price', array_keys($updates)) && (is_null($updates['price']) || $updates['price']==='')){
       $updates['price'] = '0';
+    }
+    if(in_array('purchase', array_keys($updates)) && (is_null($updates['purchase']) || $updates['purchase']==='')){
+      $updates['purchase'] = '0';
     }
     require_once('sql.class.php');
     $qry = 

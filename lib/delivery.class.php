@@ -8,7 +8,7 @@ require_once('user.class.php');
 class Delivery{
   public $id;
   public Member $supplier;
-  public $price_total;
+  public $purchase_total;
   public DateTime $created;
   public User $creator;
   public array $items = array(); //class DeliveryItem

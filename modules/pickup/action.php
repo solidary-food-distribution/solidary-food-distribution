@@ -49,58 +49,56 @@ function update_pickup_items($pickup_id){
     $pickup_items[$item->product->id] = $item;
     $pickup_item_ids .= ','.$item->id;
   }
+  $has_type_b = false;
+  $type_b_factor = 0;
   $type_b_producer_ids = array();
   require_once('sql.class.php');
-  $qry = "SELECT o.pid, p.type, p.producer_id, o.amount, ".
-    "SUM(i.amount_pieces) AS i_amount_pieces, SUM(i.amount_weight) AS i_amount_weight, ".
-    "i.delivery_item_id, MAX(di.price_type) AS di_price_type, MAX(di.price) AS di_price ".
-    "FROM msl_orders o, msl_products p ".
+  $qry = "SELECT o.pid, p.type, p.producer_id, o.amount, pr.price, pr.purchase, ".
+    "SUM(i.amount_pieces) AS i_amount_pieces, SUM(i.amount_weight) AS i_amount_weight ".
+    "FROM msl_orders o, msl_prices pr, msl_products p ".
       "LEFT JOIN msl_inventory i ON (p.pid=i.product_id AND i.pickup_item_id IN (0 $pickup_item_ids)) ".
       "LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
     "WHERE o.pid=p.pid AND o.amount>0 AND o.member_id='".intval($user['member_id'])."' ".
-    "GROUP BY o.pid, p.type, p.producer_id, o.amount";
+    "AND p.pid=pr.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE() ".
+    "GROUP BY o.pid, p.type, p.producer_id, o.amount, pr.price, pr.purchase";
   $orders = SQL::select($qry);
   #logger(print_r($orders,1));
   foreach($orders as $o){
-    if($o['pid'] == 59){
+    if($o['pid'] == 59){ //sponsoring -> ignore
       continue;
     }elseif($o['type'] == 'b'){
-      $type_b_producer_ids[ $o['producer_id'] ] = 1;
+      $has_type_b = 1;
+      $type_b_factor = $o['price'] / $o['purchase'];
       continue;
     }
     if(!isset($pickup_items[$o['pid']])){
       $item = $pickup->item_create($o['pid'], $o['delivery_item_id']);
       $item->update(array(
         'price_type' => $o['type'],
-        'price' => $o['di_price'],
+        'price' => $o['price'],
       ));
     }
   }
 
-  #logger("update_pickup_items ".print_r($type_b_producer_ids,true));
-  if(empty($type_b_producer_ids)){
-    $type_b_producer_ids=array(0);
-  }else{
-    $type_b_producer_ids[ 20 ] = 1; //HACK Carmen
-  }
-
-  $qry = "SELECT i.product_id, p.producer_id, i.amount_weight, i.amount_pieces, ".
-      "i.delivery_item_id, di.price_type di_price_type, di.price AS di_price ".
-    "FROM msl_products p, msl_inventory i ".
-    " LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
-    "WHERE i.product_id=p.pid  AND i.pickup_item_id IN (0 $pickup_item_ids) AND p.type='v' AND p.producer_id IN (".SQL::escapeArray(array_keys($type_b_producer_ids)).") ".
-    "ORDER BY p.name, i.delivery_item_id DESC";
-  $vproducts = SQL::select($qry);
-  #logger("vproducts ".print_r($vproducts,1));
-  foreach($vproducts as $p){
-    if(!isset($pickup_items[$p['product_id']])){
-      $item = $pickup->item_create($p['product_id'], $p['delivery_item_id']);
-      $item->update(array(
-        'price_type' => $p['di_price_type'],
-        'price' => $p['di_price'],
-      ));
-      $pickup_items[$p['product_id']] = $item;
-      $pickup_item_ids .= ','.$item->id;
+  if($has_type_b){
+    $qry = "SELECT i.product_id, p.producer_id, i.amount_weight, i.amount_pieces, ".
+        "i.delivery_item_id, di.price_type di_price_type, di.purchase AS di_purchase ".
+      "FROM msl_products p, msl_inventory i ".
+      " LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
+      "WHERE i.product_id=p.pid  AND i.pickup_item_id IN (0 $pickup_item_ids) AND p.type='v' ".
+      "ORDER BY p.name, i.delivery_item_id DESC";
+    $vproducts = SQL::select($qry);
+    #logger("vproducts ".print_r($vproducts,1));
+    foreach($vproducts as $p){
+      if(!isset($pickup_items[$p['product_id']])){
+        $item = $pickup->item_create($p['product_id'], $p['delivery_item_id']);
+        $item->update(array(
+          'price_type' => $p['di_price_type'],
+          'price' => round($p['di_purchase'] * $type_b_factor, 2),
+        ));
+        $pickup_items[$p['product_id']] = $item;
+        $pickup_item_ids .= ','.$item->id;
+      }
     }
   }
 }
