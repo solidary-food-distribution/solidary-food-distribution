@@ -29,7 +29,7 @@ class Orders extends ArrayObject{
       "SELECT p.*, o.member_id, o.amount, o.lock_date, ".
         "pr.price, pr.tax, pr.purchase, ".
         "mp.name AS mp_name, ".
-        "mo.name AS mo_name, mo.identification AS mo_identification ".
+        "IFNULL(mo.name,'') AS mo_name ".
       "FROM msl_members mp, msl_prices pr, msl_products p ".
       "  LEFT JOIN msl_orders o ON (p.pid=o.pid /*FILTER_MEMBER_ID*/) ".
       "  LEFT JOIN msl_members mo ON (o.member_id = mo.id) ".
@@ -73,7 +73,6 @@ class Orders extends ArrayObject{
         $order->member = new Member();
         $order->member->id = intval($row['member_id']);
         $order->member->name = $row['mo_name'];
-        $order->member->identification = $row['mo_identification'];
       }elseif(isset($member_ids) && count($member_ids)==1){
         $order->member = new Member();
         $order->member->id = intval($member_ids[0]);

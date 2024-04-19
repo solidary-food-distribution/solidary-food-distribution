@@ -7,6 +7,7 @@ user_needs_access('inventory');
 require_once('inventories.class.php');
 
 function execute_index(){
+  $product_type = get_request_param('product_type');
   $items = new Inventories();
   $inventories = array();
   foreach($items as $item){
@@ -17,7 +18,10 @@ function execute_index(){
       $inventories[$item->product->id]->amount_weight += $item->amount_weight;
     }
   } 
-  return array('inventories' => $inventories);
+  return array(
+    'inventories' => $inventories,
+    'product_type' => $product_type,
+  );
 }
 
 function execute_edit(){
