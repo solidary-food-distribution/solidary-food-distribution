@@ -45,3 +45,5 @@ $PROPERTIES['body_class']='header_h5';
 <?php endforeach ?>
 
 <div class="main_button button" onclick="location.href='/pickup/new'">Neue Abholung anlegen</div>
+
+<?php require('scroll_down.part.php') ?>

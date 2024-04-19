@@ -5,6 +5,16 @@ require_once('user.class.php');
 
 class Users extends ArrayObject{
 
+  public static function create($email, $name, $member_id=0){
+    require_once('sql.class.php');
+    $qry = 
+      "INSERT INTO msl_users ".
+        "(email, name, member_id, passwd, passwd_tmp, pickup_pin) VALUES ".
+        "('".SQL::escapeString($email)."', '".SQL::escapeString($name)."', ".intval($member_id).", '', '', '')";
+    $user_id = SQL::insert($qry);
+    return $user_id;
+  }
+
   public function __construct(array $filters = array(), array $orderby = array(), int $limit_start = 0, int $limit_count = -1){
     $users = $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
     parent::__construct($users);

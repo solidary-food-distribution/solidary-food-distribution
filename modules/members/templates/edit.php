@@ -2,7 +2,7 @@
 $PROPERTIES['pathbar']=array(
   '/admin' => 'Administration',
   '/members' => 'Mitglieder',
-  '' => 'Mitglied-Nr '.$member->identification
+  '' => $member->name
 );
 ?>
 
@@ -22,27 +22,6 @@ $PROPERTIES['pathbar']=array(
             'info' => 'Mitglied Vor-/Nachmane',
             'url' => '/members/update_ajax?member_id='.$member->id,
             'value' => $member->name
-          ));
-          ?>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="inner_row">
-    <div class="col3">
-      <div>
-        <div>Mitglied-Nr</div>
-      </div>
-    </div>
-    <div class="col5">
-      <div>
-        <div><?php
-          echo html_input(array(
-            'field' => 'identification', 
-            'type' => 'string',
-            'info' => 'Mitgliednummer',
-            'url' => '/members/update_ajax?member_id='.$member->id,
-            'value' => $member->identification
           ));
           ?>
         </div>

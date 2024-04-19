@@ -80,6 +80,8 @@ $sum=0;
   </div>
 <?php endif ?>
 
+<?php require('scroll_down.part.php') ?>
+
 <?php ob_start(); ?>
   <div class="row">
     <div class="col4 center">

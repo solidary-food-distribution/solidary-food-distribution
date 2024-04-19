@@ -1,6 +1,30 @@
 function document_ready(){
   //var mobile=is_mobile();
   //calc_scroll_filler();
+  $('div[onclick]').each(function(){
+    $(this).click(highlight_click);
+  });
+}
+
+var highlight_click_timer = 0;
+var highlight_click_element = 0;
+var highlight_click_save = '';
+function highlight_click(){
+  highlight_click_timer_func();
+  highlight_click_element = $(this);
+  highlight_click_save = $(this).css('background-color');
+  $(this).css('background-color','#44cc44');
+  highlight_click_timer = setTimeout(highlight_click_timer_func, 100);
+}
+function highlight_click_timer_func(){
+  if(highlight_click_timer){
+    clearTimeout(highlight_click_timer);
+    highlight_click_timer = 0;
+  }
+  if(highlight_click_element){
+    highlight_click_element.css('background-color', highlight_click_save);
+    highlight_click_element = 0;
+  }
 }
 
 function is_mobile(){
@@ -165,7 +189,7 @@ function highlight_input_timer(){
       i--;
     }
   }
-  highlight_inputs_timer = setTimeout(highlight_input_timer,15);
+  highlight_inputs_timer = setTimeout(highlight_input_timer, 15);
 }
 
 

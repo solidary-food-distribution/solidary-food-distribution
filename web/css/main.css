@@ -41,7 +41,8 @@ main{
   width: 100%;
   right: 0px;
   bottom: 1em;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: scroll;
 }
 
 footer{

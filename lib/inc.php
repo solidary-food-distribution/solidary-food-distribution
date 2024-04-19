@@ -103,6 +103,7 @@ function translate_access($access){
     'users'=>'Benutzer verwalten',
     'orders'=>'Abholmengen verwalten',
     'debits'=>'Abbuchungen verwalten',
+    'inventory'=>'Inventur erfassen',
   );
   if(!isset($translate[$access])){
     return $access;
