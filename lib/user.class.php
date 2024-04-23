@@ -39,4 +39,13 @@ class User{
       'members'=>$this->members,
     );
   }
+
+  public function update( array $updates = array() ){
+    require_once('sql.class.php');
+    $qry = 
+      "UPDATE msl_users SET ";
+    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= "WHERE id='".intval($this->id)."'";
+    SQL::update($qry);
+  }
 }

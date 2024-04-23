@@ -90,3 +90,11 @@ class Users extends ArrayObject{
     return $users;
   }
 }
+
+function user_get($id){
+  $objects = new Users(array('id' => $id));
+  if(!empty($objects)){
+    return $objects->first();
+  }
+  return null;
+}

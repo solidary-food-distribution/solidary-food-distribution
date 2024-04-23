@@ -72,6 +72,47 @@ $PROPERTIES['pathbar']=array(
       </div>
     </div>
   </div>
+  <div class="inner_row mt1">
+    <div class="col8">
+      <div>
+        <div>Benutzer Vor-/Nachmane</div>
+      </div>
+    </div>
+    <div class="col8">
+      <div>
+        <div>E-Mail / Login</div>
+      </div>
+    </div>
+  </div>
+  <?php foreach($users[$member->id] as $user): ?>
+    <div class="inner_row">
+      <div class="col8">
+        <?php 
+          echo html_input(array(
+            'field' => 'name', 
+            'type' => 'string',
+            'info' => 'Benutzer Vor-/Nachmane',
+            'url' => '/members/update_user_ajax?user_id='.$user->id,
+            'value' => $user->name
+          ));
+        ?>
+      </div>
+      <div class="col8">
+        <?php 
+          echo html_input(array(
+            'field' => 'email', 
+            'type' => 'string',
+            'info' => 'Benutzer E-Mail / Login',
+            'url' => '/members/update_user_ajax?user_id='.$user->id,
+            'value' => $user->email
+          ));
+        ?>
+      </div>
+    </div>
+  <?php endforeach ?>
+  <div class="inner_row">
+    <div class="button" onclick="if(confirm('Wirklich weiteren Benutzer hinzufügen?')){location.href='/members/create_user?member_id=<?php echo $member->id ?>';}">Weiteren Benutzer hinzufügen</div>
+  </div>
   <div class="col1 right last">
     <div class="buttons">
       <div class="button large ok" onclick="active_input_post_value_goto('/members/?member_id=<?php echo $member->id ?>')">
