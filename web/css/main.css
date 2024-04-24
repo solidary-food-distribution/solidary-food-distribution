@@ -221,6 +221,9 @@ div.mr1{
   min-width: 1.2em;
   text-align: center;
 }
+.input.input_text{
+  text-align: left;
+}
 .button{
   padding: 0.2em;
 }

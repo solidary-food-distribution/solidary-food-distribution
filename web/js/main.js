@@ -87,6 +87,12 @@ function validate_money(id){
   var value = $('#'+id).val();
 }
 
+function input_text_onchange(el){
+  $('.input.active').removeClass('active');
+  $(el).addClass('active');
+  active_input_post_value();
+}
+
 function input_onfocus(el){
   if($(el).hasClass('active')){
     return;
@@ -98,7 +104,11 @@ function input_onfocus(el){
   if($(el).data('type') == 'options'){
     active_input_post_value();
   }
-  keyboard_show(el);
+  if($(el).data('type') == 'input_text'){
+    $('body').off('keydown');
+  }else{
+    keyboard_show(el);
+  }
 }
 
 var active_input_post_value_goto_url='';
@@ -122,6 +132,8 @@ function active_input_post_value(){
   var value = '';
   if(type == 'options'){
     value = input.find('.option.selected').data('value');
+  }else if(type == 'input_text'){
+    value = input.val().trim();
   }else{
     value = input.text().trim();
   }
@@ -245,7 +257,7 @@ function keyboard_key(key){
     keyboard_input_change(key);
   }else if('|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|ä|ö|ü|ß|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
-  }else if('| |-|'.indexOf('|'+key+'|') >= 0 ){
+  }else if('| |-|.|@|_|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
   }else if(key == 'Ok'){
     keyboard_ok();

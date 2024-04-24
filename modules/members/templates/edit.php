@@ -17,8 +17,8 @@ $PROPERTIES['pathbar']=array(
       <div>
         <div><?php
           echo html_input(array(
-            'field' => 'name', 
-            'type' => 'string',
+            'field' => 'name',
+            'type' => 'input_text',
             'info' => 'Mitglied Vor-/Nachmane',
             'url' => '/members/update_ajax?member_id='.$member->id,
             'value' => $member->name
@@ -90,7 +90,7 @@ $PROPERTIES['pathbar']=array(
         <?php 
           echo html_input(array(
             'field' => 'name', 
-            'type' => 'string',
+            'type' => 'input_text',
             'info' => 'Benutzer Vor-/Nachmane',
             'url' => '/members/update_user_ajax?user_id='.$user->id,
             'value' => $user->name
@@ -101,7 +101,7 @@ $PROPERTIES['pathbar']=array(
         <?php 
           echo html_input(array(
             'field' => 'email', 
-            'type' => 'string',
+            'type' => 'input_text',
             'info' => 'Benutzer E-Mail / Login',
             'url' => '/members/update_user_ajax?user_id='.$user->id,
             'value' => $user->email

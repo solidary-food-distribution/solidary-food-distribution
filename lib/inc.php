@@ -186,7 +186,11 @@ function send_email($to, $subject, $text){
 }
 
 function html_input($data){
-  $return = '<div class="input';
+  if(isset($data['type']) && $data['type']=='input_text'){
+    $return = '<input class="input';
+  }else{
+    $return = '<div class="input';
+  }
   if(isset($data['class'])){
     $return .= ' '.$data['class'];
   }
@@ -211,6 +215,15 @@ function html_input($data){
   }
   if(isset($data['onclick']) && !isset($data['options'])){
     $return .= ' onclick="'.$data['onclick'].'(this)"';
+  }
+  if(isset($data['type']) && $data['type']=='input_text'){
+    if(isset($data['value'])){
+      $return .= ' value="'.htmlentities($data['value']).'"';
+    }
+    //$return .= ' onblur="input_text_onchange(this)"';
+    //$return .= ' onchange="input_text_onchange(this)"';
+    $return .= ' />';
+    return $return;
   }
   $return .= '>';
   if(isset($data['options'])){
