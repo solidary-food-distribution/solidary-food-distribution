@@ -148,6 +148,7 @@ h2 a{
 
 #main{
   position: relative;
+  height: 100%;
 }
 
 div.mt0_5{

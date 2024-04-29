@@ -46,7 +46,7 @@ $base_cost=0; //28.0;
     $price_detail='x&nbsp;'.format_money($op->product->price).'&nbsp;EUR';
   }
   if($op->amount!='0.00' && $op->product->period!='m'){
-    $price_detail.=($price_detail==''?'':'<br>').'x 4 Wochen im April 24';
+    $price_detail.=($price_detail==''?'':'<br>').'x 4 Wochen<br>(3.5.- 24.5.24)';
     $price_sum*=4;
     $purchase_sum*=4;
   }
