@@ -49,12 +49,14 @@ function pin_cancel(){
 }
 
 function pin_ok(){
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {pickup_pin: user_pickup_pin.join(',')},
     url: '/user/pickup_pin_ajax',
     dataType: 'json',
     success: function(json){
+      $('#loading').hide();
       if(json.error == ''){
         location.href = '/user';
       }else{

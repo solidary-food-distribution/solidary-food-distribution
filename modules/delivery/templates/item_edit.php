@@ -122,5 +122,9 @@ $PROPERTIES['pathbar']=array(
 
 <?php require('keyboard.part.php'); ?>
 <script type="text/javascript">
-  $('.input[data-field]').first().click();
+  if($('.input[data-field="price_type"] .option.selected[data-value="p"]').length){
+    $('.input[data-field="amount_pieces"]').first().click();
+  }else{
+    $('.input[data-field]').first().click();
+  }
 </script>

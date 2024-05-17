@@ -2,12 +2,14 @@
 
 function timesheet_edit(el,id){
   $(el).off("click");
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {id: id},
     url: '/timesheet/edit_ajax',
     dataType: "html",
     success: function(html){
+      $('#loading').hide();
       replace_header_main_footer(html);
     }
   });
@@ -18,12 +20,14 @@ function timesheet_save(el,id){
   var date=$('#input_date').data('value');
   var mins=$('#input_mins').val();
   var what=$('#input_what').val();
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {id: id, date: date, mins: mins, what: what},
     url: '/timesheet/save_ajax',
     dataType: "html",
     success: function(html){
+      $('#loading').hide();
       replace_header_main_footer(html);
     }
   });

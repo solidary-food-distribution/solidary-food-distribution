@@ -2,6 +2,7 @@ function pickups_delete(pickup_id){
   if(!confirm('Wirklich Abholung löschen?')){
     return;
   }
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {pickup_id: pickup_id},

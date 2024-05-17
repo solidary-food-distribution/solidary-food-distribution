@@ -242,6 +242,11 @@ function html_input($data){
       $return .= '<span>'.htmlentities($label).'</span></div>';
     }
   }elseif(isset($data['value'])){
+    if($data['type'] == 'money' || $data['type'] == 'weight'){
+      if(floatval(str_replace(',', '.', $data['value'])) == 0){
+        $data['value'] = '';
+      }
+    }
     $return .= $data['value'];
   }
   $return .= '</div>';

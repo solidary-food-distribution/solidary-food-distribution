@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202404291943';
+$version='202405180052';
 $body_class='';
 $header='';
 $footer='';
@@ -77,5 +77,6 @@ if($authed){
     </div>
     */ ?>
   </footer>
+  <div id="loading"></div>
 </body>
 </html>

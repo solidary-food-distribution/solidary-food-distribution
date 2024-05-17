@@ -2,6 +2,7 @@ function delivery_delete(delivery_id){
   if(!confirm('Wirklich Lieferung löschen?')){
     return;
   }
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {delivery_id: delivery_id},
@@ -17,6 +18,7 @@ function delivery_item_delete(delivery_id, item_id){
   if(!confirm('Wirklich Position löschen?')){
     return;
   }
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {delivery_id: delivery_id, item_id: item_id},

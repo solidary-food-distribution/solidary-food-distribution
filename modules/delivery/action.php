@@ -56,9 +56,23 @@ function execute_product_select(){
     $item = $delivery->item_create($product_id);
     $item_id = $item->id;
   }
+
   require_once('products.class.php');
   $product = product_get($product_id);
-  $item->update(array('price_type' => $product->type, 'price' => $product->price, 'price_sum' => 0, 'amount_pieces' => 0, 'amount_weight' => 0));
+  $price_type = $product->type;
+  $purchase = 0;
+
+  $last = new Deliveries(array('di.product_id' => $product_id, 'di.price_type!=' => ''), array('d.id' => 'DESC'), 0, 1);
+  if(count($last)){
+    $last = $last->first();
+    if(count($last->items)){
+      $last = $last->items[key($last->items)];
+      $price_type = $last->price_type;
+      $purchase = $last->purchase;
+    }
+  }
+
+  $item->update(array('price_type' => $price_type, 'purchase' => $purchase, 'purchase_sum' => 0, 'amount_pieces' => 0, 'amount_weight' => 0));
   forward_to_page('/delivery/item_edit', 'delivery_id='.$delivery_id.'&item_id='.$item_id);
 }
 

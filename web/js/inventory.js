@@ -3,6 +3,7 @@ function inventory_remove_product(product_id){
   if(!confirm('Wirklich dieses Produkt auf Menge 0 setzen?')){
     return;
   }
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {product_id: product_id},

@@ -144,6 +144,7 @@ function active_input_post_value(){
       return;
     }
   }
+  $('#loading').show();
   $.ajax({
     type: 'POST',
     data: {
@@ -154,6 +155,7 @@ function active_input_post_value(){
     url: input.data('url'),
     dataType: 'json',
     success: function(data){
+      $('#loading').hide();
       if(data.location_href){
         location.href = data.location_href;
         return;
