@@ -47,12 +47,10 @@ $PROPERTIES['body_class']='header_h5';
     <?php endforeach ?>
 -->
 
-    <div class="inner_row">
-      <div class="col last">
-        <div>
-          <div class="button" onclick="alert('NOCH NICHT UMGESETZT');">Bearbeiten</div>
-        </div>
-      </div>
+    <div class="col1 right last">
+      <span class="button large" onclick="location.href='/users/edit?user_id=<?php echo $user_id ?>';">
+        <i class="fa-solid fa-pencil"></i>
+      </span>
     </div>
   </div>
 <?php endforeach ?>

@@ -65,10 +65,13 @@ class Users extends ArrayObject{
     $keys = array_keys($users);
     require_once('sql.class.php');
     $qry =
-      "SELECT * ".
+      "SELECT a.user_id,a.access,a.start,a.end,a.member_id, m.name ".
       "FROM msl_access a ".
+        "LEFT JOIN msl_members m ON (a.member_id = m.id) ".
       "WHERE start<=CURDATE() AND end>=CURDATE() ".
-        "AND user_id IN (".SQL::escapeArray($keys).")";
+        "AND user_id IN (".SQL::escapeArray($keys).") ".
+      "ORDER BY (CASE WHEN a.member_id=0 THEN 0 ELSE 1 END),m.name,a.access";
+
     $as = SQL::select($qry);
     foreach($as as $a){
       $users[$a['user_id']]->access[$a['access']][$a['member_id']]['start'] = $a['start'];
