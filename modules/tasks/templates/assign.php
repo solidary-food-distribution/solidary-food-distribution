@@ -58,18 +58,21 @@ $PROPERTIES['body_class']='header_h5';
       </div>
     </div>
     <?php #logger(print_r($task->users,1)); ?>
-    <?php foreach($task->users as $task_user): ?>
-      <?php
-        if($task_user->user_id == $user['user_id'] || ($task_user->assign == 0 && trim($task_user->comment) == '')){
-          continue;
-        }
-      ?>
-      <div class="inner_row">
-        <div class="col12 last">
-          <?php echo htmlentities($users[$task_user->user_id]->name) ?>: <?php echo $task_user->assign ?>% <?php echo htmlentities($task_user->comment) ?>
+    <?php #logger(print_r($_SESSION['user'],1)); ?>
+    <?php if(user_has_access('tasks_assign')): ?>
+      <?php foreach($task->users as $task_user): ?>
+        <?php
+          if($task_user->user_id == $user['user_id'] || ($task_user->assign == 0 && trim($task_user->comment) == '')){
+            continue;
+          }
+        ?>
+        <div class="inner_row">
+          <div class="col12 last">
+            <?php echo htmlentities($users[$task_user->user_id]->name) ?>: <?php echo $task_user->assign ?>% <?php echo htmlentities($task_user->comment) ?>
+          </div>
         </div>
-      </div>
-    <?php endforeach ?>
+      <?php endforeach ?>
+    <?php endif ?>
   </div>
 <?php endforeach ?>
 
