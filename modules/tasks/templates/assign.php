@@ -28,7 +28,7 @@ $PROPERTIES['body_class']='header_h5';
         <?php echo 'ca. '.intval($task->effort).' min'; ?>
       </div>
       <?php
-        $assign=0;
+        $assign='';
         $comment='';
         if(!empty($task->users) && $task->users[0]->user_id==$user['user_id']){
           $assign=$task->users[0]->assign;
