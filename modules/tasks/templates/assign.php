@@ -73,8 +73,11 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php endforeach ?>
 
-
+<?php /*
+<div style="position: absolute;top:20em;">;
 <?php require('keyboard.part.php'); ?>
+</div>
 <script type="text/javascript">
   $('.input[data-field]').first().click();
 </script>
+*/ ?>

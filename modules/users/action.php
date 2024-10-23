@@ -62,3 +62,7 @@ function execute_update_ajax(){
 function execute_new(){
 
 }
+
+function execute_emails(){
+  return array('users' => get_users());
+}

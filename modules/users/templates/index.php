@@ -3,6 +3,12 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration',''=>'Benutzer');
 $PROPERTIES['body_class']='header_h5';
 ?>
 
+<?php ob_start(); ?>
+  <div class="controls">
+    <div class="button" onclick="location.href='/users/emails';">Benutzer E-Mails</div>
+  </div>
+<?php $PROPERTIES['header']=ob_get_clean(); ?>
+
 <?php foreach($users as $user_id=>$user): ?>
   <div class="row">
     <div class="inner_row">
