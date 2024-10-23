@@ -220,8 +220,8 @@ function html_input($data){
     if(isset($data['value'])){
       $return .= ' value="'.htmlentities($data['value']).'"';
     }
-    //$return .= ' onblur="input_text_onchange(this)"';
-    //$return .= ' onchange="input_text_onchange(this)"';
+    $return .= ' onblur="input_text_onchange(this)"';
+    $return .= ' onchange="input_text_onchange(this)"';
     $return .= ' />';
     return $return;
   }

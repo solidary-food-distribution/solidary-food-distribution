@@ -50,7 +50,7 @@ $PROPERTIES['body_class']='header_h5';
       <div class="col9 last">
           <?php echo  html_input(array(
             'field' => 'comment',
-            'type' => 'string',
+            'type' => 'input_text',
             'info' => 'Kommentar',
             'url' => '/tasks/assign_update_ajax?task_id='.$task->task_id,
             'value' => $comment,
