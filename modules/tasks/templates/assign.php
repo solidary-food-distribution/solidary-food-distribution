@@ -11,7 +11,7 @@ $PROPERTIES['body_class']='header_h5';
       <div class="col6">
         <b><?php echo $task->title; ?></b>
       </div>
-      <div class="col4">
+      <div class="col3">
         <?php
           $i=$task->interval;
           if($i=='e'){
@@ -35,19 +35,19 @@ $PROPERTIES['body_class']='header_h5';
           $comment=$task->users[0]->comment;
         }
       ?>
-      <div class="col8 last">
+      <div class="col9 last">
         <?php echo html_input(array(
           'field' => 'assign',
           'type' => 'options',
           'info' => 'Mitmachen',
           'url' => '/tasks/assign_update_ajax?task_id='.$task->task_id,
           'value' => $assign,
-          'options' => array('0' => 'nein', '50' => 'halb', '100' => 'voll'),
+          'options' => array('0' => '0', '10' => '10%', '25' => '25%', '50' => 'halb', '100' => 'voll'),
           )); ?>
       </div>
     </div>
     <div class="inner_row">
-      <div class="col8 last">
+      <div class="col9 last">
           <?php echo  html_input(array(
             'field' => 'comment',
             'type' => 'string',
