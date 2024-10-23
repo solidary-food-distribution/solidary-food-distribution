@@ -116,11 +116,11 @@ class SQL{
   }
   static function log_info($qry,$info){
     global $mysqli, $MODULE, $ACTION, $user;
-    file_put_contents(__DIR__.'/../log/sql_info.'.date('Ymd').'.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['id']."\n$qry\n$info\n",FILE_APPEND);
+    file_put_contents(__DIR__.'/../log/sql_info.'.date('Ymd').'.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']."\n$qry\n$info\n",FILE_APPEND);
   }
   static function log_error($qry){
     global $mysqli, $MODULE, $ACTION, $user;
-    file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['id']."\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
+    file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']."\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
   }
 
   static function buildFilterQuery($filters){

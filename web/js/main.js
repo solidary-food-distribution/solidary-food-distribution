@@ -155,6 +155,8 @@ function active_input_post_value(){
     url: input.data('url'),
     dataType: 'json',
     success: function(data){
+      //console.log("active_input_post_value success");
+      //console.log(data);
       $('#loading').hide();
       if(data.location_href){
         location.href = data.location_href;

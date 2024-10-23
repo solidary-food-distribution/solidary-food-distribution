@@ -18,7 +18,7 @@ class User{
   }
 
   public function set_session(){
-    if($_SESSION['scale']){
+    if(isset($_SESSION['scale']) && $_SESSION['scale']){
       $scale_access = array(
         'deliveries' => 1,
         'pickups' => 1,

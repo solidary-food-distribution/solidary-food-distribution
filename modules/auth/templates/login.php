@@ -1,5 +1,5 @@
 <div class="center login">
-  <?php if($_SESSION['scale']): ?>
+  <?php if(isset($_SESSION['scale']) && $_SESSION['scale']): ?>
     <?php require_once('pin.include.php'); ?>
     <div class="row" id="pin_form">
       <div class="inner_row">

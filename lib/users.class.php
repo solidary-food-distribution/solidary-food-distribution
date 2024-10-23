@@ -40,7 +40,9 @@ class Users extends ArrayObject{
     if(!empty($orderby)){
       $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
     }
+    #logger($qry);
     $us = SQL::selectID($qry, 'id');
+    #logger(print_r($us,1));
 
     $users = array();
     foreach($us as $id=>$u){

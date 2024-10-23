@@ -8,13 +8,8 @@
       <span class="label">Abholungen</span>
     </div>
   <?php endif ?>
-  <?php /*
   <div class="item" onclick="location.href='/activities'">
     <span class="label">Aktivitäten</span>
-  </div>
-  */ ?>
-  <div class="item" onclick="location.href='/timesheet'">
-    <span class="label">Arbeitszeiten</span>
   </div>
   <div class="item" onclick="location.href='/settings'">
     <span class="label">Einstellungen</span>
