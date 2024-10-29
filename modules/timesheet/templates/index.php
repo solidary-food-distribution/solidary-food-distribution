@@ -2,6 +2,19 @@
 $PROPERTIES['pathbar']=array('/activities'=>'Aktivitäten',''=>'Arbeitszeiten');
 $PROPERTIES['body_class']='header_h5 footer_h4';
 $sum=0;
+
+$topics = array(
+  ''=>'',
+  'pu'=>'Warenlieferung',
+  'iv'=>'Inventur',
+  'or'=>'Bestellung',
+  'co'=>'Kommunikation',
+  'ma'=>'Marketing',
+  'ws'=>'Webseite',
+  'sw'=>'Software',
+  'cs'=>'Konfliktlösung',
+);
+
 ?>
 
 <?php
@@ -40,10 +53,19 @@ $sum=0;
             <div class="button" onclick="timesheet_date_change(1)"><i class="fa-solid fa-caret-right"></i></div>
           </div>
         </div>
-        <div class="col4 right mr1">
+        <div class="col2 right mr1">
           <div><input id="input_mins" maxlength="3" type="text" value="<?php echo $entry['mins'] ?>" /> min</div>
         </div>
-        <div class="col8">
+        <div class="col4">
+          <div>
+            <select id="input_topic">
+              <?php foreach($topics as $kt=>$topic): ?>
+                <option value="<?php echo $kt ?>" <?php echo $entry['topic']==$kt?'selected':'' ?> ><?php echo htmlentities($topic) ?></option>
+              <?php endforeach ?>
+            </select>
+          </div>
+        </div>
+        <div class="col7">
           <div class="what"><input id="input_what" type="text" value="<?php echo htmlentities($entry['what']) ?>" /></div>
         </div>
       </div>
@@ -57,10 +79,13 @@ $sum=0;
       <div class="col4 center">
         <div><?php echo format_date($entry['date']) ?></div>
       </div>
-      <div class="col4 right mr1">
+      <div class="col2 right mr1">
         <div><?php echo $entry['mins'] ?> min</div>
       </div>
-      <div class="col8">
+      <div class="col4">
+        <div><?php echo htmlentities($topics[$entry['topic']]) ?></div>
+      </div>
+      <div class="col6">
         <div><?php echo htmlentities($entry['what']) ?></div>
       </div>
       <div class="col1 right last">

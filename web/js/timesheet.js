@@ -19,11 +19,12 @@ function timesheet_save(el,id){
   $(el).off("click");
   var date=$('#input_date').data('value');
   var mins=$('#input_mins').val();
+  var topic=$('#input_topic').val();
   var what=$('#input_what').val();
   $('#loading').show();
   $.ajax({
     type: 'POST',
-    data: {id: id, date: date, mins: mins, what: what},
+    data: {id: id, date: date, mins: mins, topic: topic, what: what},
     url: '/timesheet/save_ajax',
     dataType: "html",
     success: function(html){
