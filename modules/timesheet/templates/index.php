@@ -12,6 +12,7 @@ $topics = array(
   'co'=>'Kommunikation',
   'ma'=>'Marketing',
   'ws'=>'Webseite',
+  'is'=>'Infrastruktur',
   'sw'=>'Software',
   'cs'=>'Konfliktlösung',
 );
@@ -22,15 +23,15 @@ $topics = array(
   ob_start();
 ?>
 <div class="controls">
-  <div class="control_l <?php echo $month_prev?'':'disabled' ?>" onclick="<?php echo $month_prev?'location.href=\'/timesheet?month='.$month_prev.'\'':'' ?>">
+  <div class="control_l input <?php echo $month_prev?'':'disabled' ?>" onclick="<?php echo $month_prev?'location.href=\'/timesheet?month='.$month_prev.'\'':'' ?>">
     <i class="fa-solid fa-caret-left"></i>
-  </div><div class="control_m">
+  </div><div class="control_m input">
     <select class="center" name="month" onchange="location.href='/timesheet?month='+$(this).val();">
       <?php foreach($months as $m=>$mv): ?>
         <option value="<?php echo $m ?>" <?php echo $month==$m?'selected="selected"':'' ?> ><?php echo $mv ?></option>
       <?php endforeach ?>
     </select>
-  </div><div class="control_r <?php echo $month_next?'':'disabled' ?>" onclick="<?php echo $month_next?'location.href=\'/timesheet?month='.$month_next.'\'':'' ?>">
+  </div><div class="control_r input <?php echo $month_next?'':'disabled' ?>" onclick="<?php echo $month_next?'location.href=\'/timesheet?month='.$month_next.'\'':'' ?>">
     <i class="fa-solid fa-caret-right"></i>
   </div>
 </div>
