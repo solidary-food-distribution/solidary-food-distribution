@@ -8,6 +8,7 @@ $topics = array(
   'pu'=>'Warenlieferung',
   'iv'=>'Inventur',
   'or'=>'Bestellung',
+  'ac'=>'Buchhaltung',
   'co'=>'Kommunikation',
   'ma'=>'Marketing',
   'ws'=>'Webseite',

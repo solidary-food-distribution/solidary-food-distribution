@@ -6,9 +6,35 @@ user_ensure_authed();
 
 function execute_index(){
   global $user;
-  require_once('tasks.class.php');
-  $tasks = new Tasks();
-  return array('tasks'=>$tasks);
+  #require_once('tasks.class.php');
+  #$tasks = new Tasks();
+  #return array('tasks'=>$tasks);
+}
+
+
+function execute_calendar(){
+  global $user;
+  $month = get_request_param('month');
+  if($month==''){
+    $month = date('Y-m',time()).'-01';
+  }
+  $wd = date('w',strtotime($month))-1;
+  if($wd<0){
+    $wd+=7;
+  }
+  $start = date('Y-m-d',strtotime("-$wd days", strtotime($month)));
+  $end=date('Y-m-d',strtotime("+1 month", strtotime($month)));
+  $wde = date('w',strtotime($end));
+  $wde = 7 - $wde;
+  if($wde >= 6){
+    $wde="-".(7-$wde);
+  }else{
+    $wde="+".$wde;
+  }
+  $wde+=1;
+  $end=date('Y-m-d',strtotime("$wde days", strtotime($end)));
+  
+  return array('calendar'=>$calendar, 'month'=>$month, 'start'=>$start, 'end'=>$end);
 }
 
 

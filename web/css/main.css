@@ -217,14 +217,12 @@ div.mr1{
 /*SELECTION END*/
 
 .controls{
-  margin-top: 0.5em;
-  display: flex;
+  margin-top:0.2em;
+  display: block;
 }
 .filters{
-  margin: 0.2em;
-  display: flex;
 }
- .button, .input, .controls .control, .control_l, .control_m, .control_r{
+ .button, .input{
   display: inline-block;
   border: 2px solid black;
   border-radius: 0.5em;
@@ -233,6 +231,9 @@ div.mr1{
   cursor: pointer;
   min-width: 1.2em;
   text-align: center;
+}
+.controls .control{
+  margin: 0;
 }
 .input.input_text{
   text-align: left;
@@ -306,6 +307,10 @@ div.mr1{
 .filter.search{
   position: absolute;
   right: 0px;
+  width: 8em;
+}
+.filter.search input{
+  width: calc(100% - 2em);
 }
 
 .disabled{

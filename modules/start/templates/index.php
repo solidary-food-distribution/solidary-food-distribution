@@ -1,4 +1,8 @@
 <div class="selection">
+  <!--
+  <div class="item" onclick="location.href='/order'">
+    <span class="label">Bestellen</span>
+  </div>
   <?php if(user_has_access('deliveries') || user_has_access('inventory')): ?>
     <div class="item" onclick="location.href='/store'">
       <span class="label">Abholraum</span>
@@ -8,8 +12,12 @@
       <span class="label">Abholungen</span>
     </div>
   <?php endif ?>
+-->
   <div class="item" onclick="location.href='/activities'">
     <span class="label">Aktivitäten</span>
+  </div>
+  <div class="item" onclick="location.href='/polls'">
+    <span class="label">Umfragen</span>
   </div>
   <div class="item" onclick="location.href='/settings'">
     <span class="label">Einstellungen</span>

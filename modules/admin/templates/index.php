@@ -2,11 +2,13 @@
 $PROPERTIES['pathbar']=array('/admin'=>'Administration');
 ?>
 <div class="selection">
+  <!--
   <?php if($products): ?>
     <div class="item" onclick="location.href='/products'">
       <span class="label">Produkte</span>
     </div>
   <?php endif ?>
+-->
   <?php if($members): ?>
     <div class="item" onclick="location.href='/members'">
       <span class="label">Mitglieder</span>
@@ -17,6 +19,7 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration');
       <span class="label">Benutzer</span>
     </div>
   <?php endif ?>
+  <!--
   <?php if($orders): ?>
     <div class="item" onclick="location.href='/orders'">
       <span class="label">Abholmengen</span>
@@ -27,6 +30,7 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration');
       <span class="label">Abbuchungen</span>
     </div>
   <?php endif ?>
+  -->
   <?php if($remote): ?>
     <div class="item" onclick="location.href='/remote'">
       <span class="label">Remote SSH</span>

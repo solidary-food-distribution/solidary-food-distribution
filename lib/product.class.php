@@ -1,41 +1,28 @@
 <?php
-
 declare(strict_types=1);
-
-require_once('member.class.php');
 
 class Product{
   public int $id;
   public string $name;
-  public Member $producer;
+  public int $supplier_id;
   public string $type;
   public string $period;
   public float $amount_steps;
   public float $amount_min;
   public float $amount_max;
   public string $status;
-  public string $orders_lock_date; //REFACTOR DateTime
-  public float $price;
-  public float $tax;
-  public bool $tax_incl;
-  public float $purchase;
+  public int $pieces_per_package;
+  public string $supplier_product_id;
+  public string $gtin_piece;
+  public string $gtin_package;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');
     $qry = 
-      "UPDATE msl_products p LEFT JOIN msl_prices pr ON (p.pid=pr.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE()) SET ";
+      "UPDATE msl_products SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';
-    $qry .= "WHERE p.pid='".intval($this->id)."'";
+    $qry .= "WHERE id='".intval($this->id)."'";
     SQL::update($qry);
   }
 
-}
-
-function product_get($id){
-  require_once('products.class.php');
-  $products = new Products(array('product_id' => $id));
-  if(!empty($products)){
-    return $products->first();
-  }
-  return null;
 }
