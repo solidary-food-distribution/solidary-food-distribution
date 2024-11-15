@@ -51,6 +51,7 @@ class Polls extends ArrayObject{
       $poll->type = $p['type'];
       $poll->data = $p['data'];
       $poll->has_votes = $p['has_votes'];
+      $poll->close_datetime = $p['close_datetime'];
       $polls[$poll_id] = $poll;
     }
     #logger(print_r($polls,1));

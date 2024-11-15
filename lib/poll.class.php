@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-#require_once('task_user.class.php');
-
 class Poll{
   public $poll_id;
   public $title;
@@ -10,6 +8,7 @@ class Poll{
   public $type;
   public $data;
   public $has_votes;
+  public $close_datetime;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

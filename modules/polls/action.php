@@ -55,16 +55,28 @@ function execute_answer_vote_ajax(){
   global $user;
   $poll_answer_id = get_request_param('poll_answer_id');
   $value = get_request_param('value');
-  require_once('poll_votes.class.php');
-  $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answer_id, 'user_id' => $user['user_id']));
-  logger(print_r($poll_votes,1));
-  if(!count($poll_votes)){
-    PollVotes::create($poll_answer_id, $user['user_id'], $value);
-  }else{
-    $poll_votes->first()->update(array('value' => $value));
+
+  require_once('poll_answers.class.php');
+  $poll_answer = poll_answer_get($poll_answer_id);
+  if($poll_answer){
+    $poll = poll_get($poll_answer->poll_id);
+    if(!$poll){
+      exit;
+    }
+    if($poll->close_datetime!='0000-00-00 00:00:00' && strtotime($poll->close_datetime) < time()){
+      exit;
+    }
+    require_once('poll_votes.class.php');
+    $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answer_id, 'user_id' => $user['user_id']));
+    logger(print_r($poll_votes,1));
+    if(!count($poll_votes)){
+      PollVotes::create($poll_answer_id, $user['user_id'], $value);
+    }else{
+      $poll_votes->first()->update(array('value' => $value));
+    }
+    $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answer_id, 'value' => '1'));
+    echo json_encode(array('count' => count($poll_votes)));
   }
-  $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answer_id, 'value' => '1'));
-  echo json_encode(array('count' => count($poll_votes)));
   exit;
 }
 
@@ -74,6 +86,14 @@ function execute_answer_add_ajax(){
   $answer = get_request_param('value');
   $answer = trim($answer);
   if(!empty($answer)){
+    require_once('polls.class.php');
+    $poll = poll_get($poll_id);
+    if(!$poll){
+      exit;
+    }
+    if($poll->close_datetime!='0000-00-00 00:00:00' && strtotime($poll->close_datetime) < time()){
+      exit;
+    }
     require_once('poll_answers.class.php');
     $poll_answers = new PollAnswers(array('poll_id' => $poll_id, 'answer' => $answer));
     logger(print_r($poll_answers,1));
