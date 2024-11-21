@@ -8,4 +8,6 @@ class Orders extends Objects{
   protected $_table = 'msl_orders';
   protected $_default_order_by = 'pickup_date';
   protected $_object_name = 'Order';
+
+  
 }

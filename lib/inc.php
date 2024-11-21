@@ -70,7 +70,7 @@ function forward_to_page($forward,$query=''){
 
 function translate_product_type($type){
   $translate=array(
-    'p'=>'Stück',
+    'p'=>'St.',
     'k'=>'kg',
     'b'=>'EUR',
   );
@@ -89,6 +89,18 @@ function translate_product_period($period){
     return $period;
   }
   return $translate[$period];
+}
+
+function translate_supplier($supplier){
+  $translate=array(
+    '0' => 'nein',
+    '1' => 'Erzeuger',
+    '2' => 'Händler',
+  );
+  if(!isset($translate[$supplier])){
+    return '?';
+  }
+  return $translate[$supplier];
 }
 
 function translate_access($access){
@@ -239,7 +251,11 @@ function html_input($data){
       }
       $return .= ' onclick="'.$data['onclick'].'(this)"';
       $return .= ' data-value="'.htmlentities($value).'">';
-      $return .= '<span>'.htmlentities($label).'</span></div>';
+      if(strpos($label,'<')!==false){
+        $return .= '<span>'.$label.'</span></div>';
+      }else{
+        $return .= '<span>'.htmlentities($label).'</span></div>';
+      }
     }
   }elseif(isset($data['value'])){
     if($data['type'] == 'money' || $data['type'] == 'weight'){

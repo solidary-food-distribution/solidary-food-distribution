@@ -11,10 +11,11 @@ class Product{
   public float $amount_min;
   public float $amount_max;
   public string $status;
-  public int $pieces_per_package;
+  public int $amount_per_bundle;
   public string $supplier_product_id;
+  public int $brand_id;
   public string $gtin_piece;
-  public string $gtin_package;
+  public string $gtin_bundle;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

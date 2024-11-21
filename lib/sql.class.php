@@ -99,7 +99,7 @@ class SQL{
     }
     return $ret;
   }
-  static function escapeArray(&$ar){
+  static function escapeArray($ar){
     $str="";
     foreach($ar as $v){
       $str.="'".SQL::escapeString($v)."',";
@@ -147,7 +147,9 @@ class SQL{
   static function buildOrderbyQuery($orderby){
     $qry='';
     foreach($orderby as $field => $dir){
-      $qry .= ', '.SQL::escapeFieldName($field).' '.SQL::escapeFieldName($dir);
+      #TODO FIELD(feld,werte...)
+      $qry .= ', '.$field.' '.SQL::escapeFieldName($dir);
+      #$qry .= ', '.SQL::escapeFieldName($field).' '.SQL::escapeFieldName($dir);
     }
     return ltrim($qry, ',');
   }

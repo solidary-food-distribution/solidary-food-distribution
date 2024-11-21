@@ -234,6 +234,7 @@ div.mr1{
 }
 .controls .control{
   margin: 0;
+  display: inline-block;
 }
 .input.input_text{
   text-align: left;
@@ -246,6 +247,7 @@ div.mr1{
   font-size: 2em;
   line-height: 1.2em;
   height: 1.2em;
+  margin: 0;
 }
 .input{
   border: 1px solid black;
@@ -304,10 +306,33 @@ div.mr1{
   border-bottom-left-radius: 0em;
   border-left: none;
 }
+
+.filter{
+  position: relative;
+}
+.filter .count{
+  position: absolute;
+  display: inline-block;
+  left: 2.1em;
+  top: -0.1em;
+  background-color: rgba(255,255,255,1);
+  font-size: 0.9em;
+  border: 1px solid black;
+  border-radius: 0.5em;
+  line-height: 95%;
+  padding-left:0.2em;
+  padding-right:0.2em;
+}
+
 .filter.search{
   position: absolute;
   right: 0px;
   width: 8em;
+  border: 1px solid black;
+  background-color: white;
+  padding-left: 0.4em;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
 }
 .filter.search input{
   width: calc(100% - 2em);

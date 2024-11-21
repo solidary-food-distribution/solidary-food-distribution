@@ -33,6 +33,15 @@ function is_mobile(){
   return check;
 };
 
+function get_url_params(){
+  var data = {};
+  const params = new URLSearchParams(location.search);
+  params.forEach((value, param) => {
+    data[param] = value;
+  });
+  return data;
+}
+
 function get_ts(){
   var date = new Date();
   return date.getTime();

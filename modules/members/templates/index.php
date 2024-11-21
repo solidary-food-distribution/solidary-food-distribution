@@ -12,12 +12,12 @@ $PROPERTIES['body_class']='header_h5';
     </div>
     <div class="col4">
       <div>
-        <div>Hersteller: <?php echo $member->producer?'ja':'nein' ?></div>
+        <div>Abholer: <?php echo $member->consumer?'ja':'nein' ?></div>
       </div>
     </div>
     <div class="col4">
       <div>
-        <div>Abholer: <?php echo $member->consumer?'ja':'nein' ?></div>
+        <div>Lieferant: <?php echo translate_supplier($member->producer) ?></div>
       </div>
     </div>
     <?php if(!empty($users[$member->id])): ?>

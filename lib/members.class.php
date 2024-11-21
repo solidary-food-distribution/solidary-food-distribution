@@ -50,7 +50,7 @@ class Members extends ArrayObject{
       $member->id = intval($m['id']);
       $member->name = $m['name'];
       $member->identification = $m['identification'];
-      $member->producer = boolval($m['producer']);
+      $member->producer = intval($m['producer']);
       $member->consumer = boolval($m['consumer']);
       $members[$id] = $member;
     }

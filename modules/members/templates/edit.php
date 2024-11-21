@@ -31,10 +31,10 @@ $PROPERTIES['pathbar']=array(
   <div class="inner_row">
     <div class="col3">
       <div>
-        <div>Hersteller</div>
+        <div>Lieferant</div>
       </div>
     </div>
-    <div class="col5">
+    <div class="col7">
       <div>
         <div><?php
           echo html_input(array(
@@ -43,7 +43,7 @@ $PROPERTIES['pathbar']=array(
             'info' => 'Hersteller',
             'url' => '/members/update_ajax?member_id='.$member->id,
             'value' => $member->producer,
-            'options' => array('1' => 'ja', '0' => 'nein'),
+            'options' => array('0' => 'nein', '1' => 'Erzeuger', '2' => 'Händler'),
           ));
           ?>
         </div>
@@ -56,7 +56,7 @@ $PROPERTIES['pathbar']=array(
         <div>Abholer</div>
       </div>
     </div>
-    <div class="col5">
+    <div class="col7">
       <div>
         <div><?php
           echo html_input(array(
@@ -65,7 +65,7 @@ $PROPERTIES['pathbar']=array(
             'info' => 'Abholer',
             'url' => '/members/update_ajax?member_id='.$member->id,
             'value' => $member->consumer,
-            'options' => array('1' => 'ja', '0' => 'nein'),
+            'options' => array('0' => 'nein', '1' => 'ja'),
           ));
           ?>
         </div>
