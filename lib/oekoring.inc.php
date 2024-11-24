@@ -115,6 +115,7 @@ function oekoring_import_bnn($file){
       'purchase_bulk1' => floatval(str_replace(',', '.', $line[42])),
       'purchase_bulk2_amount' => floatval(str_replace(',', '.', $line[45])),
       'purchase_bulk2' => floatval(str_replace(',', '.', $line[46])),
+      'suggested_retail' => floatval(str_replace(',', '.', $line[37])),
     );
     $prices[$line[1]][] = $price;
 
@@ -143,7 +144,7 @@ function oekoring_insert_products_prices($products, $prices){
   SQL::update($qry);
   $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='35' AND supplier_product_id IN (".SQL::escapeArray(array_keys($prices)).")";
   $pids = SQL::selectKey2Val($qry, 'supplier_product_id', 'id');
-  $qry = "INSERT INTO msl_prices (product_id, start, end, purchase, purchase_promo, tax, purchase_bulk1_amount, purchase_bulk1, purchase_bulk2_amount, purchase_bulk2) VALUES ";
+  $qry = "INSERT INTO msl_prices (product_id, start, end, purchase, purchase_promo, tax, purchase_bulk1_amount, purchase_bulk1, purchase_bulk2_amount, purchase_bulk2, suggested_retail) VALUES ";
   foreach($prices as $supplier_product_id => $pps){
     $product_id = $pids[$supplier_product_id];
     foreach($pps as $pp){
@@ -152,7 +153,7 @@ function oekoring_insert_products_prices($products, $prices){
       #logger($product_id." ".$supplier_product_id." ".print_r($pp,1));
     }
   }
-  $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE end=VALUES(end), purchase=VALUES(purchase), purchase_promo=VALUES(purchase_promo), tax=VALUES(tax), purchase_bulk1_amount=VALUES(purchase_bulk1_amount), purchase_bulk1=VALUES(purchase_bulk1), purchase_bulk2_amount=VALUES(purchase_bulk2_amount), purchase_bulk2=VALUES(purchase_bulk2)";
+  $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE end=VALUES(end), purchase=VALUES(purchase), purchase_promo=VALUES(purchase_promo), tax=VALUES(tax), purchase_bulk1_amount=VALUES(purchase_bulk1_amount), purchase_bulk1=VALUES(purchase_bulk1), purchase_bulk2_amount=VALUES(purchase_bulk2_amount), purchase_bulk2=VALUES(purchase_bulk2), suggested_retail=VALUES(suggested_retail)";
   SQL::update($qry);
   #logger(print_r($pids,1));
 }
