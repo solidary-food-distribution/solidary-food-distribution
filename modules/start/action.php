@@ -13,5 +13,8 @@ function execute_index(){
   }
 }
 
+function execute_version(){
+}
+
 function execute_noaccess(){
 }

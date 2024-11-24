@@ -53,6 +53,7 @@ function execute_index(){
       'id'=>'new',
       'date'=>$date,
       'mins'=>'',
+      'km'=>'',
       'topic'=>'',
       'what'=>'',
       'modified'=>''
@@ -94,11 +95,12 @@ function execute_save_ajax(){
   $id=get_request_param('id');
   $date=get_request_param('date');
   $mins=get_request_param('mins');
+  $km=get_request_param('km');
   $topic=get_request_param('topic');
   $what=trim(get_request_param('what'));
 
   require_once('sql.class.php');
-  if(intval($mins) || !empty($what)){
+  if(intval($mins) || intval($km) || !empty($what)){
     if(!intval($id)){
       $id=get_unix_ms();
       $modified=$id;
@@ -106,9 +108,9 @@ function execute_save_ajax(){
       $modified=get_unix_ms();
     }
     $qry=
-      "INSERT INTO msl_timesheet (user_id,id,`date`,mins,topic,what,modified) ".
-      "VALUES ('".intval($user['user_id'])."','".intval($id)."','".SQL::escapeString($date)."','".intval($mins)."','".SQL::escapeString($topic)."','".SQL::escapeString($what)."','".intval($modified)."') ".
-      "ON DUPLICATE KEY UPDATE `date`=VALUES(`date`),mins=VALUES(mins),topic=VALUES(topic),what=VALUES(what),modified=VALUES(modified)";
+      "INSERT INTO msl_timesheet (user_id,id,`date`,mins,km,topic,what,modified) ".
+      "VALUES ('".intval($user['user_id'])."','".intval($id)."','".SQL::escapeString($date)."','".intval($mins)."','".intval($km)."','".SQL::escapeString($topic)."','".SQL::escapeString($what)."','".intval($modified)."') ".
+      "ON DUPLICATE KEY UPDATE `date`=VALUES(`date`),mins=VALUES(mins),km=VALUES(km),topic=VALUES(topic),what=VALUES(what),modified=VALUES(modified)";
     SQL::update($qry);
   }elseif(intval($id)){
     SQL::update("DELETE FROM msl_timesheet WHERE user_id='".intval($user['user_id'])."' AND id='".intval($id)."'");

@@ -10,6 +10,7 @@ class Price{
   public float $amount_per_bundle;
   public float $tax;
   public float $purchase;
+  public float $suggested_retail;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

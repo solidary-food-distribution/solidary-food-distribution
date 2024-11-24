@@ -218,6 +218,29 @@ function highlight_input_timer(){
 }
 
 
+var show_title_div = 0;
+var show_title_timer = 0;
+function show_title(el){
+  var title = $(el).attr('title');
+  var pos = $(el).offset();
+  pos.top += $(el).height();
+  if(show_title_div){
+    $('#show_title').remove();
+  }
+  if(show_title_timer){
+    clearTimeout(show_title_timer);
+  }
+  show_title_div = $('<div id="show_title" style="display:block;position:fixed;background-color:white;border:2px solid black;padding:0.2em;" onclick="$(this).remove()">'+title+'</div>');
+  show_title_div.offset(pos);
+  $('#main').append(show_title_div);
+  show_title_timer = window.setTimeout(show_timer_hide, 5000);
+}
+function show_timer_hide(){
+  clearTimeout(show_title_timer);
+  show_title_timer=0;
+  $('#show_title').hide();
+}
+
 function keyboard_show(el){
   var type = $(el).data('type');
   $('#keyboard_window').removeClass().addClass(type);

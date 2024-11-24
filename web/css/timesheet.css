@@ -1,6 +1,10 @@
-#input_mins{
+#input_mins,#input_km{
   text-align: right;
   width: 2em;
+}
+
+#input_topic{
+  max-width: 8em;
 }
 
 div.what{

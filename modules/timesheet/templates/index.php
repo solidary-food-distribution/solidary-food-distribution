@@ -8,10 +8,12 @@ $topics = array(
   'pu'=>'Warenlieferung',
   'iv'=>'Inventur',
   'or'=>'Bestellung',
+  'cl'=>'Aufräumen/Reinigen',
   'ac'=>'Buchhaltung',
   'co'=>'Kommunikation',
   'ma'=>'Marketing',
   'ws'=>'Webseite',
+  'pp'=>'Produkte&Preise',
   'is'=>'Infrastruktur',
   'sw'=>'Software',
   'cs'=>'Konfliktlösung',
@@ -56,7 +58,10 @@ $topics = array(
           </div>
         </div>
         <div class="col2 right mr1">
-          <div><input id="input_mins" maxlength="3" type="text" value="<?php echo $entry['mins'] ?>" /> min</div>
+          <div>
+            <div style="text-align:left;"><input id="input_mins" maxlength="4" type="text" value="<?php echo $entry['mins'] ?>" /> min</div>
+            <div style="text-align:left;"><input id="input_km" maxlength="3" type="text" value="<?php echo $entry['km'] ?>" /> km</div>
+          </div>
         </div>
         <div class="col4">
           <div>
@@ -82,7 +87,12 @@ $topics = array(
         <div><?php echo format_date($entry['date']) ?></div>
       </div>
       <div class="col2 right mr1">
-        <div><?php echo $entry['mins'] ?> min</div>
+        <div>
+          <div><?php echo $entry['mins'] ?> min</div>
+          <?php if($entry['km']): ?>
+            <div><?php echo $entry['km'] ?> km</div>
+          <?php endif ?>
+        </div>
       </div>
       <div class="col4">
         <div><?php echo htmlentities($topics[$entry['topic']]) ?></div>
@@ -116,7 +126,7 @@ $topics = array(
         <?php echo $months[$month] ?>
       </div>
     </div>
-    <div class="col4 right">
+    <div class="col6 right">
       <div><?php echo $sum ?> min = <?php echo number_format($sum/60,1,',','') ?> Std</div>
     </div>
   </div>

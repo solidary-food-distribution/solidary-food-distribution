@@ -76,7 +76,11 @@ function execute_index(){
   require_once('prices.class.php');
   $prices = new Prices(array('product_id' => $product_ids, 'start<=' => $order->pickup_date, 'end>=' => $order->pickup_date));
   #logger("prices ".print_r($prices,1));
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search);
+
+  require_once('sql.class.php');
+  $order_sum_oekoring = SQL::selectOne("SELECT SUM(amount_pieces*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id)) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."'")['order_sum'];
+
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'order_sum_oekoring' => $order_sum_oekoring);
 }
 
 function search_products($search, $suppliers){
@@ -98,8 +102,8 @@ function search_products($search, $suppliers){
     }
     $qry .= implode(' AND ', $wheres);
   }
-  $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC LIMIT 20";
-  logger($qry);
+  $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC LIMIT 100";
+  #logger($qry);
   $res = SQL::selectKey2Val($qry, 'id', 'id');
   return $res;
 }

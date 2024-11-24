@@ -1,3 +1,7 @@
+<?php
+$PROPERTIES['body_class']='footer_h4';
+?>
+
 <div class="selection">
   <div class="item" onclick="location.href='/order'">
     <span class="label">Bestellen</span>
@@ -28,3 +32,11 @@
     </div>
   <?php endif ?>
 </div>
+
+<?php ob_start(); ?>
+<div class="row center">
+  Aktuelle Version: <a href='/start/version'>%VERSION%</a>
+</div>
+<?php
+  $PROPERTIES['footer']=ob_get_clean();
+?>

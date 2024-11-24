@@ -93,6 +93,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         $brand = $brands[$product->brand_id];
       }
     }
+
+    $price_title = "EK: ".format_money(round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2))." EUR";
+    if($prices[$product_id]->suggested_retail){
+      $price_title .= ", UVP: ".format_money($prices[$product_id]->suggested_retail)." EUR";
+    }
     
     $sum['sum'] = $sum['sum'] + $price_row;
   ?>
@@ -113,7 +118,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           <?php echo format_amount($amount); ?>
         </div>
         <span><?php echo translate_product_type($product->type); ?></span>
-        <div style="font-size:70%">
+        <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
           <?php if($product->status == 'o'): ?>
             <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
           <?php endif ?>
@@ -132,6 +137,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
 <?php endforeach ?>
 
 <?php ob_start(); ?>
+  <div style="background:white; color:red;margin:0.5em;margin:0.2em;"><b>&gt;&gt;&gt; Die Preise werden erst am 1.12.24 fest stehen! &lt;&lt;&lt;</b></div>
   <?php if($modus == 'o'): ?>
     <div class="row">
       <div class="inner_row">
@@ -155,9 +161,18 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         <div class="col3 right"><small><?php echo format_money($sum['trader_sum'] - $sum['trader_paid']) ?> EUR</small></div>
       </div>
       <div class="inner_row">
-        <div class="col8 right last">
+        <div class="col12">
+          <?php if(floor($order_sum_oekoring)<300): ?>
+            <span style="font-size:70%;border:1px solid grey;border-radius:0.5em;padding:0.2em">Hinweis Ökoring-Bestellung: Noch <?php echo 300-floor($order_sum_oekoring) ?> EUR Bestellwert notwendig.</span>
+          <?php endif ?>
+        </div>
+        <div class="col6 right last">
+          <small>Der Warenkorb bleibt gespeichert</small>
+        </div>
+        <!--<div class="col8 right last">
           <div class="button disabled">Bestellung abschicken</div>
         </div>
+      -->
       </div>
     </div>
   <?php endif ?>

@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202411111623';
+$version='202411242319';
 $body_class='';
 $header='';
 $footer='';
@@ -11,6 +11,7 @@ if($authed){
   $body_class=isset($PROPERTIES['body_class'])?$PROPERTIES['body_class']:'';
   $header=isset($PROPERTIES['header'])?$PROPERTIES['header']:'';
   $footer=isset($PROPERTIES['footer'])?$PROPERTIES['footer']:'';
+  $footer=str_replace('%VERSION%',$version,$footer);
 }
 ?>
 <!doctype html>
