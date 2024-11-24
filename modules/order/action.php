@@ -8,6 +8,10 @@ function execute_index(){
   $order_id = get_request_param('order_id');
   $modus = get_request_param('modus');
   $search = get_request_param('search');
+  $limit = intval(get_request_param('limit'));
+  if($limit == 0){
+    $limit = 10;
+  }
   $product_id = get_request_param('product_id');
   require_once('orders.class.php');
   $orders = new Orders(array('member_id' => $user['member_id']),array('pickup_date'=>'DESC'));
@@ -44,7 +48,7 @@ function execute_index(){
     $product_ids = $products->keys();
   }elseif($modus == 's' && trim($search)!=''){
     $suppliers = new Members(array('producer>=' => 1));
-    $product_ids = search_products($search, $suppliers);
+    $product_ids = search_products($search, $suppliers, $limit);
     if(empty($product_ids)){
       $product_ids=array('0');
     }
@@ -80,10 +84,10 @@ function execute_index(){
   require_once('sql.class.php');
   $order_sum_oekoring = SQL::selectOne("SELECT SUM(amount_pieces*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id)) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."'")['order_sum'];
 
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'order_sum_oekoring' => $order_sum_oekoring);
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'order_sum_oekoring' => $order_sum_oekoring);
 }
 
-function search_products($search, $suppliers){
+function search_products($search, $suppliers, $limit){
   require_once('sql.class.php');
   $qry = "SELECT p.id FROM msl_members m,msl_products p LEFT JOIN msl_brands b ON (brand_id=b.id) WHERE m.id = p.supplier_id AND p.supplier_id IN (".SQL::escapeArray($suppliers->keys()).") AND p.status IN ('o', 's') AND p.type IN ('k', 'p') AND (";
   if(is_numeric($search)){
@@ -102,7 +106,7 @@ function search_products($search, $suppliers){
     }
     $qry .= implode(' AND ', $wheres);
   }
-  $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC LIMIT 100";
+  $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC LIMIT ".intval($limit);
   #logger($qry);
   $res = SQL::selectKey2Val($qry, 'id', 'id');
   return $res;

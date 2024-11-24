@@ -3,37 +3,34 @@ $PROPERTIES['pathbar']=array('/orders'=>'Bestellungen',''=>format_date($order->p
 $PROPERTIES['body_class']='header_h5 footer_h8';
 ?>
 
+<?php echo $start ?>
 
-<?php ob_start(); ?>
-  <div class="controls" data-order-id="<?php echo $order->id ?>">
-    <div class="control filter">
-      <?php
-        $options = array(
-          'o' => '<i class="fa-solid fa-cart-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
-          /*'p' => '<i class="fa-solid fa-heart" title="Beliebte Produkte"></i>',*/
-          '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
-          '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Großhandel',
-          's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> Suche'
-        );
-        echo html_input(array(
-          'class' => 'filter',
-          'onclick' => 'order_filter',
-          'type' => 'options',
-          'field' => 'modus',
-          'value' => $modus,
-          'options' => $options,
-      )); ?>
+<?php if($start == 0): ?>
+  <?php ob_start(); ?>
+    <div class="controls" data-order-id="<?php echo $order->id ?>">
+      <div class="control filter">
+        <?php
+          $options = array(
+            'o' => '<i class="fa-solid fa-cart-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
+            /*'p' => '<i class="fa-solid fa-heart" title="Beliebte Produkte"></i>',*/
+            '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
+            '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Großhandel',
+            's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> Suche'
+          );
+          echo html_input(array(
+            'class' => 'filter',
+            'onclick' => 'order_filter',
+            'type' => 'options',
+            'field' => 'modus',
+            'value' => $modus,
+            'options' => $options,
+        )); ?>
+      </div>
     </div>
-    <!--
-    <div class="control filter search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input class="filter" type="text" />
-    </div>
-  -->
-  </div>
-<?php $PROPERTIES['header']=ob_get_clean(); ?>
+  <?php $PROPERTIES['header']=ob_get_clean(); ?>
+<?php endif ?>
 
-<?php if($modus == 's'): ?>
+<?php if($modus == 's' && $start == 0): ?>
   <div class="input" style="margin:auto;width:50%;display:block;margin-top:0.5em;padding:0.5em;">
     <div style="display:block"><small>Produktname, Hersteller, Strichcode-Nummer...</small></div>
     <div style="display:block">
@@ -136,47 +133,55 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   </div>
 <?php endforeach ?>
 
-<?php ob_start(); ?>
-  <div style="background:white; color:red;margin:0.5em;margin:0.2em;"><b>&gt;&gt;&gt; Die Preise werden erst am 1.12.24 fest stehen! &lt;&lt;&lt;</b></div>
-  <?php if($modus == 'o'): ?>
-    <div class="row">
-      <div class="inner_row">
-        <div class="col2"></div>
-        <div class="col3 right"><small>Einkauf</small></div>
-        <div class="col3 right"><small>-&gt; Geno</small></div>
-        <div class="col5"></div>
-        <div class="col2 right">Summe</div>
-        <div class="col3 right last">
-          <?php echo format_money($sum['sum']); ?> EUR
+<?php if($modus=='s' && count($products)==$limit): ?>
+  <div id="show_more" class="button" style="float:right;margin:0.5em" onclick="order_show_more_load()">Weitere anzeigen...</div>
+  <script>
+    $('main').on('scroll',order_show_more);
+  </script>
+<?php endif ?>
+
+<?php if($start == 0): ?>
+  <?php ob_start(); ?>
+    <div style="background:white; color:red;margin:0.5em;margin:0.2em;"><b>&gt;&gt;&gt; Die Preise werden erst am 1.12.24 fest stehen! &lt;&lt;&lt;</b></div>
+    <?php if($modus == 'o'): ?>
+      <div class="row">
+        <div class="inner_row">
+          <div class="col2"></div>
+          <div class="col3 right"><small>Einkauf</small></div>
+          <div class="col3 right"><small>-&gt; Geno</small></div>
+          <div class="col5"></div>
+          <div class="col2 right">Summe</div>
+          <div class="col3 right last">
+            <?php echo format_money($sum['sum']); ?> EUR
+          </div>
+        </div>
+        <div class="inner_row">
+          <div class="col2"><small>Erzeuger</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['supplier_paid']) ?> EUR</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['supplier_sum'] - $sum['supplier_paid']) ?> EUR</small></div>
+        </div>
+        <div class="inner_row">
+          <div class="col2"><small>Großhandel</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['trader_paid']) ?> EUR</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['trader_sum'] - $sum['trader_paid']) ?> EUR</small></div>
+        </div>
+        <div class="inner_row">
+          <div class="col12">
+            <?php if(floor($order_sum_oekoring)<300): ?>
+              <span style="font-size:70%;border:1px solid grey;border-radius:0.5em;padding:0.2em">Hinweis Ökoring-Bestellung: Noch <?php echo 300-floor($order_sum_oekoring) ?> EUR Bestellwert notwendig.</span>
+            <?php endif ?>
+          </div>
+          <div class="col6 right last">
+            <small>Der Warenkorb bleibt gespeichert</small>
+          </div>
+          <!--<div class="col8 right last">
+            <div class="button disabled">Bestellung abschicken</div>
+          </div>
+        -->
         </div>
       </div>
-      <div class="inner_row">
-        <div class="col2"><small>Erzeuger</small></div>
-        <div class="col3 right"><small><?php echo format_money($sum['supplier_paid']) ?> EUR</small></div>
-        <div class="col3 right"><small><?php echo format_money($sum['supplier_sum'] - $sum['supplier_paid']) ?> EUR</small></div>
-      </div>
-      <div class="inner_row">
-        <div class="col2"><small>Großhandel</small></div>
-        <div class="col3 right"><small><?php echo format_money($sum['trader_paid']) ?> EUR</small></div>
-        <div class="col3 right"><small><?php echo format_money($sum['trader_sum'] - $sum['trader_paid']) ?> EUR</small></div>
-      </div>
-      <div class="inner_row">
-        <div class="col12">
-          <?php if(floor($order_sum_oekoring)<300): ?>
-            <span style="font-size:70%;border:1px solid grey;border-radius:0.5em;padding:0.2em">Hinweis Ökoring-Bestellung: Noch <?php echo 300-floor($order_sum_oekoring) ?> EUR Bestellwert notwendig.</span>
-          <?php endif ?>
-        </div>
-        <div class="col6 right last">
-          <small>Der Warenkorb bleibt gespeichert</small>
-        </div>
-        <!--<div class="col8 right last">
-          <div class="button disabled">Bestellung abschicken</div>
-        </div>
-      -->
-      </div>
-    </div>
-  <?php endif ?>
-<?php
-  $PROPERTIES['footer']=ob_get_clean();
-?>
- 
+    <?php endif ?>
+  <?php
+    $PROPERTIES['footer']=ob_get_clean();
+  ?>
+<?php endif ?>
