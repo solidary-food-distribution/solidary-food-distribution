@@ -72,12 +72,20 @@ function translate_product_type($type){
   $translate=array(
     'p'=>'St.',
     'k'=>'kg',
+    'w'=>'kg', //kg price, pieces ordered
     'b'=>'EUR',
   );
   if(!isset($translate[$type])){
     return '?';
   }
   return $translate[$type];
+}
+
+function translate_product_type_amount($type){
+  if($type == 'w'){
+    return 'St.';
+  }
+  return translate_product_type($type);
 }
 
 function translate_product_period($period){
@@ -164,10 +172,10 @@ function format_weight($value){
     $return = '&nbsp;';
   }elseif(substr($return, -4) == ',000'){
     $return = number_format(floatval($value),1,',','');
-  }elseif(substr($return, -1) == '0'){
-    $return = number_format(floatval($value),2,',','');
   }elseif(substr($return, -2) == '00'){
     $return = number_format(floatval($value),1,',','');
+  }elseif(substr($return, -1) == '0'){
+    $return = number_format(floatval($value),2,',','');
   }
   return $return;
 }

@@ -56,11 +56,17 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     if(isset($order_items[$product_id])){
       $order_item = $order_items[$product_id];
       if($product->type == 'k'){
-        $amount = $order_item->amount_weight;
+        $amount_price = $order_item->amount_weight;
+        $amount =$order_item->amount_weight;
+      }elseif($product->type == 'w'){
+        $amount_price = $order_item->amount_pieces * $product->kg_per_piece;
+        $amount = $order_item->amount_pieces;
       }else{
+        $amount_price =  $order_item->amount_pieces;
         $amount = $order_item->amount_pieces;
       }
     }else{
+      $amount_price = 0;
       $amount = 0;
     }
 
@@ -75,8 +81,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       }
     }
 
-    $price_row = round($price * $amount, 2);
-    $purchase_incl_tax = round($amount * round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2), 2);
+    $price_row = round($price * $amount_price, 2);
+    $purchase_incl_tax = round($amount_price * round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2), 2);
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
@@ -114,8 +120,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         <div class="input">
           <?php echo format_amount($amount); ?>
         </div>
-        <span><?php echo translate_product_type($product->type); ?></span>
+        <span><?php echo translate_product_type_amount($product->type); ?></span>
         <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
+          <?php if($product->type == 'w'): ?>
+            <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
+          <?php endif ?>
           <?php if($product->status == 'o'): ?>
             <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
           <?php endif ?>
@@ -128,7 +137,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="button large" onclick="order_change(this,1)">+</div>
     </div>
     <div class="col3 right last">
-      <span><?php echo format_money($price * $amount) ?> EUR</span>
+      <span><?php echo format_money($price * $amount_price) ?> EUR</span>
     </div>
   </div>
 <?php endforeach ?>

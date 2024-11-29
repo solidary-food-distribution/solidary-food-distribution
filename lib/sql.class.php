@@ -1,6 +1,6 @@
 <?php
 global $mysqli;
-if(strpos($_SERVER['HTTP_HOST'],'.local')){
+if(!isset($_SERVER['HTTP_HOST']) || strpos($_SERVER['HTTP_HOST'],'.local')){
   $mysqli=mysqli_connect('mysqlsrv','root','***LOCAL_DB_PWD***','msl_buchen');
 }else{
   $mysqli=mysqli_connect('***PROD_DB_HOST***','***PROD_DB_USER***','***PROD_DB_PWD***','***PROD_DB_DATABASE***');

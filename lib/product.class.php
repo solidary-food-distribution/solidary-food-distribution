@@ -6,7 +6,7 @@ class Product{
   public string $name;
   public int $supplier_id;
   public string $type;
-  public string $period;
+  public float $kg_per_piece;
   public float $amount_steps;
   public float $amount_min;
   public float $amount_max;
@@ -16,6 +16,34 @@ class Product{
   public int $brand_id;
   public string $gtin_piece;
   public string $gtin_bundle;
+
+  public static function create($inserts){
+    require_once('sql.class.php');
+    $fields = array_keys($inserts);
+    array_walk($fields, 'SQL::escapeFieldName');
+    $qry="INSERT INTO msl_products (".implode(',', $fields).") VALUES (".SQL::escapeArray($inserts).")";
+    $id = SQL::insert($qry);
+    if(!$id){
+      return false;
+    }
+    $inserts['id'] = $id;
+    $p = new Product();
+    $r = new ReflectionClass($p);
+    $props = $r->getProperties();
+    foreach($props as $prop){
+      logger(print_r($prop,true));
+      $type = $prop->getType();
+      if($type == 'int'){
+        $p->{$prop->name} = intval($inserts[$prop->name]);
+      }elseif($type == 'string'){
+        $p->{$prop->name} = strval($inserts[$prop->name]);
+      }elseif($type == 'float'){
+        $p->{$prop->name} = floatval($inserts[$prop->name]);
+      }
+    }
+    logger(print_r($p,true));
+    return $p;
+  }
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

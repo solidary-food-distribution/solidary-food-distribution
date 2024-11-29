@@ -44,7 +44,7 @@ function execute_index(){
     $suppliers = new Members(array('producer>=' => 1));
   }elseif($modus == '1' || $modus == '2'){
     $suppliers = new Members(array('producer' => $modus));
-    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o', 'type' => array('k', 'p')));
+    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o', 'type' => array('k', 'p', 'w')));
     $product_ids = $products->keys();
   }elseif($modus == 's' && trim($search)!=''){
     $suppliers = new Members(array('producer>=' => 1));
@@ -159,7 +159,7 @@ function execute_change_ajax(){
     require_once('products.class.php');
     $ps = new Products(array('id' => $product_id));
     $product = $ps->first();
-    if($product->type == 'p'){
+    if($product->type == 'p' || $product->type == 'w'){
       $amount = $oi->amount_pieces;
       $amount_field = 'amount_pieces';
     }elseif($product->type == 'k'){
@@ -167,6 +167,7 @@ function execute_change_ajax(){
       $amount_field = 'amount_weight';
     }else{
       throw new Exception("unknown product-type ".print_r($product,1), 1);
+      exit;
     }
     $change = ($dir>0)?1:-1;
     if($product->status == 'o'){
