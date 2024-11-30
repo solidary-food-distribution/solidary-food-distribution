@@ -19,12 +19,12 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration');
       <span class="label">Benutzer</span>
     </div>
   <?php endif ?>
-  <!--
   <?php if($orders): ?>
-    <div class="item" onclick="location.href='/orders'">
-      <span class="label">Abholmengen</span>
+    <div class="item" onclick="location.href='/admin/orders'">
+      <span class="label">Bestellungen</span>
     </div>
   <?php endif ?>
+  <!--
   <?php if($debits): ?>
     <div class="item" onclick="location.href='/debits'">
       <span class="label">Abbuchungen</span>
