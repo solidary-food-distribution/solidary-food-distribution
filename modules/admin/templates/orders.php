@@ -12,47 +12,46 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="col8">
         <b><?php echo htmlentities($suppliers[$supplier_id]->name) ?></b>
       </div>
-      <div class="col2 right">Stück</div>
-      <div class="col2 right">Gewicht</div>
+      <div class="col2 right">Benötigt</div>
+      <div class="col2 right">Bestellen</div>
       <div class="col3 right">EK netto</div>
       <div class="col3 right">EK brutto</div>
     </div>
     <?php $sums = array(); ?>
     <?php foreach($oi_sums as $product_id => $oi_sum): ?>
-      <?php $product = $products[$product_id]; ?>
       <div class="inner_row">
         <div class="col8">
-          <?php echo htmlentities($product->name) ?>
-        </div>
-        <div class="col2 right">
-          <?php echo ($product->type != 'k')?$oi_sum['amount_pieces'].' St.':'' ?>
-        </div>
-        <div class="col2 right">
-          <?php
-            $amount_weight = '';
-            if($product->type == 'w'){
-              $amount_weight = round($oi_sum['amount_pieces'] * $product->kg_per_piece , 2);
-            }elseif($product->type == 'k'){
-              $amount_weight = $oi_sum['amount_weight'];
-            }
-            echo $amount_weight.($amount_weight != ''?' kg':'');
+          <?php 
+            echo htmlentities($oi_sum['name']);
           ?>
         </div>
-        <div class="col3 right">
+        <div class="col2 right">
           <?php
-            $price = $prices[$product_id]->purchase;
-            if($product->type == 'p'){
-              $price *= $oi_sum['amount_pieces'];
+            if($oi_sum['amount_needed_unit'] == 'kg'){
+              echo format_weight($oi_sum['amount_needed']).' kg';
             }else{
-              $price *= $amount_weight;
+              echo $oi_sum['amount_needed'].' '.$oi_sum['amount_needed_unit'];
             }
-            $sums['netto'] += round($price ,2);
-            echo format_money($price).' EUR';
+          ?>
+        </div>
+        <div class="col2 right">
+          <?php
+            if($oi_sum['amount_order_unit'] == 'kg'){
+              echo format_weight($oi_sum['amount_order']).' kg';
+            }else{
+              echo $oi_sum['amount_order'].' '.$oi_sum['amount_order_unit'];
+            }
           ?>
         </div>
         <div class="col3 right">
           <?php
-            $price_brutto = $price * (100 + $prices[$product_id]->tax)/100;
+            $sums['netto'] += round($oi_sum['sum_price'] ,2);
+            echo format_money($oi_sum['sum_price']).' EUR';
+          ?>
+        </div>
+        <div class="col3 right">
+          <?php
+            $price_brutto = $oi_sum['sum_price'] * (100 + $oi_sum['tax'])/100;
             $sums['brutto'] += round($price_brutto, 2);
             echo format_money($price_brutto).' EUR';
           ?>
@@ -65,6 +64,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="col2 right"></div>
       <div class="col3 right"><b><?php echo format_money($sums['netto']) ?> EUR</b></div>
       <div class="col3 right"><b><?php echo format_money($sums['brutto']) ?> EUR</b></div>
+    </div>
+    <div class="inner_row">
+      <div class="col3 last right"><a href="orders_csv?supplier_id=<?php echo $supplier_id ?>">CSV-Datei</a></div>
     </div>
   </div>
 <?php endforeach ?>
