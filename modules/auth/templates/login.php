@@ -1,9 +1,10 @@
 <div class="center login">
   <?php if(isset($_SESSION['scale']) && $_SESSION['scale']): ?>
-    <?php require_once('pin.include.php'); ?>
     <div class="row" id="pin_form">
       <div class="inner_row">
-        <div>
+        <div class="col6">
+          <div id="pickup_pin" class="input active" style="width:100%;font-size: 3em;"></div>
+          <!--
           <div class="keyboard_keys icons smaller">
             <div id="pickup_pin">
               <?php for($pini = 0; $pini < 6; $pini++): ?>
@@ -11,19 +12,20 @@
               <?php endfor ?>
             </div>
           </div>
+        -->
         </div>
       </div>
     </div>
     <?php
-      $pin_title = 'Gewählte Zeichen in Reihenfolge eingeben';
-      $noshuffle = 1;
-      require('pin.part.php'); 
+      require('keyboard.part.php'); 
     ?>
     <script type="text/javascript">
-      var PIN_ICONS=[
-        <?php echo "'".implode("', '", PIN_ICONS)."'" ?>
-      ];
-      user_show_pickup_pin();
+      $('#keyboard_window > div').hide();
+      $('#keyboard_key_comma').addClass('none');
+      $('#key_shift').hide();
+      $('#keyboard_numbers').show();
+      $('#keyboard_ctrl').show();
+      $('#keyboard').show();
     </script>
     <br>
     <div class="button large" style="width:auto;position:absolute;bottom:0em;left:0em;" onclick="auth_shutdown()">Herunterfahren</div>

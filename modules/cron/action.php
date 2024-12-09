@@ -20,6 +20,7 @@ function execute_run(){
 
 
 function cron_may_send_mail_preferences(){
+  return;
   require_once('sql.class.php');
   $qry = "SELECT ".
       "d.id, d.status, ".
@@ -43,6 +44,7 @@ function cron_may_send_mail_preferences(){
 }
 
 function cron_send_mail_preferences($delivery_id){
+  return;
   require_once('deliveries.class.php');
   $delivery = delivery_get($delivery_id);
   $now = format_date(date('Y-m-d H:i:s'));

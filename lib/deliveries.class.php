@@ -37,12 +37,12 @@ class Deliveries extends ArrayObject{
     require_once('sql.class.php');
     $qry=
       "SELECT d.id AS delivery_id, ms.id AS supplier_id, ms.name AS supplier_name, d.purchase_total AS d_purchase_total, d.created AS d_created, u.id AS creator_id, u.name AS creator_name, ".
-        "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_weight, di.price_type, di.purchase, di.purchase_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
-        "p.pid AS p_id,p.name AS p_name, p.producer_id AS p_producer_id, mp.name AS p_producer_name, p.type AS p_type ".
+        "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_bundles, di.amount_weight, di.price_type, di.purchase, di.purchase_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
+        "p.id AS p_id,p.name AS p_name, p.supplier_id AS p_supplier_id, mp.name AS p_supplier_name, p.type AS p_type ".
       "FROM msl_members ms, msl_users u, msl_deliveries d ".
         "LEFT JOIN msl_delivery_items di ON (d.id=di.delivery_id) ".
-        "LEFT JOIN msl_products p ON (di.product_id=p.pid) ".
-        "LEFT JOIN msl_members mp ON (p.producer_id=mp.id) ".
+        "LEFT JOIN msl_products p ON (di.product_id=p.id) ".
+        "LEFT JOIN msl_members mp ON (p.supplier_id=mp.id) ".
       "WHERE d.id>0 AND d.supplier_id=ms.id AND d.creator_id=u.id ";
     if(!empty($filters)){
       $qry .= "AND ".SQL::buildFilterQuery($filters);
@@ -67,16 +67,10 @@ class Deliveries extends ArrayObject{
       $data=$d[key($d)];
       $delivery=new Delivery();
       $delivery->id=$data['delivery_id'];
-      $supplier=new Member();
-      $supplier->id=intval($data['supplier_id']);
-      $supplier->name=$data['supplier_name'];
-      $delivery->supplier=$supplier;
+      $delivery->supplier_id = intval($data['supplier_id']);
       $delivery->purchase_total=floatval($data['d_purchase_total']);
       $delivery->created=new DateTime($data['d_created']);
-      $creator=new User();
-      $creator->id=intval($data['creator_id']);
-      $creator->name=$data['creator_name'];
-      $delivery->creator=$creator;
+      $delivery->creator_id = intval($data['creator_id']);
       foreach($d AS $di_id=>$di){
         if((string)$di_id===''){
           continue;
@@ -85,6 +79,7 @@ class Deliveries extends ArrayObject{
         $item->id = intval($di_id);
         $item->product_id = intval($di['p_id']);
         $item->amount_pieces = intval($di['amount_pieces']);
+        $item->amount_bundles = intval($di['amount_bundles']);
         $item->amount_weight = floatval($di['amount_weight']);
         $item->price_type = $di['price_type'];
         $item->purchase = floatval($di['purchase']);
@@ -96,21 +91,6 @@ class Deliveries extends ArrayObject{
         $item->weight_min = floatval($di['weight_min']);
         $item->weight_max = floatval($di['weight_max']);
         $item->weight_avg = floatval($di['weight_avg']);
-        $item->product = new Product();
-        $item->product->id = $item->product_id;
-        if($item->product_id){
-          $item->product->name = $di['p_name'];
-          $item->product->producer = new Member();
-          $item->product->producer->id = intval($di['p_producer_id']);
-          $item->product->producer->name = $di['p_producer_name'];
-          $item->product->type = $di['p_type'];
-        }else{
-          $item->product->name = '[gelöschtes Produkt]';
-          $item->product->producer = new Member();
-          $item->product->producer->id = 0;
-          $item->product->producer->name = '';
-          $item->product->type = '';
-        }
         $delivery->items[$di_id]=$item;
       }
       $deliveries[$d_id]=$delivery;

@@ -74,15 +74,26 @@ function execute_index(){
       $order_items_count++;
     }
   }
-
-  logger("products ".print_r($products,1));
   
   require_once('prices.class.php');
   $prices = new Prices(array('product_id' => $product_ids, 'start<=' => $order->pickup_date, 'end>=' => $order->pickup_date));
   #logger("prices ".print_r($prices,1));
 
   require_once('sql.class.php');
-  $order_sum_oekoring = SQL::selectOne("SELECT SUM(amount_pieces*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id)) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."'")['order_sum'];
+  $order_sum_oekoring = SQL::selectOne("SELECT SUM((CEIL(oi.amount_pieces/oi.amount_per_bundle)*oi.amount_per_bundle)*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id)) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."'")['order_sum'];
+
+  #logger("products ".print_r($products,1));
+  $ps = $products;
+  $products = array();
+  foreach($ps as $p_id => $p){
+    if($p->supplier_id == 20 && $order->pickup_date > date('Y-m-d', strtotime('+8 days', time()))){
+      //too far in future
+    }elseif($prices[$p_id]->price == 0){
+      //no price (yet)
+    }else{
+      $products[$p_id] = $p;
+    }
+  }
 
   return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'order_sum_oekoring' => $order_sum_oekoring);
 }
@@ -157,8 +168,7 @@ function execute_change_ajax(){
       $oi = $ois->first();
     }
     require_once('products.class.php');
-    $ps = new Products(array('id' => $product_id));
-    $product = $ps->first();
+    $product = Products::sget($product_id);
     if($product->type == 'p' || $product->type == 'w'){
       $amount = $oi->amount_pieces;
       $amount_field = 'amount_pieces';
@@ -176,7 +186,7 @@ function execute_change_ajax(){
       $change *= $product->amount_per_bundle;
     }
 
-    $amount_new = $amount + $change;
+    $amount_new = round($amount + $change, 3);
     if($amount_new < $product->amount_min && $dir<0){
       $amount_new = 0;
     }elseif($amount_new < $product->amount_min && $dir>0){
@@ -189,11 +199,59 @@ function execute_change_ajax(){
     }elseif($modus !='o' && $amount_new == 0){
       $oi->delete();
     }else{
-      $oi->update(array($amount_field => $amount_new));
+      $updates = array($amount_field => $amount_new);
+      if($product->type == 'w'){
+        $updates['amount_weight'] = $amount_new * $product->kg_per_piece;
+      }
+      $oi->update($updates);
+      update_order_item_prices($oi->id);
     }
   }
   $return=execute_index();
   $return['template']='index.php';
   $return['layout']='layout_null.php';
   return $return;
+}
+
+function update_order_item_prices($order_item_id){
+  require_once('order_items.class.php');
+  $order_item = OrderItems::sget($order_item_id);
+  require_once('products.class.php');
+  $product = Products::sget($order_item->product_id);
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => $product->id, 'start<=' => date('Y-m-d'), 'end>=' => date('Y-m-d')));
+  $dbprice = $prices[$product->id];
+  $updates = array();
+  if($product->type == 'p'){
+    $price_type = 'p';
+  }else{
+    $price_type = 'k';
+  }
+  if($order_item->price_type != $price_type){
+    $updates['price_type'] = $price_type;
+  }
+  if($order_item->price != $dbprice->price){
+    $updates['price'] = $dbprice->price;
+  }
+  if($order_item->amount_per_bundle != $dbprice->amount_per_bundle){
+    $updates['amount_per_bundle'] = $dbprice->amount_per_bundle;
+  }
+  if($order_item->price_bundle != $dbprice->price_bundle){
+    $updates['price_bundle'] = $dbprice->price_bundle;
+  }
+  if($price_type == 'p'){
+    if($dbprice->amount_per_bundle > 1 && $order_item->amount_pieces >= $dbprice->amount_per_bundle){
+      $price_sum = round($order_item->amount_pieces * $dbprice->price_bundle, 2);
+    }else{
+      $price_sum = round($order_item->amount_pieces * $dbprice->price, 2);
+    }
+  }else{
+    $price_sum = round($order_item->amount_weight * $dbprice->price, 2);
+  }
+  if($order_item->price_sum != $price_sum){
+    $updates['price_sum'] = $price_sum;
+  }
+  if(!empty($updates)){
+    $order_item->update($updates);
+  }
 }

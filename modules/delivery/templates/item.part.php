@@ -7,7 +7,7 @@
   <div class="col4">
     <div class="info">
       <div class="name">
-        <b><?php echo $item->product->name ?></b>
+        <b><?php echo $products[$item->product_id]->name ?></b>
       </div>
       <?php if($item->product->producer->id != $delivery->supplier->id): ?>
         <div class="producer">
@@ -18,6 +18,11 @@
   </div>
   <div class="col4">
     <div class="amount_ctrl">
+      <?php if($item->amount_bundles): ?>
+        <div class="amount">
+          <?php echo format_amount($item->amount_bundles) ?> Gebinde
+        </div>
+      <?php endif ?>
       <?php if($item->amount_weight): ?>
         <div class="amount">
           <?php echo format_amount($item->amount_weight) ?> kg

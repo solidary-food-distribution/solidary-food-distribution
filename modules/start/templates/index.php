@@ -6,9 +6,8 @@ $PROPERTIES['body_class']='footer_h4';
   <div class="item" onclick="location.href='/order'">
     <span class="label">Bestellen</span>
   </div>
-  <!--
   <?php if(user_has_access('deliveries') || user_has_access('inventory')): ?>
-    <div class="item" onclick="location.href='/store'">
+    <div class="item" onclick="location.href='/start/store'">
       <span class="label">Abholraum</span>
     </div>
   <?php elseif(user_has_access('pickups')): ?>
@@ -16,7 +15,6 @@ $PROPERTIES['body_class']='footer_h4';
       <span class="label">Abholungen</span>
     </div>
   <?php endif ?>
--->
   <div class="item" onclick="location.href='/activities'">
     <span class="label">Aktivitäten</span>
   </div>

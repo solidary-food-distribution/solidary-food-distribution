@@ -8,6 +8,21 @@ class Objects implements ArrayAccess,Iterator,Countable{
     $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
   }
 
+  public static function sget($id){
+    $class_name = get_called_class();
+    $objects = new $class_name(array('id' => $id));
+    if($objects->count()){
+      return $objects->first();
+    }
+    return null;
+  }
+  public function get($id){
+    if(isset($this->array[$id])){
+      return $this->array[$id];
+    }
+    return null;
+  }
+
   public function count(){
     return count($this->array);
   }
@@ -36,7 +51,7 @@ class Objects implements ArrayAccess,Iterator,Countable{
   }
 
   public function offsetExists(mixed $offset){
-    return in_array($this->array, $offset);
+    return in_array($offset, $this->array);
   }
   public function offsetGet(mixed $offset){
     return $this->array[$offset];
@@ -53,12 +68,6 @@ class Objects implements ArrayAccess,Iterator,Countable{
   }
   public function isset($id){
     return isset($this->array[$id]);
-  }
-  public function get($id){
-    if(isset($this->array[$id])){
-      return $this->array[$id];
-    }
-    return null;
   }
   public function first(){
     if(!isset($this->array[key($this->array)])){
@@ -90,9 +99,13 @@ class Objects implements ArrayAccess,Iterator,Countable{
     $this->array = array();
     foreach($recset as $id => $row){
       $object = new $this->_object_name();
-      foreach($row as $key => $value){
-        if(property_exists($object, $key)){
-          $object->{$key} = $value;
+      if(property_exists($object, '_init_values')){
+        $object->_init_values($row);
+      }else{
+        foreach($row as $key => $value){
+          if(property_exists($object, $key)){
+            $object->{$key} = $value;
+          }
         }
       }
       $this->array[$id] = $object;

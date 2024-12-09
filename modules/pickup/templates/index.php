@@ -4,235 +4,220 @@ $PROPERTIES['pathbar']=array(
   '/pickup?pickup_id='.$pickup->id => format_date($pickup->created,'j.n.Y H:i')
 );
 $PROPERTIES['body_class']='header_h5 footer_h8';
-
-$order_sum = 0;
-$variable_sum = 0;
-foreach($orders as $order){
-  if($order->product->id == 59){
-    continue;
-  }elseif($order->product->type == 'b'){
-    $variable_sum += $order->amount;
-  }else{
-    $order_sum += $order->product->price * $order->amount;
-  }
-}
-$pickup_order_sum = 0;
-$pickup_variable_sum = 0;
 ?>
 
-<?php ob_start(); ?>
-  <div class="filters">
-    <?php
-      $p_types = array();
-      foreach($pickup->items as $item){
-        $p_types[($item->product->type=='v')?'v':'o']=1;
-        if($item->product->type == 'v'){
-          $pickup_variable_sum += $item->price_sum;
-        }else{
-          $pickup_order_sum += $item->price_sum;
-        }
-      }
-      $options = array('o' => 'bestellte Produkte', 'v' => 'Gemüseanteil');
-      $options = array_intersect_key($options, $p_types);
-      if($product_type != 'v'){
-        $product_type = 'o';
-      }
-      if(count($options) > 1){
-        echo html_input(array(
-          'class' => 'filter',
-          'onclick' => 'filter_options',
-          'type' => 'options',
-          'field' => 'product_type',
-          'value' => $product_type,
-          'options' => $options,
-        ));
-      }
-    ?>
-  </div>
-<?php $PROPERTIES['header']=ob_get_clean(); ?>
+<?php echo $start ?>
 
-<?php foreach($pickup->items as $item): ?>
+<?php if($start == 0): ?>
+  <?php ob_start(); ?>
+    <div class="controls" data-pickup-id="<?php echo $pickup->id ?>">
+      <div class="control filter">
+        <?php
+          $options = array(
+            'p' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($pickup_items_count?'<span class="count cart">'.$pickup_items_count.'</span>':'').' Warenkorb',
+            #'d' => '<i class="fa-solid fa-square-plus" title="Auf Lager"></i> Auf Lager'
+          );
+          echo html_input(array(
+            'class' => 'filter',
+            'onclick' => 'pickup_filter',
+            'type' => 'options',
+            'field' => 'modus',
+            'value' => $modus,
+            'options' => $options,
+        )); ?>
+      </div>
+    </div>
+  <?php $PROPERTIES['header']=ob_get_clean(); ?>
+<?php endif ?>
+
+<?php
+  $sum = array();
+?>
+
+<?php foreach($products as $product_id => $product): ?>
   <?php
-    if($item->product->type == 'v' && $product_type != 'v'){
-      continue;
-    }elseif($item->product->type != 'v' && $product_type != 'o'){
-      continue;
+    $amount_ordered = 0;
+    $amount_ordered_type = '';
+    if(isset($pickup_items[$product_id])){
+      $pickup_item = $pickup_items[$product_id];
+      $order_item = $order_items[$pickup_item->order_item_id];
+      if($product->type == 'k'){
+        $amount_ordered = $order_item->amount_weight;
+        $amount_ordered_type = 'k';
+        $amount_price = $pickup_item->amount_weight;
+        $amount = $pickup_item->amount_weight;
+        $amount_weight = $pickup_item->amount_weight;
+        $amount_ordered_weight = $order_item->amount_weight;
+      }elseif($product->type == 'w'){
+        $amount_ordered = $order_item->amount_pieces;
+        $amount_ordered_type = 'p';
+        $amount = $pickup_item->amount_pieces;
+        $amount_weight = $pickup_item->amount_weight;
+        $amount_ordered_weight = $order_item->amount_pieces * $product->kg_per_piece;
+        $amount_price = $pickup_item->amount_weight;
+      }else{
+        $amount_ordered = $order_item->amount_pieces;
+        $amount_ordered_type = 'p';
+        $amount_price =  $pickup_item->amount_pieces;
+        $amount = $pickup_item->amount_pieces;
+      }
+      $price = $pickup_item->price;
+    }else{
+      $amount_price = 0;
+      $amount = 0;
     }
+
+    
+    if($amount && $prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle){
+      if($amount >= $prices[$product_id]->amount_per_bundle){
+        $price = $prices[$product_id]->price_bundle;
+      }
+    }
+
+    $price_row = round($price * $amount_price, 2);
+    $purchase_incl_tax = round($amount_price * round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2), 2);
+    #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
+    $supplier = $suppliers[$product->supplier_id];
+    $brand = '';
+    $locked = false;
+    $locked_less = false;
+    if($amount <= 0){
+      $locked_less = true;
+    }
+
+    if($supplier->producer == 1){
+      $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
+      $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
+    }elseif($supplier->producer == 2){
+      $sum['trader_paid'] = $sum['trader_paid'] + $purchase_incl_tax;
+      $sum['trader_sum'] = $sum['trader_sum'] + $price_row;
+      if($product->brand_id){
+        $brand = $brands[$product->brand_id];
+      }
+    }
+
+    $price_title = "EK: ".format_money(round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2))." EUR";
+    if($prices[$product_id]->suggested_retail){
+      $price_title .= ", UVP: ".format_money($prices[$product_id]->suggested_retail)." EUR";
+    }
+    
+    $sum['sum'] = $sum['sum'] + $price_row;
   ?>
-  <div class="row product" id="pickup_item<?php echo $item->id ?>" data-pickup_id="<?php echo $pickup->id ?>" data-item_id="<?php echo $item->id ?>" data-product_type="<?php echo ($item->product->type=='v')?'v':'o' ?>">
+  <div class="row product" data-id="<?php echo $product_id ?>" data-pickup_id="<?php echo $pickup->id ?>" data-item_id="<?php echo $pickup_item->id ?>">
     <div class="col2">
-      <div class="image">
-        <!--<img src="" />-->
+      <div style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;"></div>
+    </div>
+    <div class="col5">
+      <div>
+        <?php echo htmlentities($product->name) ?><br>
+        <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
       </div>
     </div>
-    <div class="col4">
-      <div class="info">
-        <div class="name">
-          <b><?php echo $item->product->name ?></b>
+    <div class="col8">
+      <?php if($product->type!='k'): ?>
+        <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="pickup_change(this,\'-\')"' ?>>-</div>
+      <?php else: ?>
+        <div style="width:1.7em;font-size:2em;">&nbsp;</div>
+      <?php endif ?>
+      <div class="" style="width:6em;text-align:right;margin-right:0.2em;">
+        <?php if($amount_ordered): ?>
+          <span><?php echo format_amount($amount_ordered) ?></span>
+        <?php endif ?>
+        <?php
+          $needs_todo = ($amount_ordered != $amount);
+          if($product->type == 'k'){
+            $needs_todo = 0;
+            if($amount_weight > $amount_ordered_weight*1.2){
+              $needs_todo = 1;
+            }elseif($amount_weight < $amount_ordered_weight*0.8){
+              $needs_todo = 1;
+            }
+          }
+        ?>
+        <div class="input <?php echo $needs_todo?'needs_todo':'' ?>">
+          <?php echo format_amount($amount); ?>
         </div>
-        <?php if($item->product->producer->id != $delivery->supplier->id): ?>
-          <div class="producer">
-            <?php echo $item->product->producer->name ?>
+        <span><?php echo translate_product_type_amount($product->type); ?></span><br>
+        <?php if($product->type == 'w'): ?>
+          <div class="input <?php echo $amount_weight?'':'needs_todo' ?>">
+            <?php echo format_amount($amount_weight); ?>
           </div>
+          <span><?php echo translate_product_type_amount('k'); ?></span><br>
         <?php endif ?>
-      </div>
-    </div>
-    <div class="col4">
-      <div class="amount">
-        <?php if($item->amount_order): ?>
-          <div>
-            <?php echo format_amount($item->amount_order).' '.translate_product_type($item->product->type).' / '.translate_product_period($item->product->period); ?>
-          </div>
-        <?php endif ?>
-        <?php if(!empty($pickup_history[$item->product->id])): ?>
-          <div style="color:grey;font-size:0.8em;margin-top: 0.5em;">
-            <?php $dateCount=0; ?>
-            <?php foreach($pickup_history[$item->product->id] as $date=>$amount): ?>
-              <?php echo $date.': '.format_amount($amount) ?><br>
-              <?php if($dateCount++>=2){break;} ?>
-            <?php endforeach ?>
-          </div>
-        <?php endif ?>
-      </div>
-    </div>
-    <div class="col6">
-      <div class="amount_ctrl">
-        <?php //print_r($item); ?>
-        <?php if($item->price_type == 'p'): ?>
-          <div class="amount">
-            <b><?php echo $item->amount_pieces ?> <?php echo translate_product_type($item->price_type) ?></b>
-          </div>
-          <div class="ctrl">
-            <div class="button <?php echo $item->amount_pieces<=0?'disabled':'' ?>" onclick="pickup_change(this,'-')">-</div>
-            <div class="button"  onclick="pickup_change(this,'+')">+</div>
-            <?php if($item->amount_order): ?>
-              <div class="button amount <?php echo $item->amount_pieces==$item->amount_order?'disabled':'' ?>"  onclick="pickup_change(this,'<?php echo $item->amount_order ?>')"><span><?php echo $item->amount_order ?></span></div>
-            <?php endif ?>
-          </div>
-        <?php elseif($item->price_type == 'k'): ?>
-          <div class="amount">
-            <b><span class="value"><?php echo format_amount($item->amount_weight) ?></span> <?php echo translate_product_type($item->price_type) ?></b>
-          </div>
-          <div class="ctrl weight">
-            <?php 
-              $scale_title = $item->product->name;
-              if($item->product->type != 'v'){
-                $scale_title .= ' '.format_amount($item->amount_order).' '.translate_product_type($item->product->type);
-                $value_exact = $item->amount_order;
-                $value_min = round($item->amount_order*0.9, 2);
-                $value_max = round($item->amount_order*1.1, 2);
-                $price_sum = 0;
-              }else{
-                $value_exact = $variable_sum;
-                $value_min = round($variable_sum*0.9, 2);
-                $value_max = round($variable_sum*1.1, 2);
-                $price_sum = $variable_sum;
-              }
-            ?>
-            <div class="button scale" onclick="scale_show(this)" data-type="scale" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $value_exact ?>" data-value_min="<?php echo $value_min ?>" data-value_max="<?php echo $value_max ?>" data-price="<?php echo $item->price ?>" data-price_sum="<?php echo $price_sum ?>" data-price_sum_pickup="<?php echo $pickup_variable_sum-$item->price_sum ?>">
-              <div>
-                <i class="fa-solid fa-weight-scale"></i>
-              </div>
-            </div>
-          </div>
-        <?php endif ?>
-      </div>
-    </div>
-    <div class="col2 right last result">
-      <?php
-        if($item->price_type == 'p'){
-          $amount = $item->amount_pieces;
-          $variance = 0;
-        }else{
-          $amount = $item->amount_weight;
-          $variance = 0.1;
-        }
-        $icon = 'good';
-        if($amount < $item->amount_order * (1 - $variance)){
-          $icon = 'warning';
-        }elseif($amount > $item->amount_order * (1 + $variance)){
-          $icon = 'error';
-        }
-      ?>
-      <?php if($item->amount_order): ?>
-        <div class="icon <?php echo $icon ?>">
-          <?php if($icon != 'good'): ?>
-            <i class="fa-solid fa-triangle-exclamation"></i>
-          <?php else: ?>
-            <i class="fa-solid fa-check"></i>
+        <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
+          <?php if($product->type == 'w'): ?>
+            <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
           <?php endif ?>
+          <?php if($product->status == 'o'): ?>
+            <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
+          <?php endif ?>
+          <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>
+            <br>
+            <span><?php echo $prices[$product_id]->amount_per_bundle ?>: <?php echo format_money($prices[$product_id]->price_bundle) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
+          <?php endif ?>
+        </div>
+      </div>
+      <?php if($product->type!='k'): ?>
+        <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'+\')"' ?>>+</div>
+      <?php else: ?>
+        <div style="width:1.7em;font-size:2em;">&nbsp;</div>
+      <?php endif ?>
+      <?php if($product->type!='p'): ?>
+        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($product->name) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*0.8 ?>" data-value_max="<?php echo $amount_ordered_weight*1.2 ?>">
+          <i class="fa-solid fa-weight-scale"></i>
         </div>
       <?php else: ?>
-        <div class="price_sum">
-          <?php if($item->price_sum): ?>
-            <?php echo format_money($item->price_sum) ?> EUR
-          <?php endif ?>
+        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount!=$amount_ordered?'needs_todo':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'=\')"' ?> style="margin-left:0.2em">
+          <i class="fa-solid fa-check"></i>
         </div>
       <?php endif ?>
-      <?php /*
-      <!--
-      <div class="price_sum">
-        <?php if($item->price_sum): ?>
-          <?php echo format_money($item->price_sum) ?> EUR
-        <?php endif ?>
-      </div>
-      -->
-      */ ?>
+    </div>
+    <div class="col3 right last">
+      <span><?php echo format_money($price * $amount_price) ?> EUR</span>
     </div>
   </div>
 <?php endforeach ?>
+
 <?php require('scale.part.php'); ?>
 
-
-<?php ob_start(); ?>
-<div class="row">
-  <div class="inner_row mb1">
-    <div class="col2"></div>
-    <div class="col4">
-      <div>Bestellte Produkte</div>
-    </div>
-    <div class="col4">
-      <div>
-        <?php echo number_format($order_sum,2,',','') ?>&nbsp;EUR
-      </div>
-    </div>
-    <div class="col6 last right">
-      <div class="price_sum">
-        <?php echo number_format($pickup_order_sum,2,',','') ?>&nbsp;EUR
-      </div>
-    </div>
-  </div>
-  <?php if($variable_sum): ?>
-    <div class="inner_row">
-      <div class="col2"></div>
-      <div class="col4">
-        <div>Gemüseanteil</div>
-      </div>
-      <div class="col4">
-        <div>
-          <?php echo number_format($variable_sum,2,',','') ?>&nbsp;EUR
+<?php if($start == 0): ?>
+  <?php ob_start(); ?>
+    <?php if($modus == 'p'): ?>
+      <div class="row">
+        <div class="inner_row">
+          <div class="col2"></div>
+          <div class="col3 right"><small>Einkauf</small></div>
+          <div class="col3 right"><small>-&gt; Geno</small></div>
+          <div class="col5"></div>
+          <div class="col2 right">Summe</div>
+          <div class="col3 right last">
+            <?php echo format_money($sum['sum']); ?> EUR
+          </div>
+        </div>
+        <div class="inner_row">
+          <div class="col2"><small>Erzeuger</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['supplier_paid']) ?> EUR</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['supplier_sum'] - $sum['supplier_paid']) ?> EUR</small></div>
+        </div>
+        <div class="inner_row">
+          <div class="col2"><small>Großhandel</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['trader_paid']) ?> EUR</small></div>
+          <div class="col3 right"><small><?php echo format_money($sum['trader_sum'] - $sum['trader_paid']) ?> EUR</small></div>
+        </div>
+        <div class="inner_row">
+          <div class="col12">
+          </div>
+          <div class="col6 right last">
+            <small>Die Abholung bleibt gespeichert</small>
+          </div>
+          <!--<div class="col8 right last">
+            <div class="button disabled">Bestellung abschicken</div>
+          </div>
+        -->
         </div>
       </div>
-      <div class="col6 last right">
-        <div class="price_sum">
-          <?php echo number_format($pickup_variable_sum,2,',','') ?>&nbsp;EUR
-        </div>
-      </div>
-    </div>
-    <div class="inner_row">
-      <div class="col2"></div>
-      <div>
-        <div>
-          <?php if($product_type == 'v'): ?>
-            <small style="color:#888;"><?php echo ($others['orders_count']+1) ?> Abholer mit <?php echo $others['orders_sum']+$variable_sum ?> EUR. Du (<?php echo $variable_sum ?> EUR) und weitere <?php echo ($others['orders_count']-$others['pickup_count']) ?> (<?php echo ($others['open_sum']) ?> EUR) teilen sich verbleibende <?php echo $others['orders_sum']+$variable_sum-$others['pickup_sum'] ?> EUR.
-            </small>
-           <?php else: ?>
-            &nbsp;
-           <?php endif ?>
-        </div>
-      </div>
-    </div>
-  <?php endif ?>
-</div>
-<?php $PROPERTIES['footer']=ob_get_clean(); ?>
-
+    <?php endif ?>
+  <?php
+    $PROPERTIES['footer']=ob_get_clean();
+  ?>
+<?php endif ?>

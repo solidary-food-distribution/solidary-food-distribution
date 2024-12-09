@@ -7,11 +7,19 @@ require_once('user.class.php');
 
 class Delivery{
   public $id;
-  public Member $supplier;
+  public $supplier_id; //member->id
   public $purchase_total;
   public DateTime $created;
-  public User $creator;
+  public $creator_id; //user->id
   public array $items = array(); //class DeliveryItem
+
+  public function get_product_ids(){
+    $product_ids = array();
+    foreach($this->items as $item){
+      $product_ids[$item->product_id] = 1;
+    }
+    return array_keys($product_ids);
+  }
 
   public function item_create( $product_id ) {
     require_once('sql.class.php');

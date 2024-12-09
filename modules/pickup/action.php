@@ -9,11 +9,60 @@ require_once('pickups.class.php');
 function execute_index(){
   global $user;
   $pickup_id = get_request_param('pickup_id');
-  $product_type = get_request_param('product_type');
+  $modus = get_request_param('modus');
+  if($modus == ''){
+    $modus = 'p';
+  }
   update_pickup_items($pickup_id);
   $pickup = pickup_get($pickup_id, $user['member_id']);
-  require_once('orders.class.php');
-  $orders = new Orders(array('member_id' => $user['member_id']));
+
+  $pickup_items = array();
+  $order_item_ids = array();
+  require_once('pickup_items.class.php');
+  if($modus == 'p'){
+    require_once('pickup_items.class.php');
+    $puis = new PickupItems(array('pickup_id' => $pickup_id));
+    $product_ids = $puis->get_product_ids();
+    foreach($puis as $pui){
+      $pickup_items[$pui->product_id] = $pui;
+      $order_item_ids[] = $pui->order_item_id;
+    }
+  }
+
+  require_once('products.class.php');
+  $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
+
+  $ps = array();
+  foreach($products as $product){
+    if($product->type == 'p'){
+      $ps[$product->id] = $product;
+    }else{ //k or w
+      $ps = array($product->id => $product) + $ps;
+    }
+  }
+  $products = $ps;
+  $ps = array();
+  foreach($products as $product){
+    if($product->type == 'k'){
+      $ps = array($product->id => $product) + $ps;
+    }else{ //p or w
+      $ps[$product->id] = $product;
+    }
+  }
+  $products = $ps;
+
+  require_once('order_items.class.php');
+  $order_items = new OrderItems(array('id' => $order_item_ids));
+
+  require_once('members.class.php');
+  $suppliers = new Members(array('producer>=' => 1));
+
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => $product_ids));
+
+  require_once('sql.class.php');
+  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
+  /*
   $others = array();
   $last_pickup = array();
   if($product_type == 'v'){
@@ -21,34 +70,102 @@ function execute_index(){
   }else{
     $pickup_history = get_pickup_history($pickup);
   }
+  */
   return array(
+    'modus' => $modus,
     'pickup' => $pickup,
-    'product_type' => $product_type,
-    'orders' => $orders,
-    'others' => $others,
-    'pickup_history' => $pickup_history);
+    'pickup_items' => $pickup_items,
+    'order_items' => $order_items,
+    'products' => $products,
+    'suppliers' => $suppliers,
+    'brands' => $brands,
+    'prices' => $prices,
+    //'product_type' => $product_type,
+    //'others' => $others,
+    //'pickup_history' => $pickup_history
+  );
 }
 
 function execute_new(){
   global $user;
-  $pickup_id = Pickups::create($user['member_id'], $user['user_id']);
-  update_pickup_items($pickup_id);
-  forward_to_page('/pickup', 'pickup_id='.$pickup_id);
+  $pickup = Pickup::create($user['member_id'], $user['user_id']);
+  update_pickup_items($pickup->id);
+  forward_to_page('/pickup', 'pickup_id='.$pickup->id);
 }
 
+function execute_filter_ajax(){
+  $pickup_id = get_request_param('pickup_id');
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+  set_request_param($field, $value);
+  $return = execute_index();
+  $return['template'] = 'index.php';
+  $return['layout'] = 'layout_null.php';
+  return $return;
+}
+
+function pickup_get($pickup_id, $member_id){
+  $pickups = new Pickups(array('id' => $pickup_id, 'member_id' => $member_id));
+  if(count($pickups)){
+    return $pickups->first();
+  }
+  return null;
+}
 
 function update_pickup_items($pickup_id){
   global $user;
+  $pickup_date = '2024-12-06';
   $pickup = pickup_get($pickup_id, $user['member_id']);
-  if($pickup->status != 'o'){
+
+  require_once('orders.class.php');
+  $orders = new Orders(array('pickup_date' => $pickup_date, 'member_id' => $user['member_id']));
+  if(!count($orders)){
     return;
   }
+  $order = $orders->first();
+  require_once('order_items.class.php');
+  $order_items = new OrderItems(array('order_id' => $order->id));
+
+  require_once('products.class.php');
+  $products = new Products(array('id' => $order_items->get_product_ids()));
+
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => $order_items->get_product_ids(), 'start<=' => $order->pickup_date, 'end>=' => $order->pickup_date));
+
+  require_once('pickup_items.class.php');
+  $puis = new PickupItems(array('pickup_id' => $pickup_id));
   $pickup_items = array();
-  $pickup_item_ids = '';
-  foreach($pickup->items as $item){
-    $pickup_items[$item->product->id] = $item;
-    $pickup_item_ids .= ','.$item->id;
+  foreach($puis as $pui){
+    $pickup_items[$pui->product_id] = $pui;
   }
+
+  foreach($order_items as $oi){
+    if(!$oi->amount_pieces && !$oi->amount_weight){
+      continue;
+    }
+    if(!isset($pickup_items[$oi->product_id])){
+      $pui = PickupItem::create($pickup_id, $oi->product_id);
+      $updates = array(
+        'order_item_id' => $oi->id,
+        'amount_pieces_min' => $oi->amount_pieces,
+        'amount_pieces_max' => $oi->amount_pieces,
+        'amount_weight_min' => $oi->amount_weight * 0.9,
+        'amount_weight_max' => $oi->amount_weight * 1.1,
+        'price' => $prices[$oi->product_id]->price,
+      );
+      if($products[$oi->product_id]->type == 'p'){
+        $updates['price_type'] = 'p';
+      }else{ //k or w
+        $updates['price_type'] = 'k';
+      }
+      $pui->update($updates);
+      $puis = new PickupItems(array('id' => $pui->id));
+      $pui = $puis->first();
+      $pickup_items[$oi->product_id] = $pui;
+    }
+  }
+
+  /*
   $has_type_b = false;
   $type_b_factor = 0;
   $type_b_producer_ids = array();
@@ -101,7 +218,112 @@ function update_pickup_items($pickup_id){
       }
     }
   }
+  */
 }
+
+function execute_change_ajax(){
+  global $user;
+  $pickup_id = get_request_param('pickup_id');
+  $product_id = intval(get_request_param('product_id'));
+  $change = get_request_param('change');
+  $modus = get_request_param('modus');
+  logger("$pickup_id $product_id $change $modus");
+  if($pickup_id && $product_id && $change){
+    require_once('pickup_items.class.php');
+    $puis = new PickupItems(array('pickup_id' => $pickup_id, 'product_id' => $product_id));
+    if(!$puis->count()){
+      $pui = PickupItems::create($pickup_id, $product_id);
+    }else{
+      $pui = $puis->first();
+    }
+    require_once('products.class.php');
+    $ps = new Products(array('id' => $product_id));
+    $product = $ps->first();
+    if($product->type == 'p' || $product->type == 'w'){
+      $amount = $pui->amount_pieces;
+      $amount_field = 'amount_pieces';
+    }elseif($product->type == 'k'){
+      $amount = $pui->amount_weight;
+      $amount_field = 'amount_weight';
+    }else{
+      throw new Exception("unknown product-type ".print_r($product,1), 1);
+      exit;
+    }
+
+    if($change == '+' && $product->status == 'o'){
+      $amount_new = round($amount + $product->amount_steps, 3);
+    }elseif($change == '+' && $product->status == 's'){
+      $amount_new = round($amount + $product->amount_per_bundle, 3);
+    }elseif($change == '-' && $product->status == 'o'){
+      $amount_new = round($amount - $product->amount_steps, 3);
+    }elseif($change == '-' && $product->status == 's'){
+      $amount_new = round($amount - $product->amount_per_bundle, 3);
+    }elseif($change == '='){
+      require_once('order_items.class.php');
+      $ois = new OrderItems(array('id' => $pui->order_item_id));
+      $oi = $ois->first();
+      $amount_new = $oi->amount_pieces;
+    }
+
+    if($amount_new < $product->amount_min && $change == '-'){
+      $amount_new = 0;
+    }elseif($amount_new < $product->amount_min && $change == '+'){
+      $amount_new = $product->amount_min;
+    }elseif($amount_new > $product->amount_max){
+      $amount_new = $product->amount_max;
+    }
+    logger("amount_field $amount_field amount_new $amount_new");
+    $pui->update(array($amount_field => $amount_new));
+    update_pickup_item_price_sum($pui->id);
+  }
+  $return=execute_index();
+  $return['template']='index.php';
+  $return['layout']='layout_null.php';
+  return $return;
+}
+
+function execute_scale_ajax(){
+  global $user;
+  $pickup_id = intval(get_request_param('pickup_id'));
+  $pickup_item_id = intval(get_request_param('item_id'));
+  $value = get_request_param('value');
+  $pu = Pickups::sget($pickup_id);
+  if(!$pu || $pu->member_id!=$user['member_id']){
+    logger("ERROR wrong pickup $pickup_id ".$user['member_id']);
+    exit;
+  }
+  require_once('pickup_items.class.php');
+  $pui = PickupItems::sget($pickup_item_id);
+  if(!$pui || $pui->pickup_id!=$pickup_id){
+    logger("ERROR wrong pickup item $pickup_item_id");
+    exit;
+  }
+  $pui->update(array('amount_weight' => floatval($value)));
+  update_pickup_item_price_sum($pui->id);
+  $return=execute_index();
+  $return['template']='index.php';
+  $return['layout']='layout_null.php';
+  return $return;
+}
+
+function update_pickup_item_price_sum($pickup_item_id){
+  require_once('pickup_items.class.php');
+  $pui = PickupItems::sget($pickup_item_id);
+  if($pui->price_type == 'k'){
+    $price_sum = round($pui->amount_weight * $pui->price, 2);
+  }elseif($pui->price_type == 'p'){
+    $price_sum = round($pui->amount_pieces * $pui->price, 2);
+  }else{
+    logger("ERROR wrong price_type ".print_r($pui,1));
+    return;
+  }
+  if($pui->price_sum != $price_sum){
+    $pui->update(array('price_sum' => $price_sum));
+  }
+}
+
+
+/*
 
 function execute_update_ajax(){
   global $user;
@@ -142,6 +364,7 @@ function execute_update_ajax(){
   $return['layout']='layout_null.php';
   return $return;
 }
+*/
 
 function inventory_update($pickup_item_id, $product_id, $updates){
   require_once('inventories.class.php');
@@ -210,6 +433,7 @@ function get_info_others(){
 }
 
 function get_pickup_history($pickup){
+  return array();
   global $user;
   $pickup_history = array();
   foreach($pickup->items as $item){

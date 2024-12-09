@@ -10,17 +10,24 @@ function execute_index(){
   $delivery_id = get_request_param('delivery_id');
   $item_id = get_request_param('item_id');
   $delivery = delivery_get($delivery_id);
-  return array('delivery' => $delivery, 'item_id' => $item_id);
+  require_once('members.class.php');
+  $suppliers = new Members(array('id' => $delivery->supplier_id));
+  $supplier = $suppliers->first();
+  $product_ids = $delivery->get_product_ids();
+  require_once('products.class.php');
+  $products = new Products(array('id' => $product_ids));
+  return array('delivery' => $delivery, 'supplier' => $supplier, 'products' => $products, 'item_id' => $item_id);
 }
 
 function execute_edit(){
   $delivery_id = get_request_param('delivery_id');
   $delivery = delivery_get($delivery_id);
-  require_once('products.class.php');
-  $products = new Products(array('producer_id' => $delivery->supplier->id, 'type' => array('v')));
+  require_once('members.class.php');
+  $suppliers = new Members(array('id' => $delivery->supplier_id));
   return array(
     'delivery' => $delivery,
-    'type_v' => count($products),
+    'supplier' => $suppliers->first(),
+    #'type_v' => count($products),
   );
 }
 
@@ -29,9 +36,12 @@ function execute_item_edit(){
   $item_id = get_request_param('item_id');
   $delivery = delivery_get($delivery_id);
   $item = $delivery->items[$item_id];
+  require_once('products.class.php');
+  $product = Products::sget($item->product_id);
   return array(
     'delivery' => $delivery,
     'item' => $item,
+    'product' => $product,
   );
 }
 
@@ -99,8 +109,27 @@ function execute_item_delete_ajax(){
 }
 
 function execute_new(){
+  $pickup_date = '2024-12-06';
+  require_once('orders.class.php');
+  $orders = new Orders(array('pickup_date' => $pickup_date));
+  $order_ids = $orders->keys();
+  require_once('order_items.class.php');
+  $order_items = new OrderItems(array('order_id' => $order_ids));
+  $product_ids = array(0 => 0);
+  foreach($order_items as $order_item){
+    if($order_item->amount_pieces || $order_item->amount_weight){
+      $product_ids[$order_item->product_id] = 1;
+    }
+  }
+  require_once('products.class.php');
+  $products = new Products(array('id' => array_keys($product_ids)));
+  $supplier_ids = array(0 => 0);
+  foreach($products as $product){
+    $supplier_ids[$product->supplier_id] = 1;
+  }
+
   require_once('members.class.php');
-  $suppliers=new Members(array('producer' => 1));
+  $suppliers=new Members(array('id' => array_keys($supplier_ids)));
   return array('suppliers' => $suppliers);
 }
 
@@ -108,7 +137,37 @@ function execute_new_create(){
   global $user;
   $supplier_id=get_request_param('supplier_id');
   $delivery_id = Deliveries::create($supplier_id, $user['member_id']);
-  forward_to_page('/delivery/edit', 'delivery_id='.$delivery_id);
+  $delivery = delivery_get($delivery_id);
+  $pickup_date = '2024-12-06';
+  require_once('orders.class.php');
+  $orders = new Orders(array('pickup_date' => $pickup_date));
+  $order_ids = $orders->keys();
+  require_once('order_items.class.php');
+  $order_items = new OrderItems(array('order_id' => $order_ids));
+  $product_ids = array(0 => 0);
+  $product_amounts = array();
+  foreach($order_items as $order_item){
+    if($order_item->amount_pieces || $order_item->amount_weight){
+      $product_ids[$order_item->product_id] = 1;
+      $product_amounts[$order_item->product_id]['amount_pieces'] += $order_item->amount_pieces;
+      $product_amounts[$order_item->product_id]['amount_weight'] += $order_item->amount_weight;
+    }
+  }
+  require_once('products.class.php');
+  $products = new Products(array('id' => array_keys($product_ids)));
+  foreach($products as $product_id => $product){
+    if($product->supplier_id == $supplier_id){
+      $item = $delivery->item_create($product_id);
+      if($product->supplier_id == 35 && $product->amount_per_bundle > 1){
+        $amount = $product_amounts[$product_id]['amount_pieces'];
+        $product_amounts[$product_id]['amount_bundles'] = ceil($amount / $product->amount_per_bundle);
+        $product_amounts[$product_id]['amount_pieces'] = ceil($amount / $product->amount_per_bundle) * $product->amount_per_bundle;
+      }
+      $item->update($product_amounts[$product_id]);
+    }
+  }
+
+  forward_to_page('/delivery/index', 'delivery_id='.$delivery_id);
 }
 
 function execute_update_ajax(){
@@ -136,7 +195,7 @@ function execute_update_ajax(){
       $updates['price_sum'] = $item->price * $value;
     }
     $item->update($updates);
-    inventory_update($item->id, $item->product_id, array($field => $value));
+    #inventory_update($item->id, $item->product_id, array($field => $value));
   }else if($delivery_id){
     $delivery = delivery_get($delivery_id);
     $delivery->update(array($field => $value));

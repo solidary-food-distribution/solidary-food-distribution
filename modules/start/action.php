@@ -8,9 +8,12 @@ function execute_index(){
     if(user_has_access('pickups') && !user_has_access('deliveries') && !user_has_access('inventory')){
       forward_to_page('/pickups');
     }else{
-      forward_to_page('/store');
+      forward_to_page('/start/store');
     }
   }
+}
+
+function execute_store(){
 }
 
 function execute_version(){

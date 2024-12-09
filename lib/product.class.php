@@ -31,7 +31,7 @@ class Product{
     $r = new ReflectionClass($p);
     $props = $r->getProperties();
     foreach($props as $prop){
-      logger(print_r($prop,true));
+      #logger(print_r($prop,true));
       $type = $prop->getType();
       if($type == 'int'){
         $p->{$prop->name} = intval($inserts[$prop->name]);
@@ -41,7 +41,7 @@ class Product{
         $p->{$prop->name} = floatval($inserts[$prop->name]);
       }
     }
-    logger(print_r($p,true));
+    #logger(print_r($p,true));
     return $p;
   }
 

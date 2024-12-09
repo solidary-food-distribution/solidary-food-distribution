@@ -1,5 +1,5 @@
 <?php
-$PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen');
+$PROPERTIES['pathbar']=array('/deliveries'=>'Anlieferungen');
 $PROPERTIES['body_class']='header_h5';
 ?>
 
@@ -19,14 +19,14 @@ $PROPERTIES['body_class']='header_h5';
       </div>
     </div>
     <div class="col3">
-      <div><b><?php echo $delivery->supplier->name ?></b></div>
+      <div><b><?php echo $suppliers[$delivery->supplier_id]->name ?></b></div>
     </div>
     <div class="col10">
       <div>
         <?php
           $items = '';
           foreach($delivery->items as $item){
-            $items .= $item->product->name.', ';
+            $items .= $products[$item->product_id]->name.', ';
           }
           echo rtrim($items, ', ');
         ?>
@@ -40,6 +40,6 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php endforeach ?>
 
-<div class="main_button button" onclick="location.href='/delivery/new'">Neue Lieferung anlegen</div>
+<div class="main_button button" onclick="location.href='/delivery/new'">Neue Anlieferung anlegen</div>
 
 <?php require('scroll_down.part.php') ?>

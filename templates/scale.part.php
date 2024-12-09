@@ -7,8 +7,10 @@
     </div>
     <div id="scale_info">
       <div id="scale_display" data-type="weight"></div><div id="scale_unit"> kg</div><br>
+      <!--
       <div id="scale_price"></div>
       <div id="scale_price_sum"></div>
+      -->
     </div>
     <div id="scale_bar">
       <div id="bar_border"></div>

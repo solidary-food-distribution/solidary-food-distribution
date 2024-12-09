@@ -1,5 +1,5 @@
 <?php
-$PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen','/delivery?delivery_id='.$delivery->id => format_date($delivery->created,'j.n.Y').' '.$delivery->supplier->name);
+$PROPERTIES['pathbar']=array('/deliveries'=>'Anlieferungen','/delivery?delivery_id='.$delivery->id => format_date($delivery->created,'j.n.Y').' '.$supplier->name);
 ?>
 
 <div class="row bottom_no_radius" id="delivery_head">
@@ -11,7 +11,7 @@ $PROPERTIES['pathbar']=array('/deliveries'=>'Lieferungen','/delivery?delivery_id
   </div>
   <div class="col4">
     <div>
-      <div><b><?php echo $delivery->supplier->name ?></b></div>
+      <div><b><?php echo $supplier->name ?></b></div>
     </div>
   </div>
   <div class="col4"></div>

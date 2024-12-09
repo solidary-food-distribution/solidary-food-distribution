@@ -51,6 +51,7 @@ function execute_login_ajax(){
 
 function execute_login_pin_ajax(){
   $pickup_pin = get_request_param('pickup_pin');
+  /*
   $pickup_pin = explode(',', $pickup_pin);
   if(count($pickup_pin)<3 || count($pickup_pin)>6){
     exit;
@@ -63,9 +64,10 @@ function execute_login_pin_ajax(){
     }
     $pin .= str_pad($id, 2, '0', STR_PAD_LEFT);
   }
+  */
   $error = '';
   require('users.class.php');
-  $users = new Users(array('pickup_pin' => $pin));
+  $users = new Users(array('pickup_pin' => $pickup_pin));
   #logger(print_r($users, 1));
   if(empty($users->keys())){
     $error = 'Unbekannte PIN';

@@ -22,7 +22,7 @@
         <div onclick="keyboard_key('9')"><span>9</span></div>
       </div>
       <div>
-        <div onclick="keyboard_key(',')"><span>,</span></div>
+        <div id="keyboard_key_comma" onclick="keyboard_key(',')"><span>,</span></div>
         <div onclick="keyboard_key('0')"><span>0</span></div>
         <div class="none" onclick="return;keyboard_key('Hide')"><span><i class="fa-regular fa-eye-slash"></i></span></div>
       </div>

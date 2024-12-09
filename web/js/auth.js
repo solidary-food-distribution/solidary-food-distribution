@@ -82,6 +82,27 @@ function password_set(pwt){
   });
 }
 
+function keyboard_ok_func(){
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    data: {pickup_pin: $('#pickup_pin').html()},
+    url: '/auth/login_pin_ajax',
+    dataType: 'json',
+    success: function(json){
+      $('#loading').hide();
+      if(json.error == ''){
+        user_pickup_pin = [];
+        location.href = '/';
+      }else{
+        alert(json.error);
+      }
+    }
+  });
+}
+
+
+/*
 var user_pickup_pin = [];
 function pin_click(el){
   if(user_pickup_pin.length==6){
@@ -156,7 +177,7 @@ function pin_ok(){
     }
   });
 }
-
+*/
 
 function auth_shutdown(){
   $('#main').html('<div class="row">Wird heruntergefahren...</div>');

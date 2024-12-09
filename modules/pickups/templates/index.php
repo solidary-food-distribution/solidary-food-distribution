@@ -1,6 +1,9 @@
 <?php
 $PROPERTIES['pathbar']=array('/pickups'=>'Abholungen');
 $PROPERTIES['body_class']='header_h5';
+
+#logger(print_r($pickups,1));
+#logger(print_r($pickup_items,1));
 ?>
 
 <?php ob_start(); ?>
@@ -22,9 +25,9 @@ $PROPERTIES['body_class']='header_h5';
       <div>
         <?php
           $items = '';
-          foreach($pickup->items as $item){
+          foreach($pickup_items[$pickup->id] as $item){
             if($item->amount_pieces || $item->amount_weight){
-              $items .= $item->product->name.', ';
+              $items .= $products[$item->product_id]->name.', ';
             }
           }
           echo rtrim($items, ', ');

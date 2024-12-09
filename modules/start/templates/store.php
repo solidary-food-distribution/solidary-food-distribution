@@ -1,5 +1,5 @@
 <?php
-$PROPERTIES['pathbar']=array('/store'=>'Abholraum');
+$PROPERTIES['pathbar']=array('/start/store'=>'Abholraum');
 ?>
 <div class="selection">
   <?php if(user_has_access('pickups')): ?>
@@ -9,7 +9,7 @@ $PROPERTIES['pathbar']=array('/store'=>'Abholraum');
   <?php endif ?>
   <?php if(user_has_access('deliveries')): ?>
     <div class="item" onclick="location.href='/deliveries'">
-      <span class="label">Lieferungen</span>
+      <span class="label">Anlieferungen</span>
     </div>
   <?php endif ?>
   <?php if(user_has_access('inventory')): ?>

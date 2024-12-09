@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types=0);
 
 class OrderItem{
   public int $id;
@@ -9,6 +9,8 @@ class OrderItem{
   public float $amount_weight;
   public string $price_type;
   public float $price;
+  public float $amount_per_bundle;
+  public float $price_bundle;
   public float $price_sum;
 
   public static function create($order_id, $product_id){
@@ -18,16 +20,18 @@ class OrderItem{
     if(!$id){
       return false;
     }
+    $values = SQL::selectOne("SELECT * FROM msl_order_items WHERE id=".intval($id));
     $oi = new OrderItem();
-    $oi->id = intval($id);
-    $oi->order_id = intval($order_id);
-    $oi->product_id = intval($product_id);
-    $oi->amount_pieces = 0;
-    $oi->amount_weight = 0;
-    $oi->price_type = '';
-    $oi->price = 0;
-    $oi->price_sum = 0;
+    $oi->_init_values($values); 
     return $oi;
+  }
+
+  public function _init_values( $values ){
+    foreach($values as $key => $value){
+      if(property_exists($this, $key)){
+        $this->{$key} = $value;
+      }
+    }
   }
 
   public function update( array $updates = array() ){

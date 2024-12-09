@@ -2,7 +2,7 @@
 $PROPERTIES['pathbar']=array(
   '/deliveries' => 'Lieferungen',
   '/delivery?delivery_id='.$delivery->id.'&item_id='.$item->id => format_date($delivery->created,'j.n.Y').' '.$delivery->supplier->name,
-  '/delivery/item_edit?delivery_id='.$delivery->id.'&item_id='.$item->id => $item->product->name,
+  '/delivery/item_edit?delivery_id='.$delivery->id.'&item_id='.$item->id => $product->name,
 );
 ?>
 
@@ -16,34 +16,43 @@ $PROPERTIES['pathbar']=array(
     <div class="info">
       <div class="name">
         <div class="input left" onclick="location.href='/delivery/products?delivery_id=<?php echo $delivery->id ?>&item_id=<?php echo $item->id ?>';">
-          <?php echo $item->product->name ?>
+          <?php echo $product->name ?>
         </div>
       </div>
-      <?php if($item->product->producer->id != $delivery->supplier->id): ?>
+      <?php /*if($product->producer->id != $delivery->supplier->id): ?>
         <div class="producer">
           <?php echo $item->product->producer->name ?>
         </div>
-      <?php endif ?>
+      <?php endif*/ ?>
     </div>
   </div>
   <div class="col4">
     <div class="amount_ctrl">
       <div class="left">
         <?php
-          if($item->product->type != 'p'){
+          if($product->type != 'p'){
             echo html_input(array(
               'field' => 'amount_weight', 
               'type' => 'weight',
-              'info' => 'Gelieferte Menge '.$item->product->name.' kg',
+              'info' => 'Gelieferte Menge '.$product->name.' kg',
               'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
               'value' => format_weight($item->amount_weight)
             )).' kg<br>';
           }
-          if($item->product->type != 'k'){
+          if($product->amount_per_bundle > 1){
+            echo html_input(array(
+              'field' => 'amount_bundles', 
+              'type' => 'pieces',
+              'info' => 'Gelieferte Menge '.$product->name.' Gebinde',
+              'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
+              'value' => format_amount($item->amount_bundles)
+            )).' Gebinde<br>';
+          }
+          if($product->type != 'k'){
             echo html_input(array(
               'field' => 'amount_pieces', 
               'type' => 'pieces',
-              'info' => 'Gelieferte Menge '.$item->product->name.' Stück',
+              'info' => 'Gelieferte Menge '.$product->name.' Stück',
               'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
               'value' => format_amount($item->amount_pieces)
             )).' Stück';
@@ -68,18 +77,18 @@ $PROPERTIES['pathbar']=array(
   <div class="col4">
     <div class="amount">
       <?php 
-        if($item->product->type == 'v'){
+        if($product->type == 'v'){
           echo html_input(array(
             'field' => 'purchase',
             'type' => 'money',
-            'info' => 'Grundpreis '.$item->product->name.' gemäß Lieferschein',
+            'info' => 'Grundpreis '.$product->name.' gemäß Lieferschein',
             'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
             'value' => format_money($item->purchase)
           )). ' EUR / ';
           echo html_input(array(
             'field' => 'price_type',
             'type' => 'options',
-            'info' => 'Grundpreis Einheit '.$item->product->name.' gemäß Lieferschein',
+            'info' => 'Grundpreis Einheit '.$product->name.' gemäß Lieferschein',
             'url' => '/delivery/update_ajax?delivery_id='.$delivery->id.'&item_id='.$item->id,
             'value' => $item->price_type,
             'options' => array('k' => 'kg', 'p' => 'Stück'),

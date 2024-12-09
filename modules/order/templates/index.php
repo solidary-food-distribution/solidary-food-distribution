@@ -11,7 +11,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="control filter">
         <?php
           $options = array(
-            'o' => '<i class="fa-solid fa-cart-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
+            'o' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
             /*'p' => '<i class="fa-solid fa-heart" title="Beliebte Produkte"></i>',*/
             '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
             '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Großhandel',
@@ -86,7 +86,17 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
+    $locked = false;
+    if($order->pickup_date<'2024-12-20'){
+      $locked = true;
+    }
     if($supplier->producer == 1){
+      #if(date('Y-m-d H:i')>='2024-12-02 09:00'){
+      #  $locked = false;
+      #}
+      if($supplier->id == 20){
+        $locked = true;
+      }
       $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
       $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
     }elseif($supplier->producer == 2){
@@ -115,7 +125,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       </div>
     </div>
     <div class="col7">
-      <div class="button large" onclick="order_change(this,-1)">-</div>
+      <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="order_change(this,-1)"' ?>>-</div>
       <div class="" style="width:7em;text-align:right;margin-right:0.2em;">
         <div class="input">
           <?php echo format_amount($amount); ?>
@@ -134,7 +144,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           <?php endif ?>
         </div>
       </div>
-      <div class="button large" onclick="order_change(this,1)">+</div>
+      <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="order_change(this,1)"' ?>>+</div>
     </div>
     <div class="col3 right last">
       <span><?php echo format_money($price * $amount_price) ?> EUR</span>
@@ -151,7 +161,6 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
 
 <?php if($start == 0): ?>
   <?php ob_start(); ?>
-    <div style="background:white; color:red;margin:0.5em;margin:0.2em;"><b>&gt;&gt;&gt; Die Preise werden erst am 1.12.24 fest stehen! &lt;&lt;&lt;</b></div>
     <?php if($modus == 'o'): ?>
       <div class="row">
         <div class="inner_row">
