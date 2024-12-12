@@ -42,6 +42,11 @@ function execute_index(){
     }
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
     $suppliers = new Members(array('producer>=' => 1));
+  }elseif($modus == 'f'){
+    require_once('sql.class.php');
+    $product_ids=SQL::selectKey2Val("SELECT f.product_id,p.name FROM msl_favorites f,msl_products p WHERE f.product_id=p.id AND member_id='".intval($user['member_id'])."' ORDER BY p.name",'product_id','product_id');
+    $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
+    $suppliers = new Members(array('producer>=' => 1));
   }elseif($modus == '1' || $modus == '2'){
     $suppliers = new Members(array('producer' => $modus));
     $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o', 'type' => array('k', 'p', 'w')));
@@ -86,7 +91,7 @@ function execute_index(){
   $ps = $products;
   $products = array();
   foreach($ps as $p_id => $p){
-    if($p->supplier_id == 20 && $order->pickup_date > date('Y-m-d', strtotime('+8 days', time()))){
+    if(false && $p->supplier_id == 20 && $order->pickup_date > date('Y-m-d', strtotime('+8 days', time()))){
       //too far in future
     }elseif($prices[$p_id]->price == 0){
       //no price (yet)

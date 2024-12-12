@@ -9,9 +9,15 @@ $PROPERTIES['pathbar']=array('/orders'=>'Bestellungen');
         Bestellung zum <?php echo format_date($order->pickup_date) ?>
       </div>
       <div class="col1 right last">
-        <span class="button large" onclick="location.href='/order/?order_id=<?php echo $order->id ?>';">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </span>
+        <?php if($order->pickup_date>'2024-12-31'): ?>
+          <span class="button large disabled">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </span>
+        <?php else: ?>
+          <span class="button large" onclick="location.href='/order/?order_id=<?php echo $order->id ?>';">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </span>
+        <?php endif ?>
       </div>
     </div>
   </div>

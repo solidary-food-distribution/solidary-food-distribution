@@ -96,6 +96,9 @@ function oekoring_import_bnn($file){
     if($line[62] == 'A'){
       $start = substr($line[63],0,4).'-'.substr($line[63],4,2).'-'.substr($line[63],6,2);
       $end = substr($line[64],0,4).'-'.substr($line[64],4,2).'-'.substr($line[64],6,2);
+      if($end == '0--'){
+        $end = '9999-12-31';
+      }
       $promo = 1;
     }
     if($line[34] == 1){

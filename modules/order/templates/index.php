@@ -12,7 +12,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         <?php
           $options = array(
             'o' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
-            /*'p' => '<i class="fa-solid fa-heart" title="Beliebte Produkte"></i>',*/
+            'f' => '<i class="fa-solid fa-heart" title="Bisher bestellt"></i> Lieblinge',
             '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
             '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Großhandel',
             's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> Suche'
@@ -94,9 +94,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       #if(date('Y-m-d H:i')>='2024-12-02 09:00'){
       #  $locked = false;
       #}
-      if($supplier->id == 20){
-        $locked = true;
-      }
+      #if($supplier->id == 20){
+      #  $locked = true;
+      #}
       $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
       $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
     }elseif($supplier->producer == 2){

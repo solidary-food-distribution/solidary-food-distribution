@@ -133,7 +133,7 @@ function execute_member_orders(){
   }
   #require_once('sql.class.php');
   #$qry = "SELECT pickup_date, count(*) ...
-  $pickup_date = '2024-12-06';
+  $pickup_date = '2024-12-20';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   require_once('order_items.class.php');
