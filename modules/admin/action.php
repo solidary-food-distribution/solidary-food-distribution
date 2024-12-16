@@ -31,7 +31,7 @@ function execute_orders(){
   }
   #require_once('sql.class.php');
   #$qry = "SELECT pickup_date, count(*) ...
-  $pickup_date = '2024-12-06';
+  $pickup_date = '2024-12-20';
   $product_sums = orders_get_product_sums($pickup_date);
 
   require_once('members.class.php');
@@ -48,7 +48,7 @@ function execute_orders_csv(){
   require_once('members.class.php');
   $supplier = member_get($supplier_id);
 
-  $pickup_date = '2024-12-06';
+  $pickup_date = '2024-12-20';
   $product_sums = orders_get_product_sums($pickup_date);
 
   return array('product_sums' => $product_sums, 'supplier' => $supplier, 'pickup_date' => $pickup_date);
@@ -62,6 +62,16 @@ function orders_get_product_sums($pickup_date){
   require_once('order_items.class.php');
   $order_items = new OrderItems(array('order_id' => $orders->keys()));
   $product_ids = $order_items->get_product_ids();
+
+  $product_ids = array_flip($product_ids);
+  require_once('sql.class.php');
+  $qry = "select min(o.pickup_date) minpud,max(o.pickup_date) maxpud,oi.product_id,sum(oi.amount_pieces) summe,p.amount_per_bundle from msl_orders o,msl_order_items oi, msl_products p where o.id=oi.order_id and oi.product_id=p.id and p.supplier_id=35 and oi.amount_pieces>0 and p.status='o' group by oi.product_id,p.amount_per_bundle having minpud='2024-12-06' and summe<amount_per_bundle";
+  $res = SQL::select($qry);
+  foreach($res as $row){
+    unset($product_ids[$row['product_id']]);
+  }
+  $product_ids = array_keys($product_ids);
+
   require_once('products.class.php');
   $products = new Products(array('id' => $product_ids));
   require_once('prices.class.php');
@@ -70,6 +80,9 @@ function orders_get_product_sums($pickup_date){
   $product_sums = array();
   foreach($order_items as $order_item){
     if($order_item->amount_pieces == 0 && $order_item->amount_weight == 0){
+      continue;
+    }
+    if(!in_array($order_item->product_id, $product_ids)){
       continue;
     }
     $product_id = $order_item->product_id;

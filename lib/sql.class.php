@@ -54,12 +54,14 @@ class SQL{
   static function selectOne($qry){
     global $mysqli;
     $res=mysqli_query($mysqli,$qry);
+    if(empty($res)){
+      self::log_error($qry);
+      return false;
+    }
     $row = mysqli_fetch_assoc($res);
     $ret[]=$row;
     if(!empty($res)){
       return $ret[0];
-    }else{
-      self::log_error($qry);
     }
   }
   static function selectKey2Val($qry,$key,$val){
