@@ -44,12 +44,12 @@ $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen',''=>'Zugangsdaten');
     </div>
   </div>
   <div class="inner_row">
-    <div class="col4">
-      <div>Login für Waage</div>
+    <div class="col6">
+      <div>Türcode / Login für Waage</div>
     </div>
-    <div class="col4">
+    <div class="col12">
       <div>
-        <div class="button" onclick="location.href='/user/pickup_pin';">PIN <?php echo empty($pickup_pin)?'setzen':'ändern' ?></div>
+        <div class="button" onclick="user_show_pin(this)">Code anzeigen</div>
       </div>
     </div>
   </div>

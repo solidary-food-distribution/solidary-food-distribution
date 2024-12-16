@@ -33,7 +33,7 @@ $PROPERTIES['body_class']='footer_h4';
 
 <?php ob_start(); ?>
 <div class="row center">
-  Aktuelle Version: <a href='/start/version'>%VERSION%</a>
+  Version: <a href='/start/version'>%VERSION%</a>
 </div>
 <?php
   $PROPERTIES['footer']=ob_get_clean();

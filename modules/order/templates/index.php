@@ -91,9 +91,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       $locked = true;
     }
     if($supplier->producer == 1){
-      #if(date('Y-m-d H:i')>='2024-12-02 09:00'){
-      #  $locked = false;
-      #}
+      if(date('Y-m-d H:i')>='2024-12-16 09:00'){
+        $locked = true;
+      }
       #if($supplier->id == 20){
       #  $locked = true;
       #}

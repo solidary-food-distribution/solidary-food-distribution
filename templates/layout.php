@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202412121100';
+$version='202412170057';
 $body_class='';
 $header='';
 $footer='';
@@ -72,11 +72,6 @@ if($authed){
   </main>
   <footer id="footer">
     <?php echo $footer ?>
-    <?php /*
-    <div class="center">
-      <div class="version">Version <?php echo substr($version,0,4).'-'.substr($version,4,2).'-'.substr($version,6,2).' '.substr($version,8,2).':'.substr($version,10,2) ?></div>
-    </div>
-    */ ?>
   </footer>
   <div id="loading"></div>
 </body>

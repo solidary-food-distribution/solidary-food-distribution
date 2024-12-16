@@ -7,6 +7,7 @@ class User{
   public $email;
   public $password;
   public $member_id; //can be switched
+  public $pickup_pin;
   public $access=array();
   public $members=array();
 
@@ -34,6 +35,7 @@ class User{
       'user_id'=>$this->id,
       'name'=>$this->name,
       'email'=>$this->email,
+      'pickup_pin'=>$this->pickup_pin,
       'member_id'=>$this->member_id,
       'access'=>$this->access,
       'members'=>$this->members,

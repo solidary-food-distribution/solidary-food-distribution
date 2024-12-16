@@ -89,7 +89,7 @@ function execute_index(){
 
   require_once('sql.class.php');
   $excl = " AND p.id NOT IN (SELECT product_id FROM (select min(o.pickup_date) minpud,max(o.pickup_date) maxpud,oi.product_id,sum(oi.amount_pieces) summe,p.amount_per_bundle from msl_orders o,msl_order_items oi, msl_products p where o.id=oi.order_id and oi.product_id=p.id and p.supplier_id=35 and oi.amount_pieces>0 and p.status='o' group by oi.product_id,p.amount_per_bundle having minpud='2024-12-06' and summe<amount_per_bundle) excl)";
-  $order_sum_oekoring = SQL::selectOne("SELECT SUM((CEIL(oi.amount_pieces/oi.amount_per_bundle)*oi.amount_per_bundle)*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id)) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."' $excl")['order_sum'];
+  $order_sum_oekoring = SQL::selectOne("SELECT SUM(order_sum) order_sum FROM (SELECT (CEIL(SUM(oi.amount_pieces)/oi.amount_per_bundle)*oi.amount_per_bundle)*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."' $excl GROUP BY oi.product_id) osum")['order_sum'];
 
   #logger("products ".print_r($products,1));
   $ps = $products;

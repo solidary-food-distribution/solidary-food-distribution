@@ -51,6 +51,7 @@ class Users extends ArrayObject{
       $user->name = $u['name'];
       $user->email = $u['email'];
       $user->password = $u['passwd'];
+      $user->pickup_pin = $u['pickup_pin'];
       $user->member_id = $u['member_id'];
       $users[$id] = $user;
     }
