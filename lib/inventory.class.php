@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types=0);
 
 require_once('product.class.php');
 
@@ -7,14 +7,34 @@ class Inventory{
   public int $id;
   public int $delivery_item_id;
   public int $pickup_item_id;
-  public Product $product;
-  public int $amount_pieces;
+  public int $product_id;
+  public float $amount_pieces;
   public float $amount_weight;
   public float $dividable;
   public float $weight_min;
   public float $weight_max;
   public float $weight_avg;
 
+  public static function create($product_id, $user_id){
+    require_once('sql.class.php');
+    $qry = "INSERT INTO msl_inventory (product_id, user_id) VALUES (".intval($product_id).",".intval($user_id).")";
+    $id = SQL::insert($qry);
+    if(!$id){
+      return false;
+    }
+    $values = SQL::selectOne("SELECT * FROM msl_inventory WHERE id=".intval($id));
+    $inventory = new Inventory();
+    $inventory->_init_values($values); 
+    return $inventory;
+  }
+
+  public function _init_values( $values ){
+    foreach($values as $key => $value){
+      if(property_exists($this, $key)){
+        $this->{$key} = $value;
+      }
+    }
+  }
 
   public function update( array $updates = array() ){
     $updates['modified'] = date('Y-m-d H:i:s');

@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-require_once('product.class.php');
-
 class DeliveryItem{
   public int $id;
   public int $product_id;

@@ -14,8 +14,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="control filter">
         <?php
           $options = array(
-            'p' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($pickup_items_count?'<span class="count cart">'.$pickup_items_count.'</span>':'').' Warenkorb',
-            #'d' => '<i class="fa-solid fa-square-plus" title="Auf Lager"></i> Auf Lager'
+            'p' => '<i class="fa-solid fa-basket-shopping" title="Bestellt"></i>'.($pickup_items_count?'<span class="count cart">'.$pickup_items_count.'</span>':'').' Bestellt',
+            //'d' => '<i class="fa-solid fa-square-plus" title="Auf Lager"></i> Auf Lager'
           );
           echo html_input(array(
             'class' => 'filter',
@@ -80,8 +80,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
     $locked = false;
+    if($pickup->status == 'c'){
+      $locked = true;
+    }
     $locked_less = false;
-    if($amount <= 0){
+    if($locked || $amount <= 0){
       $locked_less = true;
     }
 

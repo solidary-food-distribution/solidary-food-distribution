@@ -86,14 +86,14 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
-    $locked = false;
-    if($order->pickup_date<'2024-12-20'){
-      $locked = true;
-    }
+    $locked = true;
+    #if($order->pickup_date<'2024-12-20'){
+    #  $locked = true;
+    #}
     if($supplier->producer == 1){
-      if(date('Y-m-d H:i')>='2024-12-16 09:00'){
-        $locked = true;
-      }
+      #if(date('Y-m-d H:i')>='2024-12-16 09:00'){
+      #  $locked = true;
+      #}
       #if($supplier->id == 20){
       #  $locked = true;
       #}

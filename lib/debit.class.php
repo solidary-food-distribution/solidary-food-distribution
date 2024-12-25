@@ -20,7 +20,7 @@ class Debit{
     }
     $values = SQL::selectOne("SELECT * FROM msl_debits WHERE id=".intval($id));
     $d = new Debit();
-    $d->_init_values($values); 
+    $d->_init_values($values);
     return $d;
   }
 
@@ -35,7 +35,7 @@ class Debit{
   public function update( array $updates = array() ){
     require_once('sql.class.php');
     $qry = 
-      "UPDATE msl_pickups SET ";
+      "UPDATE msl_debits SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
     SQL::update($qry);

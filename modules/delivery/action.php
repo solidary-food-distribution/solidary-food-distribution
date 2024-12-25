@@ -109,7 +109,7 @@ function execute_item_delete_ajax(){
 }
 
 function execute_new(){
-  $pickup_date = '2024-12-06';
+  $pickup_date = '2024-12-20';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   $order_ids = $orders->keys();
@@ -138,7 +138,7 @@ function execute_new_create(){
   $supplier_id=get_request_param('supplier_id');
   $delivery_id = Deliveries::create($supplier_id, $user['member_id']);
   $delivery = delivery_get($delivery_id);
-  $pickup_date = '2024-12-06';
+  $pickup_date = '2024-12-20';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   $order_ids = $orders->keys();

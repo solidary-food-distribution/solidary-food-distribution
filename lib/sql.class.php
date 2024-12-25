@@ -128,10 +128,14 @@ class SQL{
   static function buildFilterQuery($filters){
     $qry='';
     foreach($filters as $field => $value){
-      $qry .= ' AND '.SQL::escapeFieldName($field);
       if(is_array($value)){
-        $qry .= ' IN ('.SQL::escapeArray($value).') ';
+        if(empty($value)){
+          $qry .= ' AND 1=2 ';
+        }else{
+          $qry .= ' AND '.SQL::escapeFieldName($field).' IN ('.SQL::escapeArray($value).') ';
+        }
       }else{
+        $qry .= ' AND '.SQL::escapeFieldName($field);
         if(strpos($value, '%') !== false){
           $qry .= " LIKE ";
         }elseif(substr($field, -2, 2) == '<=' || substr($field, -2, 2) == '>=' || substr($field, -2, 2) == '!='){

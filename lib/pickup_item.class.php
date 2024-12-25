@@ -15,6 +15,8 @@ class PickupItem{
   public float $amount_weight;
   public string $price_type;
   public float $price;
+  public float $amount_per_bundle;
+  public float $price_bundle;
   public float $price_sum;
 
   public static function create($pickup_id, $product_id){

@@ -8,6 +8,12 @@ require_once('inventories.class.php');
 
 function execute_index(){
   $product_type = get_request_param('product_type');
+
+  require_once('inventory.inc.php');
+  update_inventory();
+
+  #select p.supplier_id,p.name,i.product_id,sum(amount_pieces),sum(amount_weight) from msl_inventory i,msl_products p where p.id=i.product_id group by p.supplier_id,p.name,i.product_id;
+
   $items = new Inventories();
   $inventories = array();
   foreach($items as $item){

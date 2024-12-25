@@ -1,66 +1,40 @@
 <?php
 $PROPERTIES['pathbar']=array('/admin'=>'Administration','/debits'=>'Abbuchungen');
-$PROPERTIES['body_class']='footer_h4';
+$PROPERTIES['body_class']='header_h5 footer_h4';
 $totalsum=0;
 ?>
-<?php foreach($members as $member_id=>$member): ?>
+<?php ob_start(); ?>
+  <div class="button" onclick="debits_export()">Exportieren</div>
+<?php $PROPERTIES['header']=ob_get_clean(); ?>
+<?php foreach($members as $member_id => $member): ?>
   <div class="row">
-<?php
-  ob_start();
-  $sum=0;
-?>
-  <?php foreach($member['products'] as $pid=>$product): ?>
-    <div class="inner_row product<?php echo $member_id ?>" style="display:none;">
+  <?php
+    $sum=0;
+  ?>
+    <div class="inner_row">
       <div class="col8">
-        <div><?php echo $product['name'] ?></div>
+        <div><b><?php echo htmlentities($member->name) ?></b></div>
       </div>
-      <div class="col6">
-        <div>
-          <?php
-            echo str_replace('.',',',round($product['amount'],2));
-            $rowsum=$product['amount'];
-            if($product['type']!='b'){
-              echo ' x '.number_format($product['price'],2,',','');
-              $rowsum*=$product['price'];
-            }
-            if($product['period']=='w'){
-              echo ' x 4 W';
-              $rowsum=round($rowsum*4,2);
-            }
-            /*if(!$product['tax_incl']){
-              echo ' + '.str_replace('.',',',round($product['tax'],2)).'% MwSt';
-              $rowsum=round($rowsum*(100+$product['tax'])/100,2);
-            }*/
-            $sum+=$rowsum;
-          ?>
-        </div>
+    </div>
+  <?php foreach($debits[$member_id] as $debit_id => $debit): ?>
+    <div class="inner_row">
+      <div class="col8">
+        <div>Abholung am <?php echo date('d.m.Y', strtotime($pickups[$debit->pickup_id]->created)) ?></div>
       </div>
       <div class="col4 right last">
-        <div><?php echo number_format($rowsum,2,',','') ?> EUR/Monat</div>
+        <div>
+          <?php
+            echo format_money($debit->amount);
+            $sum += round($debit->amount, 2);
+          ?> EUR
+        </div>
       </div>
     </div>
   <?php endforeach ?>
-<?php
-  $products=ob_get_clean();
-?>
-
     <div class="inner_row mb1">
-      <div class="col8">
-        <div>
-          <div><?php echo $member['name'] ?> (<?php echo $member['identification'] ?>)</div>
-        </div>
-      </div>
       <div class="col4 right last">
         <div>
-          <div><?php echo number_format($sum,2,',','') ?> EUR/Monat</div>
-        </div>
-      </div>
-    </div>
-    <?php echo $products ?>
-    <div class="inner_row">
-      <div class="col">
-        <div>
-          <div class="button" onclick="$('.product<?php echo $member_id ?>').toggle();$('.product<?php echo $member_id ?>b').toggle();">Positionen <span class="product<?php echo $member_id ?>b">zeigen</span><span class="product<?php echo $member_id ?>" style="display:none;">verbergen</span></div>
+          <div><b><?php echo number_format($sum,2,',','') ?> EUR</b></div>
         </div>
       </div>
     </div>
@@ -72,9 +46,9 @@ $totalsum=0;
 ?>
 <div class="row">
   <div class="inner_row">
-    <div class="col6 right last">
+    <div class="col4 right last">
       <div>
-        <?php echo number_format($totalsum,2,',',''); ?> EUR/Monat
+        <?php echo number_format($totalsum,2,',',''); ?> EUR
       </div>
     </div>
   </div>

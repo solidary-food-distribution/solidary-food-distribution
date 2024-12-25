@@ -13,11 +13,11 @@ function execute_index(){
   if($modus == ''){
     $modus = 'p';
   }
-  update_pickup_items($pickup_id);
   $pickup = pickup_get($pickup_id, $user['member_id']);
 
   $pickup_items = array();
   $order_item_ids = array();
+  $product_ids = array();
   require_once('pickup_items.class.php');
   if($modus == 'p'){
     require_once('pickup_items.class.php');
@@ -27,6 +27,29 @@ function execute_index(){
       $pickup_items[$pui->product_id] = $pui;
       $order_item_ids[] = $pui->order_item_id;
     }
+  }elseif($modus == 'd'){
+    require_once('inventory.inc.php');
+    update_inventory();
+    require_once('inventories.class.php');
+    $is = new Inventories();
+    $product_ids = array();
+    foreach($is as $i){
+      if(!$i->amount_pieces && !$i->amount_weight){
+        continue;
+      }
+      $product_ids[$i->product_id] = $i->product_id;
+    }
+    if(empty($product_ids)){
+      $product_ids[0] = 0;
+    }
+    $puis = new PickupItems(array('pickup_id' => $pickup_id, 'product_id' => $product_ids));
+    foreach($puis as $pui){
+      $pickup_items[$pui->product_id] = $pui;
+    }
+  }
+
+  if(empty($product_ids)){
+    $product_ids[0] = 0;
   }
 
   require_once('products.class.php');
@@ -51,6 +74,9 @@ function execute_index(){
   }
   $products = $ps;
 
+  if(empty($order_item_ids)){
+    $order_item_ids[0] = 0;
+  }
   require_once('order_items.class.php');
   $order_items = new OrderItems(array('id' => $order_item_ids));
 
@@ -114,8 +140,11 @@ function pickup_get($pickup_id, $member_id){
 
 function update_pickup_items($pickup_id){
   global $user;
-  $pickup_date = '2024-12-06';
   $pickup = pickup_get($pickup_id, $user['member_id']);
+  $pickup_date = '2024-12-20';
+  if($pickup_date > date('Y-m-d')){
+    return;
+  }
 
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date, 'member_id' => $user['member_id']));
@@ -152,6 +181,8 @@ function update_pickup_items($pickup_id){
         'amount_weight_min' => $oi->amount_weight * 0.9,
         'amount_weight_max' => $oi->amount_weight * 1.1,
         'price' => $prices[$oi->product_id]->price,
+        'amount_per_bundle' => $prices[$oi->product_id]->amount_per_bundle,
+        'price_bundle' => $prices[$oi->product_id]->price_bundle,
       );
       if($products[$oi->product_id]->type == 'p'){
         $updates['price_type'] = 'p';
@@ -309,14 +340,21 @@ function execute_scale_ajax(){
 function update_pickup_item_price_sum($pickup_item_id){
   require_once('pickup_items.class.php');
   $pui = PickupItems::sget($pickup_item_id);
+  $amount = 0;
   if($pui->price_type == 'k'){
-    $price_sum = round($pui->amount_weight * $pui->price, 2);
+    $amount = $pui->amount_weight;
   }elseif($pui->price_type == 'p'){
-    $price_sum = round($pui->amount_pieces * $pui->price, 2);
+    $amount = $pui->amount_pieces;
   }else{
     logger("ERROR wrong price_type ".print_r($pui,1));
     return;
   }
+  $price = $pui->price;
+  logger("update_pickup_item_price_sum $amount ".print_r($pui,1));
+  if(($pui->amount_per_bundle > 0) && ($pui->price_bundle > 0) && ($amount >= $pui->amount_per_bundle)){
+    $price = $pui->price_bundle;
+  }
+  $price_sum = round($amount * $price, 2);
   if($pui->price_sum != $price_sum){
     $pui->update(array('price_sum' => $price_sum));
   }
