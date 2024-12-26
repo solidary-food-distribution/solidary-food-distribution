@@ -18,6 +18,16 @@ function execute_calendar(){
   if($month==''){
     $month = date('Y-m',time()).'-01';
   }
+  $month_prev = date('Y-m-d',strtotime("-1 months", strtotime($month)));
+  $month_next = date('Y-m-d',strtotime("+1 months", strtotime($month)));
+
+  $months=array();
+  $m = date('Y-m-d',strtotime("-3 months", strtotime($month)));
+  while(count($months) < 7){
+    $months[$m] = translate_month(intval(substr($m, 5, 2)))." ".substr($m, 0, 4);
+    $m = date('Y-m-d',strtotime("+1 months", strtotime($m)));
+  }
+
   $wd = date('w',strtotime($month))-1;
   if($wd<0){
     $wd+=7;
@@ -33,8 +43,15 @@ function execute_calendar(){
   }
   $wde+=1;
   $end=date('Y-m-d',strtotime("$wde days", strtotime($end)));
+
+  require_once('tasks.class.php');
+  $ts = new Tasks(array('type' => 'e', 'starts>=' => $start, 'starts<=' => $end), array('starts' => 'ASC'));
+  $tasks = array();
+  foreach($ts as $t){
+    $tasks[substr($t->starts, 0, 10)][] = $t;
+  }
   
-  return array('calendar'=>$calendar, 'month'=>$month, 'start'=>$start, 'end'=>$end);
+  return array('month'=>$month, 'months'=>$months, 'month_prev'=>$month_prev, 'month_next'=>$month_next, 'start'=>$start, 'end'=>$end, 'tasks'=>$tasks);
 }
 
 

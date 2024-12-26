@@ -2,11 +2,9 @@
 $PROPERTIES['pathbar']=array('/activities'=>'Aktivitäten');
 ?>
 <div class="selection">
-  <!--
   <div class="item" onclick="location.href='/tasks/calendar'">
     <span class="label">Kalender</span>
   </div>
-  -->
   <div class="item" onclick="location.href='/timesheet'">
     <span class="label">Arbeitszeiten</span>
   </div>

@@ -66,7 +66,7 @@ class Tasks extends ArrayObject{
       $task->title = $data['title'];
       $task->interval = $data['interval'];
       $task->effort = $data['effort'];
-      $task->starts = new DateTime($data['starts']);
+      $task->starts = $data['starts'];
       foreach($tus AS $user_id => $tu){
         if((string)$user_id===''){
           continue;
