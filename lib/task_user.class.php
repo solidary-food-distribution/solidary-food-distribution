@@ -13,6 +13,9 @@ class TaskUser{
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');
+    if(isset($updates['assign'])){
+      $updates['assign'] = intval($updates['assign']);
+    }
     $qry = 
       "UPDATE msl_task_users SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';

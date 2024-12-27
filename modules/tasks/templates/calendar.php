@@ -40,7 +40,7 @@ $PROPERTIES['body_class']='header_h5';
   <div class="week">
     <div class="weekdays">
     <?php for($weekday=1;$weekday<=7;$weekday++): ?>
-      <div class="<?php echo (date('m',strtotime($date))==date('m',strtotime($month))?'acmo':'otmo').($date==$today?' today':'') ?>">
+      <div class="<?php echo (date('m',strtotime($date))==date('m',strtotime($month))?'acmo':'otmo').($date==$today?' today':'').(isset($tasks[$date])?' pointer':'') ?>" <?php echo isset($tasks[$date])?'onclick="location.href=\'/tasks/day?day='.$date.'\';"':'' ?> >
         <div class="day"><?php echo date('d',strtotime($date)) ?></div>
         <?php if(isset($tasks[$date])): ?>
           <?php foreach($tasks[$date] as $task): ?>

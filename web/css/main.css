@@ -126,6 +126,9 @@ a{
   color: #000000;
 }
 
+.pointer{
+  cursor: pointer;
+}
 
 /*TOP WHERE - WHO START*/
 .pathbar{
@@ -243,6 +246,7 @@ div.mr1{
 }
 .input.input_text{
   text-align: left;
+  width: 95%;
 }
 .button{
   padding: 0.2em;

@@ -1,4 +1,7 @@
 <div class="row">
+  2024-12-27 11:23 Aufgaben-Kalender implementiert<br>
+</div>
+<div class="row">
   2024-12-25 23:33 Abbuchungen Modul begonnen<br>
 </div>
 <div class="row">

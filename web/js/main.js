@@ -182,8 +182,12 @@ function active_input_post_value(){
 function input_option_select(el){
   //console.log("input_option_select");
   var input = $(el).closest('.input');
-  input.find('.option.selected').removeClass('selected');
-  $(el).addClass('selected');
+  if($(el).hasClass('selected') && input.find('.option').length==1){
+    input.find('.option.selected').removeClass('selected');
+  }else{
+    input.find('.option.selected').removeClass('selected');
+    $(el).addClass('selected');
+  }
   event.stopPropagation();
   active_input_post_value();
   input.removeClass('active');
