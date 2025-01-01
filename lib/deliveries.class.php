@@ -1,110 +1,11 @@
 <?php
 declare(strict_types=1);
 
+require_once('_objects.class.php');
 require_once('delivery.class.php');
 
-class Deliveries extends ArrayObject{
-
-  public static function create($supplier_id, $creator_id){
-    require_once('sql.class.php');
-    $qry = 
-      "INSERT INTO msl_deliveries ".
-        "(supplier_id, creator_id, created) VALUES ".
-        "('" . intval($supplier_id) . "', '" . intval($creator_id) . "', NOW())";
-    $delivery_id = SQL::insert($qry);
-    return $delivery_id;
-  }
-
-  public function __construct(array $filters=array(), array $orderby=array(), int $limit_start=0, int $limit_count=-1){
-    $array = $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
-    parent::__construct($array);
-  }
-
-  public function first(){
-    $array = $this->getArrayCopy();
-    return $array[key($array)];
-  }
-
-  public function keys(){
-    return array_keys($this->getArrayCopy());
-  }
-
-  private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
-    if(isset($filters['id'])){
-      $filters['d.id'] = $filters['id'];
-      unset($filters['id']);
-    }
-    require_once('sql.class.php');
-    $qry=
-      "SELECT d.id AS delivery_id, ms.id AS supplier_id, ms.name AS supplier_name, d.purchase_total AS d_purchase_total, d.created AS d_created, u.id AS creator_id, u.name AS creator_name, ".
-        "di.id AS di_id, di.product_id, di.amount_pieces, di.amount_bundles, di.amount_weight, di.price_type, di.purchase, di.purchase_sum, di.dividable, di.best_before, di.weight_min, di.weight_max, di.weight_avg, ".
-        "p.id AS p_id,p.name AS p_name, p.supplier_id AS p_supplier_id, mp.name AS p_supplier_name, p.type AS p_type ".
-      "FROM msl_members ms, msl_users u, msl_deliveries d ".
-        "LEFT JOIN msl_delivery_items di ON (d.id=di.delivery_id) ".
-        "LEFT JOIN msl_products p ON (di.product_id=p.id) ".
-        "LEFT JOIN msl_members mp ON (p.supplier_id=mp.id) ".
-      "WHERE d.id>0 AND d.supplier_id=ms.id AND d.creator_id=u.id ";
-    if(!empty($filters)){
-      $qry .= "AND ".SQL::buildFilterQuery($filters);
-    }
-    if(empty($orderby)){
-      $orderby = array('d.id' => 'ASC', 'di.id' => 'ASC');
-    }
-    $qry .= 
-      " ORDER BY ".SQL::buildOrderbyQuery($orderby);
-
-    if($limit_start > 0 || $limit_count >= 0){
-      if($limit_count < 0){
-        $limit_count = 9999;
-      }
-      $qry .=
-        " LIMIT ".intval($limit_start).", ".intval($limit_count);
-    }
-
-    $ds=SQL::selectID2($qry,'delivery_id','di_id');
-    $deliveries = array();
-    foreach($ds as $d_id=>$d){
-      $data=$d[key($d)];
-      $delivery=new Delivery();
-      $delivery->id=$data['delivery_id'];
-      $delivery->supplier_id = intval($data['supplier_id']);
-      $delivery->purchase_total=floatval($data['d_purchase_total']);
-      $delivery->created=new DateTime($data['d_created']);
-      $delivery->creator_id = intval($data['creator_id']);
-      foreach($d AS $di_id=>$di){
-        if((string)$di_id===''){
-          continue;
-        }
-        $item = new DeliveryItem();
-        $item->id = intval($di_id);
-        $item->product_id = intval($di['p_id']);
-        $item->amount_pieces = intval($di['amount_pieces']);
-        $item->amount_bundles = intval($di['amount_bundles']);
-        $item->amount_weight = floatval($di['amount_weight']);
-        $item->price_type = $di['price_type'];
-        $item->purchase = floatval($di['purchase']);
-        $item->purchase_sum = floatval($di['purchase_sum']);
-        $item->dividable = floatval($di['dividable']);
-        if($di['best_before']!=='0000-00-00'){
-          $item->best_before = new DateTime($di['best_before']);
-        }
-        $item->weight_min = floatval($di['weight_min']);
-        $item->weight_max = floatval($di['weight_max']);
-        $item->weight_avg = floatval($di['weight_avg']);
-        $delivery->items[$di_id]=$item;
-      }
-      $deliveries[$d_id]=$delivery;
-    }
-    return $deliveries;
-  }
-
-}
-
-
-function delivery_get($id){
-  $deliveries = new Deliveries(array('id' => $id));
-  if(!empty($deliveries)){
-    return $deliveries->first();
-  }
-  return null;
+class Deliveries extends Objects{
+  protected $_table = 'msl_deliveries';
+  protected $_default_order_by = 'id';
+  protected $_object_name = 'Delivery';
 }

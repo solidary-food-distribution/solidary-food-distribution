@@ -5,23 +5,30 @@ user_ensure_authed();
 user_needs_access('deliveries');
 
 require_once('deliveries.class.php');
+require_once('delivery_items.class.php');
 
 function execute_index(){
   $delivery_id = get_request_param('delivery_id');
   $item_id = get_request_param('item_id');
-  $delivery = delivery_get($delivery_id);
+  
+  $delivery = Deliveries::sget($delivery_id);
+  
   require_once('members.class.php');
   $suppliers = new Members(array('id' => $delivery->supplier_id));
   $supplier = $suppliers->first();
-  $product_ids = $delivery->get_product_ids();
+
+  $delivery_items = new DeliveryItems(array('delivery_id' => $delivery_id));
+  
+  $product_ids = $delivery_items->get_product_ids();
   require_once('products.class.php');
   $products = new Products(array('id' => $product_ids));
-  return array('delivery' => $delivery, 'supplier' => $supplier, 'products' => $products, 'item_id' => $item_id);
+
+  return array('delivery' => $delivery, 'delivery_items' => $delivery_items, 'supplier' => $supplier, 'products' => $products, 'item_id' => $item_id);
 }
 
 function execute_edit(){
   $delivery_id = get_request_param('delivery_id');
-  $delivery = delivery_get($delivery_id);
+  $delivery = Deliveries::sget($delivery_id);
   require_once('members.class.php');
   $suppliers = new Members(array('id' => $delivery->supplier_id));
   return array(
@@ -34,23 +41,28 @@ function execute_edit(){
 function execute_item_edit(){
   $delivery_id = get_request_param('delivery_id');
   $item_id = get_request_param('item_id');
-  $delivery = delivery_get($delivery_id);
-  $item = $delivery->items[$item_id];
+
+  $delivery = Deliveries::sget($delivery_id);
+  require_once('members.class.php');
+  $suppliers = new Members(array('id' => $delivery->supplier_id));
+  $item = DeliveryItems::sget($item_id);
+
   require_once('products.class.php');
   $product = Products::sget($item->product_id);
   return array(
     'delivery' => $delivery,
+    'supplier' => $suppliers->first(),
     'item' => $item,
     'product' => $product,
   );
 }
 
 function execute_products(){
-  $id=get_request_param('delivery_id');
+  $delivery_id=get_request_param('delivery_id');
   $item_id=get_request_param('item_id');
-  $delivery=delivery_get($id);
+  $delivery = Deliveries::sget($delivery_id);
   require_once('products.class.php');
-  $products=new Products(array('producer_id' => $delivery->supplier->id, 'type' => array('v','p','k')));
+  $products=new Products(array('producer_id' => $delivery->supplier_id, 'type' => array('v','p','k')));
   return array('delivery'=>$delivery,'products'=>$products,'item_id'=>$item_id);
 }
 
@@ -109,13 +121,13 @@ function execute_item_delete_ajax(){
 }
 
 function execute_new(){
-  $pickup_date = '2024-12-20';
+  $pickup_date = '2025-01-10';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   $order_ids = $orders->keys();
   require_once('order_items.class.php');
   $order_items = new OrderItems(array('order_id' => $order_ids));
-  $product_ids = array(0 => 0);
+  $product_ids = array();
   foreach($order_items as $order_item){
     if($order_item->amount_pieces || $order_item->amount_weight){
       $product_ids[$order_item->product_id] = 1;
@@ -123,7 +135,7 @@ function execute_new(){
   }
   require_once('products.class.php');
   $products = new Products(array('id' => array_keys($product_ids)));
-  $supplier_ids = array(0 => 0);
+  $supplier_ids = array();
   foreach($products as $product){
     $supplier_ids[$product->supplier_id] = 1;
   }
@@ -138,7 +150,7 @@ function execute_new_create(){
   $supplier_id=get_request_param('supplier_id');
   $delivery_id = Deliveries::create($supplier_id, $user['member_id']);
   $delivery = delivery_get($delivery_id);
-  $pickup_date = '2024-12-20';
+  $pickup_date = '2025-01-10';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   $order_ids = $orders->keys();
@@ -187,8 +199,7 @@ function execute_update_ajax(){
     $value = number_format(floatval($value), 2, '.', '');
   }
   if($item_id){
-    $delivery = delivery_get($delivery_id);
-    $item = $delivery->items[$item_id];
+    $item = DeliveryItems::sget($item_id);
     $updates = array($field => $value);
     #logger('item '.print_r($item,1));
     if($item->product->type == 'p' || $item->product->type == 'k'){

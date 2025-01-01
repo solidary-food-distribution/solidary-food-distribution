@@ -86,20 +86,24 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
-    $locked = true;
-    #if($order->pickup_date<'2024-12-20'){
-    #  $locked = true;
-    #}
+    $locked = false;
+    if($order->pickup_date != '2024-01-10'){
+      $locked = true;
+    }
     if($supplier->producer == 1){
-      #if(date('Y-m-d H:i')>='2024-12-16 09:00'){
-      #  $locked = true;
-      #}
-      #if($supplier->id == 20){
-      #  $locked = true;
-      #}
+      $lock_date = date('Y-m-d', strtotime('-4 days', strtotime($order->pickup_date))).' 09:00:00';
+      logger("lock_date $lock_date");
+      if(date('Y-m-d H:i:s') >= $lock_date){
+        $locked = true;
+      }
       $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
       $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
     }elseif($supplier->producer == 2){
+      $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
+      logger("lock_date $lock_date");
+      if(date('Y-m-d H:i:s') >= $lock_date){
+        $locked = true;
+      }
       $sum['trader_paid'] = $sum['trader_paid'] + $purchase_incl_tax;
       $sum['trader_sum'] = $sum['trader_sum'] + $price_row;
       if($product->brand_id){

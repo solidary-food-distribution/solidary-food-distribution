@@ -94,6 +94,14 @@ class Objects implements ArrayAccess,Iterator,Countable{
     }else{
       $qry .= "ORDER BY ".$this->_default_order_by;
     }
+    if($limit_start){
+      if($limit_count == -1){
+        $limit_count = 99999999;
+      }
+      $qry .= " LIMIT ".intval($limit_start).", ".intval($limit_count);
+    }elseif($limit_count != -1){
+      $qry .= " LIMIT ".intval($limit_count);
+    }
     $recset = SQL::selectID($qry, 'id');
 
     $this->array = array();

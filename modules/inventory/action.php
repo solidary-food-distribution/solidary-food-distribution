@@ -14,16 +14,16 @@ function execute_index(){
 
   #select p.supplier_id,p.name,i.product_id,sum(amount_pieces),sum(amount_weight) from msl_inventory i,msl_products p where p.id=i.product_id group by p.supplier_id,p.name,i.product_id;
 
-  $items = new Inventories();
+  #$items = new Inventories();
   $inventories = array();
-  foreach($items as $item){
+  /*foreach($items as $item){
     if(!isset($inventories[$item->product->id])){
       $inventories[$item->product->id] = $item;
     }else{
       $inventories[$item->product->id]->amount_pieces += $item->amount_pieces;
       $inventories[$item->product->id]->amount_weight += $item->amount_weight;
     }
-  } 
+  }*/
   return array(
     'inventories' => $inventories,
     'product_type' => $product_type,

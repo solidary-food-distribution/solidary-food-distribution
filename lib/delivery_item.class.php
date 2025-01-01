@@ -1,8 +1,9 @@
 <?php
-declare(strict_types=1);
+declare(strict_types=0);
 
 class DeliveryItem{
   public int $id;
+  public int $delivery_id;
   public int $product_id;
   public int $amount_pieces;
   public int $amount_bundles;
@@ -11,10 +12,12 @@ class DeliveryItem{
   public float $purchase;
   public float $purchase_sum;
   public float $dividable;
-  public DateTime $best_before;
+  public string $best_before;
   public float $weight_min;
   public float $weight_max;
   public float $weight_avg;
+
+
 
   public function update( array $updates = array() ){
     global $user;

@@ -141,7 +141,7 @@ function pickup_get($pickup_id, $member_id){
 function update_pickup_items($pickup_id){
   global $user;
   $pickup = pickup_get($pickup_id, $user['member_id']);
-  $pickup_date = '2024-12-20';
+  $pickup_date = '2025-01-10';
   if($pickup_date > date('Y-m-d')){
     return;
   }

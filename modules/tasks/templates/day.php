@@ -39,6 +39,9 @@ global $user;
         if($task_user->user_id == $user['user_id']){
           continue;
         }
+        if($task_user->assign == 0 && trim($task_user->comment) == ''){
+          continue;
+        }
       ?>
       <div class="inner_row">
         <div class="col5"></div>

@@ -1,47 +1,21 @@
 <?php
 declare(strict_types=1);
 
-require_once('delivery_item.class.php');
-require_once('member.class.php');
-require_once('user.class.php');
-
 class Delivery{
   public $id;
   public $supplier_id; //member->id
   public $purchase_total;
-  public DateTime $created;
+  public $created;
   public $creator_id; //user->id
-  public array $items = array(); //class DeliveryItem
 
-  public function get_product_ids(){
-    $product_ids = array();
-    foreach($this->items as $item){
-      $product_ids[$item->product_id] = 1;
-    }
-    return array_keys($product_ids);
-  }
-
-  public function item_create( $product_id ) {
+  public static function create($supplier_id, $creator_id){
     require_once('sql.class.php');
-    $qry =
-      "INSERT INTO msl_delivery_items ".
-        "(delivery_id, product_id) VALUES ".
-        "('" . intval($this->id) . "', '" . intval($product_id) . "')";
-    $item_id = SQL::insert($qry);
-    $item = new DeliveryItem();
-    $item->id = $item_id;
-    $item->product_id = intval($product_id);
-    $items[$item->id] = $item;
-    return $item;
-  }
-
-  public function item_delete( $item_id ) {
-    require_once('sql.class.php');
-    $qry =
-      "DELETE FROM msl_delivery_items " .
-        "WHERE delivery_id='" . intval($this->id) . "' AND id='" . intval($item_id) . "'";
-    SQL::update($qry);
-    return true;
+    $qry = 
+      "INSERT INTO msl_deliveries ".
+        "(supplier_id, creator_id, created) VALUES ".
+        "('" . intval($supplier_id) . "', '" . intval($creator_id) . "', NOW())";
+    $delivery_id = SQL::insert($qry);
+    return $delivery_id;
   }
 
   public function update( array $updates = array() ){

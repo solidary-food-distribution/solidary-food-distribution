@@ -19,9 +19,9 @@ $PROPERTIES['pathbar']=array(
   </div>
   <div class="col4"></div>
   <div class="col3 right">
-    <?php if($delivery->purchase_total): ?>
+    <?php /*if($delivery->purchase_total): ?>
       <div><?php echo number_format($delivery->purchase_total,2,',','') ?> EUR</div>
-    <?php endif ?>
+    <?php endif*/ ?>
   </div>
   <div class="col1 right last">
     <div class="buttons">
@@ -33,7 +33,7 @@ $PROPERTIES['pathbar']=array(
 </div>
 
 <?php 
-  foreach($delivery->items as $di_id=>$item){
+  foreach($delivery_items as $di_id=>$item){
     require('item.part.php');
   }
 ?>

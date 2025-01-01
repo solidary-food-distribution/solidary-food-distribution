@@ -1,3 +1,6 @@
+<?php
+  $product = $products[$item->product_id];
+?>
 <div class="row product" id="delivery_item<?php echo $item->id ?>">
   <div class="col2">
     <div class="image">
@@ -7,11 +10,11 @@
   <div class="col4">
     <div class="info">
       <div class="name">
-        <b><?php echo $products[$item->product_id]->name ?></b>
+        <b><?php echo htmlentities($product->name) ?></b>
       </div>
-      <?php if($item->product->producer->id != $delivery->supplier->id): ?>
+      <?php if($product->producer_id != $delivery->supplier_id): ?>
         <div class="producer">
-          <?php echo $item->product->producer->name ?>
+          <?php echo $suppliers[$product->producer_id]->name ?>
         </div>
       <?php endif ?>
     </div>

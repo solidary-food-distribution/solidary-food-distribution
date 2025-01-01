@@ -1,7 +1,7 @@
 <?php
 $PROPERTIES['pathbar']=array(
-  '/deliveries' => 'Lieferungen',
-  '/delivery?delivery_id='.$delivery->id.'&item_id='.$item->id => format_date($delivery->created,'j.n.Y').' '.$delivery->supplier->name,
+  '/deliveries' => 'Anlieferungen',
+  '/delivery?delivery_id='.$delivery->id.'&item_id='.$item->id => format_date($delivery->created,'j.n.Y').' '.$supplier->name,
   '/delivery/item_edit?delivery_id='.$delivery->id.'&item_id='.$item->id => $product->name,
 );
 ?>

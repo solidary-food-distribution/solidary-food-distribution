@@ -25,7 +25,7 @@ $PROPERTIES['body_class']='header_h5';
       <div>
         <?php
           $items = '';
-          foreach($delivery->items as $item){
+          foreach($delivery_items[$delivery->id] as $item){
             $items .= $products[$item->product_id]->name.', ';
           }
           echo rtrim($items, ', ');

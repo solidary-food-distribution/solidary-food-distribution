@@ -1,10 +1,38 @@
 <?php
 
+require_once('inventories.class.php');
+
 function update_inventory(){
+
+  $delivery_item_modified = '0000-00-00 00:00:00';
+  $inventories = new Inventories(array('delivery_item_id>' => 0), array('modified' => 'DESC'), 0, 1);
+  if($inventories->count()){
+    $delivery_item_modified = $inventories->first()->modified;
+  }
+
+/*
+  require_once('deliveries.class.php');
+  $deliveries = new Deliveries(array('modified>=' => $delivery_item_modified));
+  foreach($deliveries as $delivery){
+
+  }
+*/
+
+
+  $pickup_item_modified = '';
+  $inventories = new Inventories(array('pickup_item_id>' => 0), array('modified' => 'DESC'), 0, 1);
+  if($inventories->count()){
+    $pickup_item_modified = $inventories->first()->modified;
+  }
+
+
+
+  logger(print_r($inventories,1));
+  return;
 
   $idis = array();
   $ipuis = array();
-  require_once('inventories.class.php');
+  
   $inventories = new Inventories(array('user_id>' => 0), array('created' => 'ASC'));
   foreach($inventories as $inventory){
     if($inventory->delivery_item_id){
@@ -23,9 +51,8 @@ function update_inventory(){
         continue;
       }
       if(!isset($idis[$di->id])){
-        $inventory = Inventory::create($di->product_id, 0);
+        $inventory = Inventory::create($di->product_id, $di->id, 0, 0);
         $inventory->update(array(
-          'delivery_item_id' => $di->id,
           'amount_pieces' => $di->amount_pieces,
           'amount_weight' => $di->amount_weight,
           'dividable' => $di->dividable,
@@ -47,9 +74,8 @@ function update_inventory(){
       continue;
     }
     if(!isset($ipuis[$pui->id])){
-      $inventory = Inventory::create($pui->product_id, 0);
+      $inventory = Inventory::create($pui->product_id, 0, $pui->id, 0);
       $inventory->update(array(
-        'pickup_item_id' => $pui->id,
         'amount_pieces' => -$pui->amount_pieces,
         'amount_weight' => -$pui->amount_weight,
       ));
