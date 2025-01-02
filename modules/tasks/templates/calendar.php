@@ -44,7 +44,15 @@ $PROPERTIES['body_class']='header_h5';
         <div class="day"><?php echo date('d',strtotime($date)) ?></div>
         <?php if(isset($tasks[$date])): ?>
           <?php foreach($tasks[$date] as $task): ?>
-            <div class="task"><?php echo $task->title ?></div>
+            <?php
+              $class='red';
+              foreach($task->users as $tu){
+                if($tu->assign == 100){
+                  $class='green';
+                }
+              }
+            ?>
+            <div class="task <?php echo $class ?>"><?php echo $task->title ?></div>
           <?php endforeach ?>
         <?php endif ?>
       </div>

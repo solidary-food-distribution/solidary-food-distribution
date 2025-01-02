@@ -14,7 +14,8 @@ function oekoring_download_bnns(){
   ftp_pasv($ftp, true);
   $files = ftp_nlist($ftp, '.');
   foreach($files as $file){
-    if(substr($file, -4, 4) == '.BNN'){
+    //if(substr($file, -4, 4) == '.BNN'){
+    if($file == 'PL.BNN'){
       $result = ftp_get($ftp, __DIR__.'/../data/oekoring/'.$file, $file, FTP_BINARY);
       if(!$result){
         return array('error' => 'download from FTP failed: '.error_get_last()['message']);

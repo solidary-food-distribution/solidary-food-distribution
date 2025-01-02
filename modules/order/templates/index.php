@@ -87,12 +87,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
     $locked = false;
-    if($order->pickup_date != '2024-01-10'){
+    if($order->pickup_date != '2025-01-10'){
       $locked = true;
     }
     if($supplier->producer == 1){
       $lock_date = date('Y-m-d', strtotime('-4 days', strtotime($order->pickup_date))).' 09:00:00';
-      logger("lock_date $lock_date");
       if(date('Y-m-d H:i:s') >= $lock_date){
         $locked = true;
       }
@@ -100,7 +99,6 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
     }elseif($supplier->producer == 2){
       $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
-      logger("lock_date $lock_date");
       if(date('Y-m-d H:i:s') >= $lock_date){
         $locked = true;
       }

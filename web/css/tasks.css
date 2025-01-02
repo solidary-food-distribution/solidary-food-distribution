@@ -32,6 +32,14 @@
   background-color: rgba(255,255,255,0.9);
 }
 
+.weekdays > div > div.task.red{
+  background-color: rgba(255,128,128,0.9);
+}
+
+.weekdays > div > div.task.green{
+  background-color: rgba(248,255,248,0.9);
+}
+
 .weekdays.labels{
   height: 1.5em;
 }

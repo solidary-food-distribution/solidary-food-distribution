@@ -88,7 +88,7 @@ function execute_day(){
       $user_ids[] = $tu->user_id;
     }
   }
-  logger(print_r($task_users,1));
+  #logger(print_r($task_users,1));
 
   require_once('users.class.php');
   $users = new Users(array('id' => $user_ids));
