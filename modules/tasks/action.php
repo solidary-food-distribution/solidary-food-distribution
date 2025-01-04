@@ -79,11 +79,10 @@ function execute_day(){
   $user_ids = array();
   foreach($tasks as $task){
     foreach($task->users as $tu){
-      if($tu->user_id == $user['user_id']){
+      if($tu->user_id == $user['user_id'] || empty($task_users[$task->task_id])){
         $task_users[$task->task_id][$tu->user_id] = $tu;
       }else{
         $task_users[$task->task_id] = array($tu->user_id => $tu) + $task_users[$task->task_id];
-        
       }
       $user_ids[] = $tu->user_id;
     }

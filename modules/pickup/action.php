@@ -183,6 +183,7 @@ function update_pickup_items($pickup_id){
         'price' => $prices[$oi->product_id]->price,
         'amount_per_bundle' => $prices[$oi->product_id]->amount_per_bundle,
         'price_bundle' => $prices[$oi->product_id]->price_bundle,
+        'tax' => $prices[$oi->product_id]->tax,
       );
       if($products[$oi->product_id]->type == 'p'){
         $updates['price_type'] = 'p';

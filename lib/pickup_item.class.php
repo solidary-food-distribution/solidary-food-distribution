@@ -3,6 +3,7 @@
 
 class PickupItem{
   public int $id;
+  public string $modified;
   public int $pickup_id;
   public int $product_id;
   public int $order_item_id;

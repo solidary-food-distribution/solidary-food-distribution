@@ -12,6 +12,11 @@ if(mysqli_connect_errno()){
 }
 mysqli_report(MYSQLI_REPORT_ERROR);
 
+global $user;
+if(!isset($user['user_id'])){
+  $user['user_id']=0;
+}
+
 class SQL{
   static function update($qry){
     global $mysqli;

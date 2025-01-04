@@ -3,6 +3,7 @@ declare(strict_types=0);
 
 class DeliveryItem{
   public int $id;
+  public string $modified;
   public int $delivery_id;
   public int $product_id;
   public int $amount_pieces;

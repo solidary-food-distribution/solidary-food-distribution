@@ -45,7 +45,7 @@ $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen',''=>'Zugangsdaten');
   </div>
   <div class="inner_row">
     <div class="col6">
-      <div>Türcode / Login für Waage</div>
+      <div>Tür- / Waagen-Code</div>
     </div>
     <div class="col12">
       <div>

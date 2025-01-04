@@ -7,11 +7,9 @@ user_needs_access('pickups');
 function execute_index(){
   global $user;
   require_once('pickups.class.php');
-  $pickups = new Pickups(array('member_id' => $user['member_id']),array(),-3);
+  $pickups = new Pickups(array('member_id' => $user['member_id']),array('id' => 'DESC'), 0, 3);
   $pickup_ids = $pickups->keys();
-  if(empty($pickup_ids)){
-    $pickup_ids = array(0 => 0);
-  }
+  $pickups_array = array_reverse($pickups->array(), true);
   require_once('pickup_items.class.php');
   $puis = new PickupItems(array('pickup_id' => $pickup_ids));
   $pickup_items = array();
@@ -24,7 +22,7 @@ function execute_index(){
   }
   require_once('products.class.php');
   $products = new Products(array('id' => $product_ids));
-  return array('pickups'=>$pickups, 'pickup_items' => $pickup_items, 'products' => $products);
+  return array('pickups'=>$pickups_array, 'pickup_items' => $pickup_items, 'products' => $products);
 }
 
 

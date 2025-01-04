@@ -50,7 +50,7 @@ if($authed){
               }
             ?>
           </div>
-          <div class="logout" onclick="location.href='/auth/logout';"><?php echo isset($_SESSION['scale'])?($user['name'].' - '):'' ?>Logout</div>
+          <div class="logout" onclick="location.href='/auth/logout';"><?php echo (isset($_SESSION['scale']) && intval($_SESSION['scale']))?($user['name'].' - '):'' ?>Logout</div>
       <?php else: ?>
           <div class="center headline">
             <div class="image">

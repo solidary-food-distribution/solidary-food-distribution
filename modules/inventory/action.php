@@ -4,32 +4,37 @@ require_once('inc.php');
 user_ensure_authed();
 user_needs_access('inventory');
 
-require_once('inventories.class.php');
+require_once('inventory.inc.php');
 
 function execute_index(){
   $product_type = get_request_param('product_type');
 
-  require_once('inventory.inc.php');
   update_inventory();
+  $data = get_inventory();
 
-  #select p.supplier_id,p.name,i.product_id,sum(amount_pieces),sum(amount_weight) from msl_inventory i,msl_products p where p.id=i.product_id group by p.supplier_id,p.name,i.product_id;
+  require_once('products.class.php');
+  $products = new Products(array('id' => array_keys($data)), array('name' => 'ASC'));
 
-  #$items = new Inventories();
-  $inventories = array();
-  /*foreach($items as $item){
-    if(!isset($inventories[$item->product->id])){
-      $inventories[$item->product->id] = $item;
-    }else{
-      $inventories[$item->product->id]->amount_pieces += $item->amount_pieces;
-      $inventories[$item->product->id]->amount_weight += $item->amount_weight;
-    }
-  }*/
   return array(
-    'inventories' => $inventories,
+    'data' => $data,
+    'products' => $products,
     'product_type' => $product_type,
   );
 }
 
+function execute_filter_ajax(){
+  $pickup_id = get_request_param('pickup_id');
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+  set_request_param($field, $value);
+  $return = execute_index();
+  $return['template'] = 'index.php';
+  $return['layout'] = 'layout_null.php';
+  return $return;
+}
+
+
+/*
 function execute_edit(){
   $product_id = get_request_param('product_id');
   $items = new Inventories(array('product_id' => $product_id));
@@ -42,11 +47,12 @@ function execute_edit(){
     }
   }
   return array(
-    'inventory' => get_inventory($product_id, false),
+    'inventory' => get_inventory($product_id),
   );
 }
+*/
 
-function get_inventory($product_id){
+/*function get_inventory($product_id){
   $items = new Inventories(array('product_id' => $product_id));
   foreach($items as $item){
     if(!isset($inventory)){
@@ -57,9 +63,9 @@ function get_inventory($product_id){
     }
   }
   return $inventory;
-}
+}*/
 
-
+/*
 function execute_products(){
   $product_ids = array();
   $items = new Inventories();
@@ -126,3 +132,4 @@ function execute_update_ajax(){
   echo json_encode(array('value' => $value));
   exit;
 }
+*/
