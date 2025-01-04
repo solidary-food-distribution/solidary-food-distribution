@@ -78,8 +78,8 @@ function execute_update_user_ajax(){
   $field = get_request_param('field');
   $type = get_request_param('type');
   $value = get_request_param('value');
-  $user = user_get($user_id);
-  $user->update(array($field => $value));
+  $user_obj = user_get($user_id);
+  $user_obj->update(array($field => $value));
   echo json_encode(array('value' => $value));
   exit;
 }

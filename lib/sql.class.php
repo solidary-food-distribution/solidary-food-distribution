@@ -12,11 +12,6 @@ if(mysqli_connect_errno()){
 }
 mysqli_report(MYSQLI_REPORT_ERROR);
 
-global $user;
-if(!isset($user['user_id'])){
-  $user['user_id']=0;
-}
-
 class SQL{
   static function update($qry){
     global $mysqli;
@@ -123,11 +118,11 @@ class SQL{
   }
   static function log_info($qry,$info){
     global $mysqli, $MODULE, $ACTION, $user;
-    file_put_contents(__DIR__.'/../log/sql_info.'.date('Ymd').'.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']."\n$qry\n$info\n",FILE_APPEND);
+    file_put_contents(__DIR__.'/../log/sql_info.'.date('Ymd').'.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".(isset($user['user_id'])?$user['user_id']:0)."\n$qry\n$info\n",FILE_APPEND);
   }
   static function log_error($qry){
     global $mysqli, $MODULE, $ACTION, $user;
-    file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".$user['user_id']."\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
+    file_put_contents(__DIR__.'/../log/sql_error.log',date('Y-m-d H:i:s')." $MODULE $ACTION ".(isset($user['user_id'])?$user['user_id']:0)."\n".mysqli_error($mysqli)." >> $qry\n",FILE_APPEND);
   }
 
   static function buildFilterQuery($filters){
