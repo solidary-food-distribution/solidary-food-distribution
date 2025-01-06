@@ -51,7 +51,7 @@ class Objects implements ArrayAccess,Iterator,Countable{
   }
 
   public function offsetExists(mixed $offset){
-    return in_array($offset, $this->array);
+    return array_key_exists($offset, $this->array);
   }
   public function offsetGet(mixed $offset){
     return $this->array[$offset];
@@ -64,6 +64,7 @@ class Objects implements ArrayAccess,Iterator,Countable{
   }
 
   public function array(){
+    reset($this->array);
     return $this->array;
   }
   public function isset($id){

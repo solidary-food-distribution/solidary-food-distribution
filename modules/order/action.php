@@ -81,10 +81,6 @@ function execute_index(){
   $prices = new Prices(array('product_id' => $product_ids, 'start<=' => $order->pickup_date, 'end>=' => $order->pickup_date));
   #logger("prices ".print_r($prices,1));
 
-  require_once('sql.class.php');
-  $excl = " AND p.id NOT IN (SELECT product_id FROM (select min(o.pickup_date) minpud,max(o.pickup_date) maxpud,oi.product_id,sum(oi.amount_pieces) summe,p.amount_per_bundle from msl_orders o,msl_order_items oi, msl_products p where o.id=oi.order_id and oi.product_id=p.id and p.supplier_id=35 and oi.amount_pieces>0 and p.status='o' group by oi.product_id,p.amount_per_bundle having minpud='2024-12-06' and summe<amount_per_bundle) excl)";
-  $order_sum_oekoring = SQL::selectOne("SELECT SUM(order_sum) order_sum FROM (SELECT (CEIL(SUM(oi.amount_pieces)/oi.amount_per_bundle)*oi.amount_per_bundle)*(SELECT MIN(purchase) FROM msl_prices pr WHERE pr.product_id=p.id) order_sum FROM msl_orders o, msl_order_items oi, msl_products p WHERE o.id=oi.order_id AND oi.product_id=p.id AND p.supplier_id=35 AND o.pickup_date='".SQL::escapeString($order->pickup_date)."' $excl GROUP BY oi.product_id) osum")['order_sum'];
-
   #logger("products ".print_r($products,1));
   $ps = $products;
   $products = array();
@@ -98,7 +94,7 @@ function execute_index(){
     }
   }
 
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'order_sum_oekoring' => $order_sum_oekoring);
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
 }
 
 function search_products($search, $suppliers, $limit){
@@ -257,4 +253,53 @@ function update_order_item_prices($order_item_id){
   if(!empty($updates)){
     $order_item->update($updates);
   }
+}
+
+function get_oekoring_order_sum($pickup_date){
+  require_once('orders.class.php');
+  $orders = new Orders(array('pickup_date' => $pickup_date));
+  require_once('order_items.class.php');
+  $order_items = new OrderItems(array('order_id' => $orders->keys()));
+  require_once('products.class.php');
+  $products = new Products(array('id' => $order_items->get_product_ids(), 'supplier_id' => 35));
+
+  $amounts = array();
+  foreach($order_items as $order_item){
+    if(!isset($products[$order_item->product_id]) || !$order_item->amount_pieces){
+      continue;
+    }
+    $amounts[$order_item->product_id] = $amounts[$order_item->product_id] + $order_item->amount_pieces;
+  }
+  #logger("amounts ".print_r($amounts,1));
+
+  require_once('inventory.inc.php');
+  /*
+  foreach($amounts as $product_id => $amount){
+    update_inventory_product($product_id);
+  }
+  */
+  $inventory = get_inventory(array_keys($amounts));
+
+  foreach($amounts as $product_id => $amount){
+    if(isset($inventory[$product_id]) && $inventory[$product_id]['amount_pieces'] >= $amount){
+      #logger("inventory ".print_r($inventory[$product_id],1));
+      unset($amounts[$product_id]);
+    }else{
+      $amounts[$product_id] -= $inventory[$product_id]['amount_pieces'];
+    }
+  }
+  #logger("amounts ".print_r($amounts,1));
+
+  $order_sum = 0;
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => array_keys($amounts), 'start<=' => $pickup_date, 'end>=' => $pickup_date));
+  foreach($amounts as $product_id => $amount){
+    if($amount < 0){
+      continue;
+    }
+    $amount_order = ceil($amount / $prices[$product_id]->amount_per_bundle) * $prices[$product_id]->amount_per_bundle;
+    $order_sum += $amount_order * $prices[$product_id]->purchase;
+  }
+
+  return $order_sum;
 }
