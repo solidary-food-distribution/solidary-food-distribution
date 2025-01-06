@@ -38,6 +38,7 @@ function update_inventory_product($product_id){
   if($inventories->count()){
     $user_modified = $inventories->first()->modified;
   }
+  #logger("update_inventory_product $product_id user_modified $user_modified ".print_r($inventories,1));
 
   $delivery_item_modified = '0000-00-00 00:00:00';
   $inventories = new Inventories(array('delivery_item_id>' => 0, 'product_id' => $product_id, 'modified>' => $user_modified), array('modified' => 'DESC'), 0, 1);
@@ -93,7 +94,16 @@ function update_inventory_product($product_id){
     require_once('inventory_log.class.php');
     $inventories = new Inventories(array('product_id' => $product_id, 'modified<' => $user_modified));
     foreach($inventories as $inventory){
-      InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id, $inventory->user_id);
+      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id, $inventory->user_id);
+      $inventory_log->update(array(
+        'modified' => $inventory->modified,
+        'amount_pieces' => $inventory->amount_pieces,
+        'amount_weight' => $inventory->amount_weight,
+        'dividable' => $inventory->dividable,
+        'weight_min' => $inventory->weight_min,
+        'weight_max' => $inventory->weight_max,
+        'weight_avg' => $inventory->weight_avg,
+      ));
       $inventory->delete();
     }
   }
@@ -110,6 +120,7 @@ function get_inventory($product_ids = array()){
   foreach($inventories as $inventory){
     $data[$inventory->product_id]['amount_pieces'] = $data[$inventory->product_id]['amount_pieces'] + $inventory->amount_pieces;
     $data[$inventory->product_id]['amount_weight'] = $data[$inventory->product_id]['amount_weight'] + $inventory->amount_weight;
+    $data[$inventory->product_id]['user_id'] = $inventory->user_id;
   }
   return $data;
 }

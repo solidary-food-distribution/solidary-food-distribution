@@ -12,6 +12,7 @@ $PROPERTIES['body_class']='header_h5';
         $options = array(
           '1' => '<i class="fa-solid fa-tractor" title="Erzeuger"></i> Erzeuger', 
           '2' => '<i class="fa-solid fa-warehouse" title="Großhandel"></i> Großhandel',
+          's' => '<i class="fa-solid fa-magnifying-glass" title="Suche"></i> Suche'
         );
         echo html_input(array(
           'class' => 'filter',
@@ -25,44 +26,63 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
+<?php if($modus == 's'): ?>
+  <div class="row">
+    Noch nicht umgesetzt
+  </div>
+<?php endif ?>
+
 <?php foreach($products as $product): ?>
-  <div class="row product">
+  <?php
+    $supplier = $suppliers[$product->supplier_id];
+    $brand = $brands[$product->brand_id];
+    $pdata = $data[$product->id];
+    $amount = 0;
+    $amount_weight = 0;
+    if($pdata['user_id']){
+      if($product->type == 'k'){
+        $amount = $pdata['amount_weight'];
+      }
+      if($product->type == 'p' || $product->type == 'w'){
+        $amount = $pdata['amount_pieces'];
+      }
+      if($product->type == 'w'){
+        $amount_weight = $pdata['amount_weight'];
+      }
+    }
+  ?>
+  <div class="row product" data-id="<?php echo $product->id ?>">
     <div class="col2">
       <div style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;"></div>
     </div>
-    <div class="col8">
+    <div class="col7">
       <div>
         <?php echo htmlentities($product->name) ?><br>
         <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
       </div>
     </div>
-    <div class="col8">
-      <?php if($product->type!='k'): ?>
-        <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="pickup_change(this,\'-\')"' ?>>-</div>
+    <div class="col9">
+      <?php if($product->type == 'k' || $pdata['amount_pieces'] == 0): ?>
+        <div class="button large" onclick="inventory_update(this,'0')">0</div>
+      <?php elseif($product->type != 'k'): ?>
+        <div class="button large " onclick="inventory_update(this,'-')">-</div>
       <?php else: ?>
         <div style="width:1.7em;font-size:2em;">&nbsp;</div>
       <?php endif ?>
-      <div class="" style="width:6em;text-align:right;margin-right:0.2em;">
-        <?php if($amount_ordered): ?>
-          <span><?php echo format_amount($amount_ordered) ?></span>
+      <div class="" style="width:7.5em;text-align:right;margin-right:0.2em;">
+        <?php if($pdata['user_id']): ?>
+        <?php elseif($product->type == 'p' || $product->type == 'w'): ?>
+          <span><?php echo format_amount($pdata['amount_pieces']) ?></span>
+        <?php elseif($product->type == 'k'): ?>
+          <span><?php echo format_amount($pdata['amount_weight']) ?></span>
         <?php endif ?>
-        <?php
-          $needs_todo = ($amount_ordered != $amount);
-          if($product->type == 'k'){
-            $needs_todo = 0;
-            if($amount_weight > $amount_ordered_weight*1.2){
-              $needs_todo = 1;
-            }elseif($amount_weight < $amount_ordered_weight*0.8){
-              $needs_todo = 1;
-            }
-          }
-        ?>
-        <div class="input <?php echo $needs_todo?'needs_todo':'' ?>">
+        <div class="input <?php echo $pdata['user_id']?'':'needs_todo' ?>">
           <?php echo format_amount($amount); ?>
         </div>
         <span><?php echo translate_product_type_amount($product->type); ?></span><br>
         <?php if($product->type == 'w'): ?>
-          <div class="input <?php echo $amount_weight?'':'needs_todo' ?>">
+          <span><?php echo format_amount($pdata['amount_weight']) ?></span>
+          <div class="input <?php echo $pdata['user_id']?'':'needs_todo' ?>">
             <?php echo format_amount($amount_weight); ?>
           </div>
           <span><?php echo translate_product_type_amount('k'); ?></span><br>
@@ -74,16 +94,16 @@ $PROPERTIES['body_class']='header_h5';
         </div>
       </div>
       <?php if($product->type!='k'): ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'+\')"' ?>>+</div>
+        <div class="button large" onclick="inventory_update(this,'+')">+</div>
       <?php else: ?>
         <div style="width:1.7em;font-size:2em;">&nbsp;</div>
       <?php endif ?>
       <?php if($product->type!='p'): ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($product->name) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*0.8 ?>" data-value_max="<?php echo $amount_ordered_weight*1.2 ?>">
+        <div class="button large  <?php echo $pdata['user_id']?'':'needs_todo' ?> disabled" onclick="alert('Noch nicht umgesetzt');return;scale_show(this)" style="margin-left:0.2em" data-title="<?php echo htmlentities($product->name) ?>" data-value_exact="<?php echo $amount_weight ?>" data-value_min="<?php echo $amount_weight*0.8 ?>" data-value_max="<?php echo $amount_weight*1.2 ?>">
           <i class="fa-solid fa-weight-scale"></i>
         </div>
-      <?php else: ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount!=$amount_ordered?'needs_todo':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'=\')"' ?> style="margin-left:0.2em">
+      <?php elseif($pdata['amount_pieces'] > 0 && !$pdata['user_id']): ?>
+        <div class="button large" onclick="inventory_update(this,'=')" style="margin-left:0.2em">
           <i class="fa-solid fa-check"></i>
         </div>
       <?php endif ?>
@@ -91,4 +111,6 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php endforeach ?> 
 
+<?php /*
 <div class="main_button button" onclick="location.href='/inventory/products';">Produkt hinzufügen</div>
+*/ ?>

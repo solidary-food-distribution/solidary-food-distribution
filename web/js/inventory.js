@@ -46,6 +46,24 @@ function inventory_filter(el){
   });
 }
 
+function inventory_update(el, change){
+  var product_id = $(el).closest('.product').data('id');
+  var data = get_url_params();
+  data['product_id'] = product_id;
+  data['change'] = change;
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    data: data,
+    url: '/inventory/update_ajax',
+    dataType: "html",
+    success: function(html){
+      $('#loading').hide();
+      replace_header_main_footer(html);
+    }
+  });
+}
+
 /*
 function inventory_remove_product(product_id){
   active_input_post_value();

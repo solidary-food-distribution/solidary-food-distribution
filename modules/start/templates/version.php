@@ -1,4 +1,7 @@
 <div class="row">
+  2025-01-06 04:02 Inventur begonnen<br>
+</div>
+<div class="row">
   2024-12-27 11:23 Aufgaben-Kalender implementiert<br>
 </div>
 <div class="row">

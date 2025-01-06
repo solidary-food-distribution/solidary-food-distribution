@@ -20,15 +20,12 @@ class InventoryLog{
 
   public static function create($inventory_id, $product_id, $delivery_item_id, $pickup_item_id, $user_id){
     require_once('sql.class.php');
-    $qry = "INSERT INTO msl_inventory_log ($id, product_id, delivery_item_id, pickup_item_id, user_id) VALUES (".intval($inventory_id).",".intval($product_id).",".intval($delivery_item_id).",".intval($pickup_item_id).",".intval($user_id).")";
-    $id = SQL::insert($qry);
-    if(!$id){
-      return false;
-    }
-    $values = SQL::selectOne("SELECT * FROM msl_inventory WHERE id=".intval($id));
-    $inventory = new InventoryLog();
-    $inventory->_init_values($values); 
-    return $inventory;
+    $qry = "INSERT INTO msl_inventory_log (id, product_id, delivery_item_id, pickup_item_id, user_id) VALUES (".intval($inventory_id).",".intval($product_id).",".intval($delivery_item_id).",".intval($pickup_item_id).",".intval($user_id).")";
+    SQL::insert($qry);
+    $values = SQL::selectOne("SELECT * FROM msl_inventory_log WHERE id=".intval($inventory_id));
+    $inventory_log = new InventoryLog();
+    $inventory_log->_init_values($values); 
+    return $inventory_log;
   }
 
   public function _init_values( $values ){
@@ -41,7 +38,7 @@ class InventoryLog{
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');
-    $qry = "UPDATE msl_inventory SET ";
+    $qry = "UPDATE msl_inventory_log SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
     SQL::update($qry);
