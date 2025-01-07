@@ -49,6 +49,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
 
 <?php
   $sum = array();
+  $infos_lazy_load = array();
 ?>
 
 <?php foreach($products as $product_id => $product): ?>
@@ -118,7 +119,28 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   ?>
   <div class="row product" data-id="<?php echo $product_id ?>">
     <div class="col2">
-      <div style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;"></div>
+      <div class="image" style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;">
+        <?php
+          $infos = array();
+          if(!empty($product->infos)){
+            $infos = json_decode($product->infos, true);
+            if($infos['date'] < date('Y-m-d')){
+              $infos_lazy_load[] = $product_id;
+            }
+          }elseif($product->supplier_id == 35){
+            $infos_lazy_load[] = $product_id;
+          }
+          if(isset($infos['link'])){
+            echo '<a href="'.$infos['link'].'" target="_blank">';
+          }
+          if(isset($infos['image'])){
+            echo '<img src="'.$infos['image'].'" />';
+          }
+          if(isset($infos['link'])){
+            echo '</a>';
+          }
+        ?>
+      </div>
     </div>
     <div class="col6">
       <div>
@@ -158,6 +180,12 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   <div id="show_more" class="button" style="float:right;margin:0.5em" onclick="order_show_more_load()">Weitere anzeigen...</div>
   <script>
     $('main').on('scroll',order_show_more);
+  </script>
+<?php endif ?>
+
+<?php if(!empty($infos_lazy_load)): ?>
+  <script>
+    order_infos_lazy_load('<?php echo implode(',', $infos_lazy_load); ?>');
   </script>
 <?php endif ?>
 

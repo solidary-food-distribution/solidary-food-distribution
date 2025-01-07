@@ -122,6 +122,45 @@ function search_products($search, $suppliers, $limit){
   return $res;
 }
 
+function execute_infos_lazy_load_ajax(){
+  $product_ids = get_request_param('product_ids');
+  $product_ids = explode(',', $product_ids);
+  require_once('products.class.php');
+  $products = new Products(array('id' => $product_ids));
+  $gtins = array();
+  foreach($products as $product){
+    if($product->supplier_id == 35 && trim($product->gtin_piece) != ''){
+      $gtins[$product->gtin_piece] = $product->id;
+    }
+  }
+  $infos = array();
+  if(!empty($gtins)){
+    $url = 'https://db.ecoinform.de/web/ecodb.php/produktliste/json?partner=674a474e75a77642&eanliste='.implode(',',array_keys($gtins));
+    $ecodata = file_get_contents($url);
+    if(!empty($ecodata)){
+      $ecodata = json_decode($ecodata, true);
+      foreach($ecodata['produkte'] as $eco_id => $data){
+        if(isset($gtins[$data['p_ean1']])){
+          $product_id = $gtins[$data['p_ean1']];
+          $pinfos = array(
+            'date' => date('Y-m-d'),
+            'link' => 'https://www.ecoinform.de/main.php/detail?id='.$eco_id,
+          );
+          if(!empty($data['p_bild'])){
+            $pinfos['image'] = 'https://img.ecoinform.de'.$data['p_bild'];
+          }
+          $json = json_encode($pinfos);
+          $products[$product_id]->update(array('infos' => $json));
+          $infos[$product_id] = $pinfos;
+        }
+      }
+      $datanature="712*j<tOH7RZ%/V";
+    }
+  }
+  echo json_encode($infos);
+  exit;
+}
+
 function find_current_order_id($orders){
   if(!$orders->count()){
     return 0;

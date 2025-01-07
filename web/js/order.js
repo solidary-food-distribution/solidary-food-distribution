@@ -82,3 +82,28 @@ function order_show_more_load(){
   $('#show_more').html('...');
   order_filter($('#show_more'));
 }
+
+function order_infos_lazy_load(product_ids){
+  $.ajax({
+    type: 'GET',
+    url: '/order/infos_lazy_load_ajax?product_ids='+product_ids,
+    dataType: "json",
+    success: function(json){
+      for (const [product_id, infos] of Object.entries(json)) {
+        console.log(product_id);
+        console.log(infos);
+        var html = '';
+        if(infos.link != ''){
+          html = '<a href="' + infos.link + '" target="_blank">';
+        }
+        if(infos.image != ''){
+          html += '<img src="' + infos.image + '" />';
+        }
+        if(infos.link != ''){
+          html += '</a>';
+        }
+        $('.row.product[data-id='+product_id+'] .image').html(html);
+      }
+    }
+  });
+}
