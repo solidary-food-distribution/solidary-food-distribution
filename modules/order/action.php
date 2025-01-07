@@ -135,6 +135,7 @@ function execute_infos_lazy_load_ajax(){
   }
   $infos = array();
   if(!empty($gtins)){
+    //1. ecoinform
     $url = 'https://db.ecoinform.de/web/ecodb.php/produktliste/json?partner=674a474e75a77642&eanliste='.implode(',',array_keys($gtins));
     $ecodata = file_get_contents($url);
     if(!empty($ecodata)){
@@ -151,10 +152,36 @@ function execute_infos_lazy_load_ajax(){
           }
           $json = json_encode($pinfos);
           $products[$product_id]->update(array('infos' => $json));
+          $products[$product_id]->infos = $json;
           $infos[$product_id] = $pinfos;
         }
       }
-      $datanature="712*j<tOH7RZ%/V";
+      //$datanature="712*j<tOH7RZ%/V";
+    }
+    //2. duckduckgo search
+    $add_search = array();
+    $brand_ids = array();
+    foreach($gtins as $gtin => $product_id){
+      if(!isset($infos[$product_id])){
+        $add_search[$product_id] = 1;
+        $brand_ids[$products[$product_id]->brand_id] = 1;
+      }
+    }
+    if(!empty($brand_ids)){
+      require_once('sql.class.php');
+      $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands WHERE id IN (".SQL::escapeArray(array_keys($brand_ids)).")", 'id', 'name');
+    }
+    foreach($add_search as $product_id => $dummy){
+      $product = $products[$product_id];
+      $pinfos = array(
+        'date' => date('Y-m-d'),
+        'link' => 'https://duckduckgo.com/?q='.$product->gtin_piece.'+'.urlencode(trim($brands[$product->brand_id].' '.$product->name)),
+        'image' => '/img/search.png',
+      );
+      $json = json_encode($pinfos);
+      $products[$product_id]->update(array('infos' => $json));
+      $products[$product_id]->infos = $json;
+      $infos[$product_id] = $pinfos;
     }
   }
   echo json_encode($infos);
