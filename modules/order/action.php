@@ -18,7 +18,7 @@ function execute_index(){
   if(!$orders->isset($order_id)){
     $order_id = find_current_order_id($orders);
     if($order_id){
-      forward_to_page('/order/?order_id='.$order_id);
+      forward_to_page('/order/?order_id='.$order_id.'&modus='.$modus.'&search='.urlencode($search));
     }else{
       forward_to_page('/orders');
     }
@@ -57,6 +57,9 @@ function execute_index(){
   }elseif($modus == 's' && trim($search)!=''){
     $suppliers = new Members(array('producer>=' => 1));
     $product_ids = search_products($search, $suppliers, $limit);
+    if(empty($product_ids)){
+      $product_ids=array('0');
+    }
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
   }elseif($modus == 's'){
     $products = array();

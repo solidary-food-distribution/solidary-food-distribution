@@ -96,13 +96,20 @@ function execute_update_ajax(){
   $data = get_inventory(array($product_id));
   $pdata = $data[$product_id];
   require_once('inventories.class.php');
-  $inventories = new Inventories(array('product_id' => $product_id), array('id' => 'DESC'), 0, 1);
+  $inventories = new Inventories(array('product_id' => $product_id), array('id' => 'DESC'));
   $user_id = 0;
+  $modified = '0000-00-00 00:00:00';
   if($inventories->count()){
     $inventory = $inventories->first();
     $user_id = $inventory->user_id;
+    $modified = $inventory->modified;
   }
-  if(!$user_id){
+  if(($user_id != $user['user_id']) || (substr($modified, 0, 10) != date('Y-m-d'))){
+    if($user_id){
+      foreach($inventories as $i){
+        echo "TODO bestehende inventory ins log";exit;
+      }
+    }
     $inventory = Inventory::create($product_id, 0, 0, $user['user_id']);
   }
   if($change == '0'){

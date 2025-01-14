@@ -19,6 +19,32 @@ class DeliveryItem{
   public float $weight_avg;
 
 
+  public static function create($delivery_id, $product_id){
+    require_once('sql.class.php');
+    $qry = 
+      "INSERT INTO msl_delivery_items ".
+        "(delivery_id, product_id, created, modified) VALUES ".
+        "('" . intval($delivery_id) . "', '" . intval($product_id) . "', NOW(), NOW())";
+    $id = SQL::insert($qry);
+    $values = SQL::selectOne("SELECT * FROM msl_delivery_items WHERE id=".intval($id));
+    $delivery_item = new DeliveryItem();
+    $delivery_item->_init_values($values); 
+    return $delivery_item;
+  }
+
+  public function _init_values( $values ){
+    foreach($values as $key => $value){
+      if(property_exists($this, $key)){
+        $this->{$key} = $value;
+      }
+    }
+  }
+
+  public function delete(){
+    require_once('sql.class.php');
+    $qry = "DELETE FROM msl_delivery_items WHERE id='".intval($this->id)."'";
+    SQL::update($qry);
+  }
 
   public function update( array $updates = array() ){
     global $user;

@@ -23,50 +23,27 @@ function execute_index(){
   require_once('products.class.php');
   $products = new Products(array('id' => $product_ids));
 
-  return array('delivery' => $delivery, 'delivery_items' => $delivery_items, 'supplier' => $supplier, 'products' => $products, 'item_id' => $item_id);
-}
+  require_once('sql.class.php');
+  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
 
-function execute_edit(){
-  $delivery_id = get_request_param('delivery_id');
-  $delivery = Deliveries::sget($delivery_id);
-  require_once('members.class.php');
-  $suppliers = new Members(array('id' => $delivery->supplier_id));
-  return array(
-    'delivery' => $delivery,
-    'supplier' => $suppliers->first(),
-    #'type_v' => count($products),
-  );
-}
-
-function execute_item_edit(){
-  $delivery_id = get_request_param('delivery_id');
-  $item_id = get_request_param('item_id');
-
-  $delivery = Deliveries::sget($delivery_id);
-  require_once('members.class.php');
-  $suppliers = new Members(array('id' => $delivery->supplier_id));
-  $item = DeliveryItems::sget($item_id);
-
-  require_once('products.class.php');
-  $product = Products::sget($item->product_id);
-  return array(
-    'delivery' => $delivery,
-    'supplier' => $suppliers->first(),
-    'item' => $item,
-    'product' => $product,
-  );
+  return array('delivery' => $delivery, 'delivery_items' => $delivery_items, 'supplier' => $supplier, 'brands' => $brands, 'products' => $products, 'item_id' => $item_id);
 }
 
 function execute_products(){
+  echo "needs refactor";exit;
+  /*
   $delivery_id=get_request_param('delivery_id');
   $item_id=get_request_param('item_id');
   $delivery = Deliveries::sget($delivery_id);
   require_once('products.class.php');
   $products=new Products(array('producer_id' => $delivery->supplier_id, 'type' => array('v','p','k')));
   return array('delivery'=>$delivery,'products'=>$products,'item_id'=>$item_id);
+  */
 }
 
 function execute_product_select(){
+  echo "needs refactor";exit;
+  /*
   $delivery_id=get_request_param('delivery_id');
   $item_id=get_request_param('item_id');
   $product_id=get_request_param('product_id');
@@ -96,29 +73,23 @@ function execute_product_select(){
 
   $item->update(array('price_type' => $price_type, 'purchase' => $purchase, 'purchase_sum' => 0, 'amount_pieces' => 0, 'amount_weight' => 0));
   forward_to_page('/delivery/item_edit', 'delivery_id='.$delivery_id.'&item_id='.$item_id);
+  */
 }
 
 function execute_delete_ajax(){
-  $id=get_request_param('delivery_id');
-  $delivery=delivery_get($id);
-  $updates = array( 'delete' => 1 );
-  foreach($delivery->items as $item){
-    inventory_update($item->id, $item->product_id, $updates);
+  $delivery_id = get_request_param('delivery_id');
+  require_once('inventory.inc.php');
+  $delivery_items = new DeliveryItems(array('delivery_id' => $delivery_id));
+  foreach($delivery_items as $delivery_item){
+    $delivery_item->delete();
+    require_once('inventory.inc.php');
+    update_inventory_product($delivery_item->product_id);
   }
-  $delivery->delete($id);
+  $delivery = Deliveries::sget($delivery_id);
+  $delivery->delete($delivery_id);
   exit;
 }
 
-function execute_item_delete_ajax(){
-  $id=get_request_param('delivery_id');
-  $item_id=get_request_param('item_id');
-  $delivery=delivery_get($id);
-  $item = $delivery->items[$item_id];
-  $updates = array( 'delete' => 1 );
-  inventory_update($item_id, $item->product_id, $updates);
-  $delivery->item_delete($item_id);
-  exit;
-}
 
 function execute_new(){
   $pickup_date = '2025-01-10';
@@ -148,8 +119,8 @@ function execute_new(){
 function execute_new_create(){
   global $user;
   $supplier_id=get_request_param('supplier_id');
-  $delivery_id = Deliveries::create($supplier_id, $user['member_id']);
-  $delivery = delivery_get($delivery_id);
+  $delivery_id = Delivery::create($supplier_id, $user['user_id']);
+  $delivery = Deliveries::sget($delivery_id);
   $pickup_date = '2025-01-10';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
@@ -169,7 +140,7 @@ function execute_new_create(){
   $products = new Products(array('id' => array_keys($product_ids)));
   foreach($products as $product_id => $product){
     if($product->supplier_id == $supplier_id){
-      $item = $delivery->item_create($product_id);
+      $item = DeliveryItem::create($delivery_id, $product_id);
       if($product->supplier_id == 35 && $product->amount_per_bundle > 1){
         $amount = $product_amounts[$product_id]['amount_pieces'];
         $product_amounts[$product_id]['amount_bundles'] = ceil($amount / $product->amount_per_bundle);
@@ -182,58 +153,72 @@ function execute_new_create(){
   forward_to_page('/delivery/index', 'delivery_id='.$delivery_id);
 }
 
-function execute_update_ajax(){
+
+function execute_change_ajax(){
+  global $user;
   $delivery_id = get_request_param('delivery_id');
-  $item_id = get_request_param('item_id');
-  $field = get_request_param('field');
-  $type = get_request_param('type');
-  $value = get_request_param('value');
-  if($type == 'weight'){
-    $value = str_replace(',', '.', $value);
-    $value = number_format(floatval($value), 3, '.', '');
-  }elseif($type == 'pieces'){
-    $value = str_replace(',', '.', $value);
-    $value = number_format(floatval($value), 2, '.', '');
-  }elseif($type == 'money'){
-    $value = str_replace(',', '.', $value);
-    $value = number_format(floatval($value), 2, '.', '');
-  }
-  if($item_id){
-    $item = DeliveryItems::sget($item_id);
-    $updates = array($field => $value);
-    #logger('item '.print_r($item,1));
-    if($item->product->type == 'p' || $item->product->type == 'k'){
-      $updates['price_sum'] = $item->price * $value;
+  $product_id = intval(get_request_param('product_id'));
+  $change = get_request_param('change');
+  logger("$delivery_id $product_id $change");
+  if($delivery_id && $product_id && $change){
+    require_once('delivery_items.class.php');
+    $delivery_items = new DeliveryItems(array('delivery_id' => $delivery_id, 'product_id' => $product_id));
+    if(!$delivery_items->count()){
+      $delivery_item = DeliveryItems::create($delivery_id, $product_id);
+    }else{
+      $delivery_item = $delivery_items->first();
     }
-    $item->update($updates);
-    #inventory_update($item->id, $item->product_id, array($field => $value));
-  }else if($delivery_id){
-    $delivery = delivery_get($delivery_id);
-    $delivery->update(array($field => $value));
+    require_once('products.class.php');
+    $product = Products::sget($product_id);
+    if($product->type == 'p' || $product->type == 'w'){
+      $amount = $delivery_item->amount_pieces;
+      $amount_field = 'amount_pieces';
+    }elseif($product->type == 'k'){
+      $amount = $delivery_item->amount_weight;
+      $amount_field = 'amount_weight';
+    }else{
+      throw new Exception("unknown product-type ".print_r($product,1), 1);
+      exit;
+    }
+
+    if($change == '+' && $product->supplier_id == 35){
+      $amount_new = round($amount + $product->amount_per_bundle, 3);
+    }elseif($change == '+'){
+      $amount_new = round($amount + $product->amount_steps, 3);
+    }elseif($change == '-' && $product->supplier_id == 35){
+      $amount_new = round($amount - $product->amount_per_bundle, 3);
+    }elseif($change == '-'){
+      $amount_new = round($amount - $product->amount_steps, 3);
+    }
+
+    if($amount_new < 0){
+      $amount_new = 0;
+    }
+    logger("amount_field $amount_field amount_new $amount_new");
+    $delivery_item->update(array($amount_field => $amount_new));
+    require_once('inventory.inc.php');
+    update_inventory_product($product_id);
   }
-  echo json_encode(array('value' => $value));
-  exit;
+  $return=execute_index();
+  $return['template']='index.php';
+  $return['layout']='layout_null.php';
+  return $return;
 }
 
-function inventory_update($delivery_item_id, $product_id, $updates){
-  require_once('inventories.class.php');
-  $objects = new Inventories(array('delivery_item_id' => $delivery_item_id));
-  if(count($objects)){
-    $inventory = $objects->first();
-  }elseif(!isset($updates['delete'])){
-    $id = Inventories::create($delivery_item_id, 0, $product_id);
-    $inventory = inventory_get($id);
-  }
-  if(isset($inventory) && isset($updates['delete'])){
-    $inventory->delete();
-    return;
-  }
-  foreach($updates as $field=>$value){
-    if(!isset($inventory->{$field})){
-      unset($updates[$field]);
-    }
-  }
-  if(!empty($updates)){
-    $inventory->update($updates);
-  }
+
+function execute_scale_ajax(){
+  global $user;
+  $delivery_id = intval(get_request_param('delivery_id'));
+  $delivery_item_id = intval(get_request_param('item_id'));
+  $value = get_request_param('value');
+  $delivery = Deliveries::sget($delivery_id);
+  require_once('delivery_items.class.php');
+  $delivery_item = DeliveryItems::sget($delivery_item_id);
+  $delivery_item->update(array('amount_weight' => floatval($value)));
+  require_once('inventory.inc.php');
+  update_inventory_product($delivery_item->product_id);
+  $return=execute_index();
+  $return['template']='index.php';
+  $return['layout']='layout_null.php';
+  return $return;
 }

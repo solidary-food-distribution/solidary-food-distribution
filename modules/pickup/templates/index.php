@@ -14,8 +14,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="control filter">
         <?php
           $options = array(
-            'p' => '<i class="fa-solid fa-basket-shopping" title="Bestellt"></i>'.($pickup_items_count?'<span class="count cart">'.$pickup_items_count.'</span>':'').' Bestellt',
-            //'d' => '<i class="fa-solid fa-square-plus" title="Auf Lager"></i> Auf Lager'
+            'p' => '<i class="fa-solid fa-basket-shopping" title="Abholung"></i>'.($pickup_items_count?'<span class="count cart">'.$pickup_items_count.'</span>':'').' Abholung',
+            'd' => '<i class="fa-solid fa-square-plus" title="Auf Lager"></i> Auf Lager'
           );
           echo html_input(array(
             'class' => 'filter',
@@ -66,6 +66,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       $amount_price = 0;
       $amount = 0;
     }
+    if(isset($inventory[$product_id])){
+      $amount_ordered = $inventory[$product_id]['amount_pieces'];
+    }
 
     
     if($amount && $prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle){
@@ -86,6 +89,10 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $locked_less = false;
     if($locked || $amount <= 0){
       $locked_less = true;
+    }
+    $locked_more = false;
+    if($locked || ($modus == 'd' && $amount_ordered == 0)){
+      $locked_more = true;
     }
 
     if($supplier->producer == 1){
@@ -136,6 +143,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
               $needs_todo = 1;
             }
           }
+          if($modus == 'd'){
+            $needs_todo = 0;
+          }
         ?>
         <div class="input <?php echo $needs_todo?'needs_todo':'' ?>">
           <?php echo format_amount($amount); ?>
@@ -161,7 +171,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         </div>
       </div>
       <?php if($product->type!='k'): ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'+\')"' ?>>+</div>
+        <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?'':'onclick="pickup_change(this,\'+\')"' ?>>+</div>
       <?php else: ?>
         <div style="width:1.7em;font-size:2em;">&nbsp;</div>
       <?php endif ?>
@@ -169,7 +179,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($product->name) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*0.8 ?>" data-value_max="<?php echo $amount_ordered_weight*1.2 ?>">
           <i class="fa-solid fa-weight-scale"></i>
         </div>
-      <?php else: ?>
+      <?php elseif($modus != 'd' && $amount_ordered > 0): ?>
         <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount!=$amount_ordered?'needs_todo':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'=\')"' ?> style="margin-left:0.2em">
           <i class="fa-solid fa-check"></i>
         </div>

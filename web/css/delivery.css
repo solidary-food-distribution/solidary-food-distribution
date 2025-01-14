@@ -1,0 +1,98 @@
+#scale{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+#scale_window{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  top:10%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 3px solid black;
+  border-radius: 1em;
+  width: 20em;
+}
+#scale_header{
+  margin: 0.5em;
+  display: flex;
+  position: relative;
+  justify-content: center;
+}
+#scale_title{
+  display: inline-block;
+  font-size: 1.5em;
+  margin: 0em;
+  text-align: center;
+}
+#scale_info{
+  display: block;
+  text-align: center;
+}
+#scale_price{
+  display: inline-block;
+  font-size: 1em;
+  margin: 0em;
+  padding: 0.2em;
+  text-align: center;
+  border: 1px solid black;
+}
+#scale_price_sum{
+  margin-top: 1em;
+}
+#scale_display, #scale_unit{
+  display: inline-block;
+  font-size: 1.5em;
+  margin: 0em;
+  padding: 0.2em;
+  text-align: center;
+  border: 1px solid black;
+}
+#scale_bar{
+  position: relative;
+  margin: 0.5em;
+  height: 1em;
+}
+#scale_bar #bar_border{
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  height: 1em;
+  border: 1px solid black;
+  background-color: white;
+}
+#scale_bar #bar{
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  height: 1em;
+  border-right: 1px solid black;
+  background-color: grey;
+}
+#scale_bar #bar_exact{
+  position: absolute;
+  top:1px;
+  height: 1em;
+  width:2px;
+  background-color: #aca;
+}
+#scale_bar #bar_okay{
+  position: absolute;
+  top:1px;
+  right:1px;
+  height: 1em;
+  background-color: #cfc;
+}
+#scale_keyboard{
+  display: none;
+}
+#scale_scale{
+  display: none;
+}
+#scale_unit{
+  display: none;
+  border: none;
+}

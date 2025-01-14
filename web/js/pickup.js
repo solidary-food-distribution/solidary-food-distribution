@@ -203,36 +203,6 @@ function scale_read(){
   });
 }
 
-/*
-function scale_show_price(value){
-  if(!scale_price){
-    $('#scale_price').hide();
-    $('#scale_price_sum').hide();
-    return;
-  }
-  $('#scale_price').show();
-  value = value.toString().replace(' kg', '');
-  value = parseFloat(value);
-  if(isNaN(value)){
-    value = 0;
-  }
-  var sum = value * scale_price;
-  var text = ' x ' + format_money(scale_price) + ' EUR = ' + format_money(sum) + ' EUR';
-  $('#scale_price').text(text);
-  if(scale_price_sum){
-    text = 'Gemüseanteil ' + format_money(scale_price_sum_pickup + sum) + ' EUR von ' + format_money(scale_price_sum) + ' EUR';
-    $('#scale_price_sum').text(text);
-    $('#scale_price_sum').show();
-    scale_show_bar(scale_price_sum_pickup + sum);
-  }else{
-    $('#scale_price_sum').text('');
-    $('#scale_price_sum').hide();
-    scale_show_bar(value);
-  }
-}
-*/
-
-
 function scale_show_bar(value){
   if(!scale_exact){
     $('#scale_bar').hide();

@@ -18,6 +18,7 @@ function execute_index(){
   $pickup_items = array();
   $order_item_ids = array();
   $product_ids = array();
+  $inventory = array();
   require_once('pickup_items.class.php');
   if($modus == 'p'){
     require_once('pickup_items.class.php');
@@ -29,16 +30,15 @@ function execute_index(){
     }
   }elseif($modus == 'd'){
     require_once('inventory.inc.php');
-    update_inventory();
-    require_once('inventories.class.php');
-    $is = new Inventories();
-    $product_ids = array();
-    foreach($is as $i){
-      if(!$i->amount_pieces && !$i->amount_weight){
+    $is = get_inventory();
+    #logger(print_r($is,1));
+    foreach($is as $product_id => $i){
+      if(!$i['amount_pieces'] && !$i['amount_weight']){
         continue;
       }
-      $product_ids[$i->product_id] = $i->product_id;
+      $inventory[$product_id] = $i;
     }
+    $product_ids = array_keys($inventory);
     if(empty($product_ids)){
       $product_ids[0] = 0;
     }
@@ -57,6 +57,9 @@ function execute_index(){
 
   $ps = array();
   foreach($products as $product){
+    if($modus == 'd' && $product->supplier_id != 35){
+      continue;
+    }
     if($product->type == 'p'){
       $ps[$product->id] = $product;
     }else{ //k or w
@@ -97,6 +100,7 @@ function execute_index(){
     $pickup_history = get_pickup_history($pickup);
   }
   */
+  #logger(print_r($inventory,1));
   return array(
     'modus' => $modus,
     'pickup' => $pickup,
@@ -106,6 +110,7 @@ function execute_index(){
     'suppliers' => $suppliers,
     'brands' => $brands,
     'prices' => $prices,
+    'inventory' => $inventory,
     //'product_type' => $product_type,
     //'others' => $others,
     //'pickup_history' => $pickup_history
@@ -191,66 +196,11 @@ function update_pickup_items($pickup_id){
         $updates['price_type'] = 'k';
       }
       $pui->update($updates);
-      $puis = new PickupItems(array('id' => $pui->id));
-      $pui = $puis->first();
+      update_inventory_product($product_id);
+      $pui = PickupItems::sget($pui->id);
       $pickup_items[$oi->product_id] = $pui;
     }
   }
-
-  /*
-  $has_type_b = false;
-  $type_b_factor = 0;
-  $type_b_producer_ids = array();
-  require_once('sql.class.php');
-  $qry = "SELECT o.pid, p.type, p.producer_id, o.amount, pr.price, pr.purchase, ".
-    "SUM(i.amount_pieces) AS i_amount_pieces, SUM(i.amount_weight) AS i_amount_weight ".
-    "FROM msl_orders o, msl_prices pr, msl_products p ".
-      "LEFT JOIN msl_inventory i ON (p.pid=i.product_id AND i.pickup_item_id IN (0 $pickup_item_ids)) ".
-      "LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
-    "WHERE o.pid=p.pid AND o.amount>0 AND o.member_id='".intval($user['member_id'])."' ".
-    "AND p.pid=pr.pid AND pr.start<=CURDATE() AND pr.end>=CURDATE() ".
-    "GROUP BY o.pid, p.type, p.producer_id, o.amount, pr.price, pr.purchase";
-  $orders = SQL::select($qry);
-  #logger(print_r($orders,1));
-  foreach($orders as $o){
-    if($o['pid'] == 59){ //sponsoring -> ignore
-      continue;
-    }elseif($o['type'] == 'b'){
-      $has_type_b = 1;
-      $type_b_factor = $o['price'] / $o['purchase'];
-      continue;
-    }
-    if(!isset($pickup_items[$o['pid']])){
-      $item = $pickup->item_create($o['pid'], $o['delivery_item_id']);
-      $item->update(array(
-        'price_type' => $o['type'],
-        'price' => $o['price'],
-      ));
-    }
-  }
-
-  if($has_type_b){
-    $qry = "SELECT i.product_id, p.producer_id, i.amount_weight, i.amount_pieces, ".
-        "i.delivery_item_id, di.price_type di_price_type, di.purchase AS di_purchase ".
-      "FROM msl_products p, msl_inventory i ".
-      " LEFT JOIN msl_delivery_items di ON (di.id = i.delivery_item_id) ".
-      "WHERE i.product_id=p.pid  AND i.pickup_item_id IN (0 $pickup_item_ids) AND p.type='v' ".
-      "ORDER BY p.name, i.delivery_item_id DESC";
-    $vproducts = SQL::select($qry);
-    #logger("vproducts ".print_r($vproducts,1));
-    foreach($vproducts as $p){
-      if(!isset($pickup_items[$p['product_id']])){
-        $item = $pickup->item_create($p['product_id'], $p['delivery_item_id']);
-        $item->update(array(
-          'price_type' => $p['di_price_type'],
-          'price' => round($p['di_purchase'] * $type_b_factor, 2),
-        ));
-        $pickup_items[$p['product_id']] = $item;
-        $pickup_item_ids .= ','.$item->id;
-      }
-    }
-  }
-  */
 }
 
 function execute_change_ajax(){
@@ -264,13 +214,12 @@ function execute_change_ajax(){
     require_once('pickup_items.class.php');
     $puis = new PickupItems(array('pickup_id' => $pickup_id, 'product_id' => $product_id));
     if(!$puis->count()){
-      $pui = PickupItems::create($pickup_id, $product_id);
+      $pui = PickupItem::create($pickup_id, $product_id);
     }else{
       $pui = $puis->first();
     }
     require_once('products.class.php');
-    $ps = new Products(array('id' => $product_id));
-    $product = $ps->first();
+    $product = Products::sget($product_id);
     if($product->type == 'p' || $product->type == 'w'){
       $amount = $pui->amount_pieces;
       $amount_field = 'amount_pieces';
@@ -307,6 +256,8 @@ function execute_change_ajax(){
     logger("amount_field $amount_field amount_new $amount_new");
     $pui->update(array($amount_field => $amount_new));
     update_pickup_item_price_sum($pui->id);
+    require_once('inventory.inc.php');
+    update_inventory_product($product_id);
   }
   $return=execute_index();
   $return['template']='index.php';
@@ -361,75 +312,6 @@ function update_pickup_item_price_sum($pickup_item_id){
   }
 }
 
-
-/*
-
-function execute_update_ajax(){
-  global $user;
-  $pickup_id = get_request_param('pickup_id');
-  $item_id = get_request_param('item_id');
-  $value = get_request_param('value');
-  $pickup = pickup_get($pickup_id, $user['member_id']);
-  $item = $pickup->items[$item_id];
-  $field = '';
-  #logger("item ".print_r($item, true));
-  if($item->price_type == 'k'){
-    $field = 'amount_weight';
-    $value = str_replace(',', '.', $value);
-    $value = number_format(floatval($value), 3, '.', '');
-  }elseif($item->price_type == 'p'){
-    $field = 'amount_pieces';
-    if($value == '+'){
-      $value = $item->amount_pieces + 1;
-    }elseif($value == '-'){
-      $value = $item->amount_pieces - 1;
-      if($value < 0){
-        $value = 0;
-      }
-    }
-    $value = str_replace(',', '.', $value);
-    $value = number_format(floatval($value), 2, '.', '');
-  }
-  if($field){
-    $updates = array(
-      $field => $value,
-      'price_sum' => round($value * $item->price, 2)
-    );
-    $item->update($updates);
-    inventory_update($item->id, $item->product_id, array($field => $value));
-  }
-  $return = execute_index();
-  $return['template']='index.php';
-  $return['layout']='layout_null.php';
-  return $return;
-}
-*/
-
-function inventory_update($pickup_item_id, $product_id, $updates){
-  require_once('inventories.class.php');
-  $objects = new Inventories(array('pickup_item_id' => $pickup_item_id));
-  if(count($objects)){
-    $inventory = $objects->first();
-  }else{
-    $id = Inventories::create(0, $pickup_item_id, $product_id);
-    $inventory = inventory_get($id);
-  }
-  foreach($updates as $field=>$value){
-    if(!isset($inventory->{$field})){
-      unset($updates[$field]);
-    }
-  }
-  if(!empty($updates)){
-    if(isset($updates['amount_pieces'])){
-      $updates['amount_pieces'] *= -1;
-    }
-    if(isset($updates['amount_weight'])){
-      $updates['amount_weight'] *= -1;
-    }
-    #logger(print_r($updates,1));
-    $inventory->update($updates);
-  }
-}
 
 function get_info_others(){
   global $user;

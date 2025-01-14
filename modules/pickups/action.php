@@ -30,7 +30,7 @@ function execute_delete_ajax(){
   global $user;
   $pickup_id = get_request_param('pickup_id');
   require_once('pickups.class.php');
-  $pickups = new Pickups(array('id' => $pickup_id, 'member_id' => $user['member_id']),array(),-5);
+  $pickups = new Pickups(array('id' => $pickup_id, 'member_id' => $user['member_id']),array('id' => 'DESC'), 0, 3);
   logger(print_r($pickups,1));
   //TODO check if all items amount=0
   if($pickups->isset($pickup_id)){
