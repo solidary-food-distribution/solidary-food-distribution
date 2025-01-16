@@ -97,6 +97,7 @@ function execute_update_ajax(){
   $pdata = $data[$product_id];
   require_once('inventories.class.php');
   $inventories = new Inventories(array('product_id' => $product_id), array('id' => 'DESC'));
+  #logger("execute_update_ajax ".print_r($inventories,1));
   $user_id = 0;
   $modified = '0000-00-00 00:00:00';
   if($inventories->count()){
@@ -104,11 +105,21 @@ function execute_update_ajax(){
     $user_id = $inventory->user_id;
     $modified = $inventory->modified;
   }
+  #logger("$user_id $modified");
   if(($user_id != $user['user_id']) || (substr($modified, 0, 10) != date('Y-m-d'))){
-    if($user_id){
-      foreach($inventories as $i){
-        echo "TODO bestehende inventory ins log";exit;
-      }
+    require_once('inventory_log.class.php');
+    foreach($inventories as $inventory){
+      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id, $inventory->user_id);
+      $inventory_log->update(array(
+        'modified' => $inventory->modified,
+        'amount_pieces' => $inventory->amount_pieces,
+        'amount_weight' => $inventory->amount_weight,
+        'dividable' => $inventory->dividable,
+        'weight_min' => $inventory->weight_min,
+        'weight_max' => $inventory->weight_max,
+        'weight_avg' => $inventory->weight_avg,
+      ));
+      $inventory->delete();
     }
     $inventory = Inventory::create($product_id, 0, 0, $user['user_id']);
   }
