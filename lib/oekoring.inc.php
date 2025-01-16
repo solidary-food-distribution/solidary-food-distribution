@@ -136,10 +136,15 @@ function oekoring_import_bnn($file){
   if($full){
     SQL::update("UPDATE msl_products SET status='d' WHERE import_status='n' AND supplier_id='35'");
   }
-  #update msl_prices set price=(purchase*((100+tax)/100))*1.3 where product_id in (select id from msl_products where supplier_id=35);
-  #update msl_prices pr,msl_products p set pr.amount_per_bundle=p.amount_per_bundle where pr.product_id=p.id and p.supplier_id=35;
-  #update msl_prices set price_bundle=(purchase*((100+tax)/100))*1.25 where product_id in (select id from msl_products where supplier_id=35);
   fclose($h);
+
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=NOW() AND end>=NOW()";
+  SQL::update($qry);
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.6,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=NOW() AND pr.end>=NOW()";
+  SQL::update($qry);
+  $qry = "UPDATE msl_prices pr, msl_products p  SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.5,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=NOW() AND pr.end>=NOW()";
+  SQL::update($qry);
+
   return 'ok '.print_r($header,1);
 }
 
