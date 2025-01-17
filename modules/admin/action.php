@@ -2,26 +2,28 @@
 
 require_once('inc.php');
 user_ensure_authed();
-user_has_access('admin');
+user_needs_access('admin');
 
 
 function execute_index(){
-  $products=user_has_access('products');
-  $members=user_has_access('members');
-  $users=user_has_access('users');
-  $orders=user_has_access('orders');
-  $debits=user_has_access('debits');
-  $remote=user_has_access('remote');
-  if(!$products && !$members && !$users && !$orders && !$debits && !$remote){
+  $products = user_has_access('products');
+  $members = user_has_access('members');
+  $users = user_has_access('users');
+  $orders = user_has_access('orders');
+  $debits = user_has_access('debits');
+  $remote = user_has_access('remote');
+  $mails = user_has_access('mails');
+  if(!$products && !$members && !$users && !$orders && !$debits && !$remote && !$mails){
     forward_to_noaccess();
   }
   return array(
-    'products'=>$products,
-    'members'=>$members,
-    'users'=>$users,
-    'orders'=>$orders,
-    'debits'=>$debits,
-    'remote'=>$remote,
+    'products' => $products,
+    'members' => $members,
+    'users' => $users,
+    'orders' => $orders,
+    'debits' => $debits,
+    'remote' => $remote,
+    'mails' => $mails,
   );
 }
 

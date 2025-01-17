@@ -201,7 +201,8 @@ function send_email($to, $subject, $text){
     'Reply-To: buchen@mit-sinn-leben.de'."\r\n".
     'Content-Type: text/plain;charset=UTF-8'."\r\n".
     'X-Mailer: PHP/' . phpversion();
-  logger("send_email $to $subject");
+  global $MODULE,$ACTION;
+  file_put_contents(__DIR__.'/../log/send_email.log',date('Y-m-d H:i:s')." $MODULE $ACTION\n$to\n$subject\n$text\n\n",FILE_APPEND);
   mail($to, $subject, $text, $header);
 }
 

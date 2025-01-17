@@ -132,10 +132,10 @@ class SQL{
         if(empty($value)){
           $qry .= ' AND 1=2 ';
         }else{
-          $qry .= ' AND '.SQL::escapeFieldName($field).' IN ('.SQL::escapeArray($value).') ';
+          $qry .= ' AND `'.SQL::escapeFieldName($field).'` IN ('.SQL::escapeArray($value).') ';
         }
       }else{
-        $qry .= ' AND '.SQL::escapeFieldName($field);
+        $qry .= ' AND `'.SQL::escapeFieldName($field).'`';
         if(strpos($value, '%') !== false){
           $qry .= " LIKE ";
         }elseif(substr($field, -2, 2) == '<=' || substr($field, -2, 2) == '>=' || substr($field, -2, 2) == '!='){
@@ -154,7 +154,7 @@ class SQL{
     $qry='';
     foreach($orderby as $field => $dir){
       #TODO FIELD(feld,werte...)
-      $qry .= ', '.$field.' '.SQL::escapeFieldName($dir);
+      $qry .= ', `'.$field.'` '.SQL::escapeFieldName($dir);
       #$qry .= ', '.SQL::escapeFieldName($field).' '.SQL::escapeFieldName($dir);
     }
     return ltrim($qry, ',');
@@ -162,7 +162,7 @@ class SQL{
   static function buildUpdateQuery($updates){
     $qry='';
     foreach($updates as $field => $value){
-      $qry .= ', '.SQL::escapeFieldName($field)." = '".SQL::escapeString($value)."'";
+      $qry .= ', `'.SQL::escapeFieldName($field)."` = '".SQL::escapeString($value)."'";
     }
     return ltrim($qry, ',');
   }

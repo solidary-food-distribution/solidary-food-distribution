@@ -2,6 +2,11 @@
 $PROPERTIES['pathbar']=array('/admin'=>'Administration');
 ?>
 <div class="selection">
+  <?php if($mails): ?>
+    <div class="item" onclick="location.href='/mails'">
+      <span class="label">E-Mails</span>
+    </div>
+  <?php endif ?>
   <!--
   <?php if($products): ?>
     <div class="item" onclick="location.href='/products'">
