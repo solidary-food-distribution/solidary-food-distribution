@@ -154,7 +154,7 @@ class SQL{
     $qry='';
     foreach($orderby as $field => $dir){
       #TODO FIELD(feld,werte...)
-      $qry .= ', `'.$field.'` '.SQL::escapeFieldName($dir);
+      $qry .= ', '.$field.' '.SQL::escapeFieldName($dir);
       #$qry .= ', '.SQL::escapeFieldName($field).' '.SQL::escapeFieldName($dir);
     }
     return ltrim($qry, ',');
