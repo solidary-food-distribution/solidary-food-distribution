@@ -103,7 +103,7 @@ var scale_edit_mode = 0;
 var scale_row = 0;
 function scale_show(el){
   scale_row = $(el).closest('.row');
-  $('#scale_title').text($(el).data('title'));
+  $('#scale_title').html($(el).data('title'));
   if(scale_edit_mode){
     $('#scale_display').text(scale_row.find('.value').text());
     $('#scale_ok').show();

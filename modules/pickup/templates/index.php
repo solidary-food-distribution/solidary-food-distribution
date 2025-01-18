@@ -38,6 +38,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   <?php
     $amount_ordered = 0;
     $amount_ordered_type = '';
+    $scale_title = '';
+    $scale_minmax = 0.1;
     if(isset($pickup_items[$product_id])){
       $pickup_item = $pickup_items[$product_id];
       $order_item = $order_items[$pickup_item->order_item_id];
@@ -48,6 +50,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         $amount = $pickup_item->amount_weight;
         $amount_weight = $pickup_item->amount_weight;
         $amount_ordered_weight = $order_item->amount_weight;
+        $scale_title = format_amount($amount_ordered_weight).' kg '.htmlentities($product->name);
       }elseif($product->type == 'w'){
         $amount_ordered = $order_item->amount_pieces;
         $amount_ordered_type = 'p';
@@ -55,6 +58,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         $amount_weight = $pickup_item->amount_weight;
         $amount_ordered_weight = $order_item->amount_pieces * $product->kg_per_piece;
         $amount_price = $pickup_item->amount_weight;
+        $scale_title = format_amount($amount_ordered).' St. '.htmlentities($product->name).'<br><span style="font-size:60%">ca.(!) '.format_amount($product->kg_per_piece).' kg / St.</span>';
+        $scale_minmax = 0.3;
       }else{
         $amount_ordered = $order_item->amount_pieces;
         $amount_ordered_type = 'p';
@@ -176,7 +181,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         <div style="width:1.7em;font-size:2em;">&nbsp;</div>
       <?php endif ?>
       <?php if($product->type!='p'): ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($product->name) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*0.8 ?>" data-value_max="<?php echo $amount_ordered_weight*1.2 ?>">
+        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>">
           <i class="fa-solid fa-weight-scale"></i>
         </div>
       <?php elseif($modus != 'd' && $amount_ordered > 0): ?>
