@@ -325,50 +325,7 @@ function update_order_item_prices($order_item_id){
 }
 
 function get_oekoring_order_sum($pickup_date){
-  require_once('orders.class.php');
-  $orders = new Orders(array('pickup_date' => $pickup_date));
-  require_once('order_items.class.php');
-  $order_items = new OrderItems(array('order_id' => $orders->keys()));
-  require_once('products.class.php');
-  $products = new Products(array('id' => $order_items->get_product_ids(), 'supplier_id' => 35));
-
-  $amounts = array();
-  foreach($order_items as $order_item){
-    if(!isset($products[$order_item->product_id]) || !$order_item->amount_pieces){
-      continue;
-    }
-    $amounts[$order_item->product_id] = $amounts[$order_item->product_id] + $order_item->amount_pieces;
-  }
-  #logger("amounts ".print_r($amounts,1));
-
-  require_once('inventory.inc.php');
-  /*
-  foreach($amounts as $product_id => $amount){
-    update_inventory_product($product_id);
-  }
-  */
-  $inventory = get_inventory(array_keys($amounts));
-
-  foreach($amounts as $product_id => $amount){
-    if(isset($inventory[$product_id]) && $inventory[$product_id]['amount_pieces'] >= $amount){
-      #logger("inventory ".print_r($inventory[$product_id],1));
-      unset($amounts[$product_id]);
-    }else{
-      $amounts[$product_id] -= $inventory[$product_id]['amount_pieces'];
-    }
-  }
-  #logger("amounts ".print_r($amounts,1));
-
-  $order_sum = 0;
-  require_once('prices.class.php');
-  $prices = new Prices(array('product_id' => array_keys($amounts), 'start<=' => $pickup_date, 'end>=' => $pickup_date));
-  foreach($amounts as $product_id => $amount){
-    if($amount < 0){
-      continue;
-    }
-    $amount_order = ceil($amount / $prices[$product_id]->amount_per_bundle) * $prices[$product_id]->amount_per_bundle;
-    $order_sum += $amount_order * $prices[$product_id]->purchase;
-  }
-
+  require_once('purchases.inc.php');
+  $order_sum = purchases_get_sum($pickup_date, 35);
   return $order_sum;
 }

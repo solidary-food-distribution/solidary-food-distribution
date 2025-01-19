@@ -15,6 +15,14 @@ class Members extends ArrayObject{
     return $member_id;
   }
 
+  public static function sget($id){
+    $objects = new Members(array('id' => $id));
+    if($objects->count()){
+      return $objects->first();
+    }
+    return null;
+  }
+
   public function __construct(array $filters = array(), array $orderby = array(), int $limit_start = 0, int $limit_count = -1){
     $array = $this->load_from_db($filters, $orderby, $limit_start, $limit_count);
     parent::__construct($array);

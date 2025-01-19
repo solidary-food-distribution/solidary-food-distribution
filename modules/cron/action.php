@@ -18,13 +18,7 @@ function execute_run(){
   exit;
 }
 
-
-function cron_may_send_purchases(){
-  update_delivery_dates();
-
-}
-
-function update_delivery_dates(){
+function cron_update_delivery_dates(){
   require_once('sql.class.php');
   $qry = "SELECT * FROM msl_delivery_dates WHERE `date`>=CURDATE() ORDER BY `date`";
   $delivery_dates = SQL::select($qry);
@@ -44,3 +38,17 @@ function update_delivery_dates(){
   }
 }
 
+function cron_may_send_purchases(){
+  require_once('purchases.class.php');
+  $now = date('Y-m-d H:i:s');
+  $purchases = new Purchases(array('datetime<=' => $now, 'sent' => '0000-00-00 00:00:00'));
+  foreach($purchases as $purchase){
+    send_purchase($purchase->$id);
+  }
+}
+
+function send_purchase($purchase_id){
+  require_once('purchases.class.php');
+  $purchase = Purchases::sget($purchase_id);
+  
+}

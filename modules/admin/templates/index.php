@@ -26,10 +26,12 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration');
   <?php endif ?>
   <?php if($orders): ?>
     <div class="item" onclick="location.href='/admin/orders'">
-      <span class="label">Bestellungen</span>
-    </div>
-    <div class="item" onclick="location.href='/admin/member_orders'">
       <span class="label">Mitglieder Bestellungen</span>
+    </div>
+  <?php endif ?>
+  <?php if($purchases): ?>
+    <div class="item" onclick="location.href='/admin/purchases'">
+      <span class="label">Lieferanten Bestellungen</span>
     </div>
   <?php endif ?>
   <?php if($debits): ?>

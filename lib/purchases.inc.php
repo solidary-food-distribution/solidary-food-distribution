@@ -1,0 +1,75 @@
+<?php
+
+function purchases_get_product_sums($pickup_date, $supplier_id){
+  require_once('orders.class.php');
+  $orders = new Orders(array('pickup_date' => $pickup_date));
+  require_once('order_items.class.php');
+  $order_items = new OrderItems(array('order_id' => $orders->keys()));
+  require_once('products.class.php');
+  $products = new Products(array('id' => $order_items->get_product_ids(), 'supplier_id' => $supplier_id));
+
+  $order_amounts = array();
+  foreach($order_items as $order_item){
+    if(!isset($products[$order_item->product_id]) || (!$order_item->amount_pieces && !$order_item->amount_weight)){
+      continue;
+    }
+    $order_amounts[$order_item->product_id]['amount_pieces'] = $order_amounts[$order_item->product_id]['amount_pieces'] + $order_item->amount_pieces;
+    $order_amounts[$order_item->product_id]['amount_weight'] = $order_amounts[$order_item->product_id]['amount_weight'] + $order_item->amount_weight;
+  }
+  #logger("purchases_get_product_sums order_amounts ".print_r($order_amounts,1));
+
+  require_once('inventory.inc.php');
+  $inventory = get_inventory(array_keys($order_amounts));
+
+  #logger("purchases_get_product_sums inventory ".print_r($inventory,1));
+
+  foreach($order_amounts as $product_id => $amounts){
+    $order_amounts[$product_id]['amount_pieces_needed'] = $order_amounts[$product_id]['amount_pieces'];
+    $order_amounts[$product_id]['amount_weight_needed'] = $order_amounts[$product_id]['amount_weight'];
+    $order_amounts[$product_id]['amount_pieces_inventory'] = $inventory[$product_id]['amount_pieces'];
+    $order_amounts[$product_id]['amount_weight_inventory'] = $inventory[$product_id]['amount_weight'];
+    if(isset($inventory[$product_id]) && ($products[$product_id]->type == 'p' || $products[$product_id]->type == 'w') && $inventory[$product_id]['amount_pieces'] >= $amounts['amount_pieces']){
+      unset($order_amounts[$product_id]);
+    }elseif(isset($inventory[$product_id]) && $products[$product_id]->type == 'k' && $inventory[$product_id]['amount_weight'] >= $amounts['amount_weight']){
+      unset($order_amounts[$product_id]);
+    }else{
+      $order_amounts[$product_id]['amount_pieces'] -= $inventory[$product_id]['amount_pieces'];
+      $order_amounts[$product_id]['amount_weight'] -= $inventory[$product_id]['amount_weight'];
+    }
+  }
+  #logger("purchases_get_product_sums order_amounts ".print_r($order_amounts,1));
+
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => array_keys($order_amounts), 'start<=' => $pickup_date, 'end>=' => $pickup_date));
+  foreach($order_amounts as $product_id => $amount){
+    if($amount['amount_pieces'] <= 0 && $amount['amount_weight'] <= 0){
+      continue;
+    }
+    $amount_order = 0;
+    if($amount['amount_pieces']>0){
+      if($prices[$product_id]->amount_per_bundle > 1){
+        $amount_bundles = ceil($amount['amount_pieces'] / $prices[$product_id]->amount_per_bundle);
+        $amount_order = $amount_bundles * $prices[$product_id]->amount_per_bundle;
+        $order_amounts[$product_id]['amount_pieces'] = $amount_order;
+        $order_amounts[$product_id]['amount_bundles'] = $amount_bundles;
+      }else{
+        $amount_order = $amount['amount_pieces'];
+      }
+    }elseif($amount['amount_weight'] > 0){
+      $amount_order = $amount['amount_weight'];
+    }
+    $order_amounts[$product_id]['purchase_sum'] = $amount_order * $prices[$product_id]->purchase;
+  }
+
+  return $order_amounts;
+}
+
+
+function purchases_get_sum($pickup_date, $supplier_id){
+  $order_amounts = purchases_get_product_sums($pickup_date, $supplier_id);
+  $purchases_sum = 0;
+  foreach($order_amounts as $amount){
+    $purchases_sum += $amount['purchase_sum'];
+  }
+  return $purchases_sum;
+}
