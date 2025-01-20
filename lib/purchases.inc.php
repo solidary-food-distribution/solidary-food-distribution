@@ -46,7 +46,7 @@ function purchases_get_product_sums($pickup_date, $supplier_id){
       continue;
     }
     $amount_order = 0;
-    if($amount['amount_pieces']>0){
+    if($amount['amount_pieces']>0 && $products[$product_id]->type=='p'){
       if($prices[$product_id]->amount_per_bundle > 1){
         $amount_bundles = ceil($amount['amount_pieces'] / $prices[$product_id]->amount_per_bundle);
         $amount_order = $amount_bundles * $prices[$product_id]->amount_per_bundle;
@@ -58,7 +58,13 @@ function purchases_get_product_sums($pickup_date, $supplier_id){
     }elseif($amount['amount_weight'] > 0){
       $amount_order = $amount['amount_weight'];
     }
-    $order_amounts[$product_id]['purchase_sum'] = $amount_order * $prices[$product_id]->purchase;
+    if($products[$product_id]->type == 'p'){
+      $order_amounts[$product_id]['price_type'] = 'p';
+    }else{
+      $order_amounts[$product_id]['price_type'] = 'k';
+    }
+    $order_amounts[$product_id]['purchase'] = $prices[$product_id]->purchase;
+    $order_amounts[$product_id]['purchase_sum'] = round($amount_order * $prices[$product_id]->purchase, 3);
   }
 
   return $order_amounts;

@@ -94,7 +94,7 @@ function execute_orders_csv(){
 }
 
 
-function execute_member_orders(){
+function execute_orders(){
   if(!user_has_access('orders')){
     forward_to_noaccess();
   }

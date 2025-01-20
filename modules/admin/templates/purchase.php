@@ -27,7 +27,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       </div>
       <div class="col2 right">
         <?php
-          if($oi_sum['amount_weight_needed']){
+          if($products[$product_id]->type == 'k'){
             echo format_weight($oi_sum['amount_weight_needed']).' kg';
           }else{
             echo $oi_sum['amount_pieces_needed'].' St.';
@@ -36,7 +36,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       </div>
       <div class="col2 right">
         <?php
-          if($oi_sum['amount_weight_inventory']){
+          if($products[$product_id]->type == 'k' && $oi_sum['amount_weight_inventory']){
             echo format_weight($oi_sum['amount_weight_inventory']).' kg';
           }elseif($oi_sum['amount_pieces_inventory']){
             echo $oi_sum['amount_pieces_inventory'].' St.';
@@ -45,7 +45,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       </div>
       <div class="col3 right" style="display:inline;vertical-align:bottom;">
         <?php
-          if($oi_sum['amount_weight']){
+          if($products[$product_id]->type == 'k' && $oi_sum['amount_weight']){
             echo format_weight($oi_sum['amount_weight']).' kg';
           }else{
             if(isset($oi_sum['amount_bundles'])){

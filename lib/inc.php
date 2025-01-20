@@ -196,14 +196,25 @@ function format_date($date, $format='j.n.Y', $weekday=true){
   return $ret;
 }
 
-function send_email($to, $subject, $text){
-  $header='From: "Mit Sinn Leben eG" <buchen@mit-sinn-leben.de>'."\r\n".
-    'Reply-To: buchen@mit-sinn-leben.de'."\r\n".
-    'Content-Type: text/plain;charset=UTF-8'."\r\n".
-    'X-Mailer: PHP/' . phpversion();
+function send_email($to, $subject, $text, $headers = array()){
+  if(!isset($headers['From'])){
+    $headers['From'] = '"Mit Sinn Leben eG" <buchen@mit-sinn-leben.de>';
+  }
+  if(!isset($headers['Reply-To'])){
+    $headers['Reply-To'] = 'buchen@mit-sinn-leben.de';
+  }
+  if(!isset($headers['Content-Type'])){
+    $headers['Content-Type'] = 'text/plain; charset=UTF-8';
+  }
+  $headers['X-Mailer'] = 'PHP/' . phpversion();
   global $MODULE,$ACTION;
-  file_put_contents(__DIR__.'/../log/send_email.log',date('Y-m-d H:i:s')." $MODULE $ACTION\n$to\n$subject\n$text\n\n",FILE_APPEND);
-  mail($to, $subject, $text, $header);
+  $log = date('Y-m-d H:i:s')." $MODULE $ACTION\n";
+  foreach($headers as $param => $value){
+    $log .= $param . ": ".$value."\n";
+  }
+  $log .= "To: $to\nSubject: $subject\n$text\n\n";
+  file_put_contents(__DIR__.'/../log/send_email.log', $log, FILE_APPEND);
+  mail($to, $subject, $text, $headers);
 }
 
 function html_input($data){

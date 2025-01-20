@@ -43,12 +43,80 @@ function cron_may_send_purchases(){
   $now = date('Y-m-d H:i:s');
   $purchases = new Purchases(array('datetime<=' => $now, 'sent' => '0000-00-00 00:00:00'));
   foreach($purchases as $purchase){
-    send_purchase($purchase->$id);
+    send_purchase($purchase->id);
+    $purchase->update(array('sent' => date('Y-m-d H:i:s')));
   }
 }
 
 function send_purchase($purchase_id){
   require_once('purchases.class.php');
   $purchase = Purchases::sget($purchase_id);
-  
+  require_once('delivery_dates.class.php');
+  $delivery_date = DeliveryDates::sget($purchase->delivery_date_id);
+  require_once('purchases.inc.php');
+  $product_sums = purchases_get_product_sums($delivery_date->date, $purchase->supplier_id);
+  #logger("product_sums ".print_r($product_sums,1));
+  $fields = array('amount_pieces', 'amount_bundles', 'amount_weight', 'price_type', 'purchase', 'purchase_sum');
+  $fields = array_flip($fields);
+  require_once('purchase_items.class.php');
+  foreach($product_sums as $product_id => $sums){
+    $purchase_items = new PurchaseItems(array('purchase_id' => $purchase_id, 'product_id' => $product_id));
+    if(count($purchase_items)){
+      $purchase_item = $purchase_items->first();
+    }else{
+      $purchase_item = PurchaseItem::create($purchase_id, $product_id);
+    }
+    $updates = array_intersect_key($sums, $fields);
+    $purchase_item->update($updates);
+  }
+  if($purchase->supplier_id != 35){
+    send_purchase_email($purchase_id);
+  }
+}
+
+function send_purchase_email($purchase_id){
+  require_once('purchases.class.php');
+  $purchase = Purchases::sget($purchase_id);
+  require_once('members.class.php');
+  $supplier = Purchases::sget($purchase->supplier_id);
+  require_once('users.class.php');
+  $users = new Users(array('member_id' => $purchase->supplier_id));
+  require_once('delivery_dates.class.php');
+  $delivery_date = DeliveryDates::sget($purchase->delivery_date_id);
+  require_once('purchase_items.class.php');
+  $purchase_items = new PurchaseItems(array('purchase_id' => $purchase_id));
+  $purchase_items_array = array();
+  foreach($purchase_items as $purchase_item){
+    $purchase_items_array[$purchase_item->product_id] = $purchase_item;
+  }
+  require_once('products.class.php');
+  $products = new Products(array('id' => $purchase_items->get_product_ids()), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
+
+  $html = '<html><head></head><body>';
+  $html .= '<table><tr><th>Produkt</th><th>Menge</th><th>Einheit</th></tr>';
+  foreach($products as $product){
+    $html .= '<tr><td>'.htmlentities($product->name);
+    if($product->type == 'w'){
+      $html .= ' (ca. '.format_amount($product->kg_per_piece).' kg)';
+    }
+    $html .= '</td><td align="right">';
+    if($product->type == 'k'){
+      $html .= format_amount($purchase_items_array[$product->id]->amount_weight).'</td><td>kg';
+    }else{
+      $html .= format_amount($purchase_items_array[$product->id]->amount_pieces).'</td><td>St.';
+    }
+    $html .= '</td></tr>';
+  }
+  $html .= '</table>';
+
+  $headers['MIME-Version'] = '1.0';
+  $headers['Content-Type'] = 'text/html; charset=utf-8';
+  $to = array();
+  foreach($users as $user){
+    $to[] = $user->email;
+  }
+  $to = implode(', ', $to);
+  $subject = 'Bestellung zur Abholung am '.format_date($delivery_date->date);
+  send_email($to, $subject, $html, $headers);
+  $purchase->update(array('content' => $html));
 }
