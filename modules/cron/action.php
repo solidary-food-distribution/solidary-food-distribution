@@ -69,16 +69,14 @@ function send_purchase($purchase_id){
     $updates = array_intersect_key($sums, $fields);
     $purchase_item->update($updates);
   }
-  if($purchase->supplier_id != 35){
-    send_purchase_email($purchase_id);
-  }
+  send_purchase_email($purchase_id);
 }
 
 function send_purchase_email($purchase_id){
   require_once('purchases.class.php');
   $purchase = Purchases::sget($purchase_id);
   require_once('members.class.php');
-  $supplier = Purchases::sget($purchase->supplier_id);
+  $supplier = Members::sget($purchase->supplier_id);
   require_once('users.class.php');
   $users = new Users(array('member_id' => $purchase->supplier_id));
   require_once('delivery_dates.class.php');
@@ -93,21 +91,37 @@ function send_purchase_email($purchase_id){
   $products = new Products(array('id' => $purchase_items->get_product_ids()), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
 
   $html = '<html><head></head><body>';
-  $html .= '<table><tr><th>Produkt</th><th>Menge</th><th>Einheit</th></tr>';
+  $html .= '<table><tr><th>Produkt</th>';
+  if($supplier->id == 35){
+    $html .= '<th>Art.Nr</th>';
+  }
+  $html .= '<th>Menge</th><th>Einheit</th></tr>';
   foreach($products as $product){
-    $html .= '<tr><td>'.htmlentities($product->name);
+    $purchase_item = $purchase_items_array[$product->id];
+    $html .= '<tr>';
+    $html .= '<td>'.htmlentities($product->name);
     if($product->type == 'w'){
       $html .= ' (ca. '.format_amount($product->kg_per_piece).' kg)';
     }
-    $html .= '</td><td align="right">';
+    $html .= '</td>';
+    if($supplier->id == 35){
+      $html .= '<td>'.htmlentities($product->supplier_product_id).'</td>';
+    }
+    $html .= '<td align="right">';
     if($product->type == 'k'){
-      $html .= format_amount($purchase_items_array[$product->id]->amount_weight).'</td><td>kg';
+      $html .= format_amount($purchase_item->amount_weight).'</td><td>kg';
+    }elseif($purchase_item->amount_bundles){
+      $html .= format_amount($purchase_item->amount_bundles).'</td><td>Gb. <small>('.format_amount($purchase_item->amount_pieces).' St.)</small>';
     }else{
-      $html .= format_amount($purchase_items_array[$product->id]->amount_pieces).'</td><td>St.';
+      $html .= format_amount($purchase_item->amount_pieces).'</td><td>St.';
     }
     $html .= '</td></tr>';
   }
   $html .= '</table>';
+  $html .= '<br>Diese E-Mail ist automatisch erzeugt worden, und dennoch:<br>';
+  $html .= 'Wir bedanken uns und wünschen von Herzen alles Gute!<br><br>';
+  $html .= 'Stefan D, Mathias und Stefan O und alle Mitglieder';
+  $html .= '</body></html>';
 
   $headers['MIME-Version'] = '1.0';
   $headers['Content-Type'] = 'text/html; charset=utf-8';
@@ -116,7 +130,12 @@ function send_purchase_email($purchase_id){
     $to[] = $user->email;
   }
   $to = implode(', ', $to);
-  $subject = 'Bestellung zur Abholung am '.format_date($delivery_date->date);
+  if($to == ''){
+    $to = 'info@mit-sinn-leben.de';
+  }else{
+    $headers['Cc'] = 'info@mit-sinn-leben.de';
+  }
+  $subject = 'Bestellung zur Abholung am '.format_date($delivery_date->date).' von '.$supplier->name;
   send_email($to, $subject, $html, $headers);
   $purchase->update(array('content' => $html));
 }
