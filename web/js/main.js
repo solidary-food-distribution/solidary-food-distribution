@@ -137,6 +137,9 @@ function active_input_post_value(){
     return;
   }
   //console.log("active_input_post_value2 "+input.data('field'));
+  if(input.data('url') == undefined){
+    return;
+  }
   var type = input.data('type');
   var value = '';
   if(type == 'options'){

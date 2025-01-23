@@ -92,7 +92,11 @@ function execute_delete_ajax(){
 
 
 function execute_new(){
-  $pickup_date = '2025-01-24';
+  require_once('delivery_dates.class.php');
+  $delivery_dates = new DeliveryDates(array('date>=' => date('Y-m-d')), array('date' => 'ASC'), 0, 1);
+  $delivery_date = $delivery_dates->first();
+
+  $pickup_date = $delivery_date->date;
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   $order_ids = $orders->keys();
@@ -205,6 +209,36 @@ function execute_change_ajax(){
   return $return;
 }
 
+function execute_add_product_ajax(){
+  $delivery_id = intval(get_request_param('delivery_id'));
+  $supplier_product_id = trim(get_request_param('supplier_product_id'));
+  $delivery = Deliveries::sget($delivery_id);
+  $error = '';
+  require_once('products.class.php');
+  $products = new Products(array('supplier_id' => $delivery->supplier_id, 'supplier_product_id' => $supplier_product_id));
+  if(!count($products)){
+    $error = "Artikelnummer ".$supplier_product_id." nicht gefunden";
+  }
+  if($error == ''){
+    $product = $products->first();
+    require_once('delivery_items.class.php');
+    $delivery_items = new DeliveryItems(array('delivery_id' => $delivery->id, 'product_id' => $product->id));
+    if(!count($delivery_items)){
+      $delivery_item = DeliveryItem::create($delivery->id, $product->id);
+    }else{
+      $delivery_item = $delivery_items->first();
+      $error = 'Produkt mit Artikelnummer '.$supplier_product_id.' ist bereits in der Liste.';
+    }
+    $supplier_product_id = '';
+    set_request_param('item_id', $delivery_item->id);
+  }
+  $return=execute_index();
+  $return['supplier_product_id'] = $supplier_product_id;
+  $return['error'] = $error;
+  $return['template'] = 'index.php';
+  $return['layout'] = 'layout_null.php';
+  return $return;
+}
 
 function execute_scale_ajax(){
   global $user;

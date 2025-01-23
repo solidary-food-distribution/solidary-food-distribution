@@ -32,6 +32,26 @@ function delivery_change(el,change){
   });
 }
 
+function delivery_add_product(){
+  var supplier_product_id = $('input[data-field="supplier_product_id"]').val().trim();
+  if(supplier_product_id == ''){
+    return;
+  }
+  var data = get_url_params();
+  data['supplier_product_id'] = supplier_product_id;
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    data: data,
+    url: '/delivery/add_product_ajax',
+    dataType: "html",
+    success: function(html){
+      $('#loading').hide();
+      replace_header_main_footer(html);
+    }
+  });
+}
+
 
 var scale_exact = 0;
 var scale_min = 0;

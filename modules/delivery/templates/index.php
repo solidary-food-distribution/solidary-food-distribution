@@ -43,6 +43,7 @@ $PROPERTIES['pathbar']=array(
     </div>
     <div class="col5">
       <div>
+        <?php echo ($supplier->id == 35)?htmlentities($product->supplier_product_id.' '):'' ?>
         <?php echo htmlentities($product->name) ?><br>
         <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
       </div>
@@ -99,6 +100,34 @@ $PROPERTIES['pathbar']=array(
 <?php require('keyboard.part.php'); ?>
 
 
-<?php /*
-<div class="main_button button" onclick="location.href='/delivery/products?delivery_id=<?php echo $delivery->id ?>';">Neue Position anlegen</div>
-*/ ?>
+<?php if($supplier->id == 35): ?>
+  <div class="row">
+    <div class="inner_row">
+      <div class="col8">
+        <b>Weiteres geliefertes Produkt anlegen</b>
+      </div>
+    </div>
+    <div class="inner_row mt1">
+      <div class="col2">
+        Artikelnr
+      </div>
+      <div class="col2">
+        <?php echo html_input(array(
+          'type' => 'input_text',
+          'field' => 'supplier_product_id',
+          'value' => $supplier_product_id,
+          )); ?>
+      </div>
+      <div class="col2">
+        <div class="button" onclick="delivery_add_product()">anlegen</div>
+      </div>
+    </div>
+    <?php if(isset($error)): ?>
+      <div class="inner_row mt1">
+        <b><?php echo htmlentities($error) ?></b>
+      </div>
+    <?php endif ?>
+  </div>
+<?php endif ?>
+
+<div style="height:20em;"></div>

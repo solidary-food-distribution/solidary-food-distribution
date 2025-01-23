@@ -151,6 +151,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           if($modus == 'd'){
             $needs_todo = 0;
           }
+          if(!isset($pickup_item->order_item_id) || $pickup_item->order_item_id == 0){
+            $needs_todo = 0;
+          }
         ?>
         <div class="input <?php echo $needs_todo?'needs_todo':'' ?>">
           <?php echo format_amount($amount); ?>
