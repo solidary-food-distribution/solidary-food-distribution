@@ -6,21 +6,29 @@ $PROPERTIES['pathbar']=array(
 $PROPERTIES['body_class']='header_h5 footer_h8';
 ?>
 
-<?php foreach($product_sums as $member_id => $supplier_ids): ?>
+<?php foreach($member_orders as $member_id => $order): ?>
   <div class="row">
     <div class="inner_row">
       <div class="col8">
         <b><?php echo htmlentities($members[$member_id]->name) ?></b>
       </div>
     </div>
-    <?php ksort($supplier_ids) ?>
-    <?php foreach($supplier_ids as $supplier_id => $count): ?>
+    <?php ksort($order_items_array[$order->id]) ?>
+    <?php foreach($order_items_array[$order->id] as $order_item): ?>
+      <?php $product = $products[$order_item->product_id]; ?>
       <div class="inner_row">
-        <div class="col3">
-          <?php echo htmlentities($suppliers[$supplier_id]->name) ?>
+        <div class="col8">
+          <?php if($product->supplier_id == 35): ?>
+            <?php echo htmlentities($product->supplier_product_id) ?>
+          <?php endif ?>
+          <?php echo htmlentities($product->name) ?>
         </div>
         <div class="col3 right">
-          <?php echo $count ?> Artikel
+          <?php if($product->type == 'k'): ?>
+            <?php echo format_amount($order_item->amount_weight).' kg' ?>
+          <?php else: ?>
+            <?php echo format_amount($order_item->amount_pieces).' St.' ?>
+          <?php endif ?>
         </div>
       </div>
     <?php endforeach ?>

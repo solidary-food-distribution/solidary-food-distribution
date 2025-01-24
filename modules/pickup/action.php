@@ -173,6 +173,8 @@ function update_pickup_items($pickup_id){
     $pickup_items[$pui->product_id] = $pui;
   }
 
+  require_once('inventory.inc.php');
+
   foreach($order_items as $oi){
     if(!$oi->amount_pieces && !$oi->amount_weight){
       continue;
@@ -292,6 +294,29 @@ function execute_scale_ajax(){
 function update_pickup_item_price_sum($pickup_item_id){
   require_once('pickup_items.class.php');
   $pui = PickupItems::sget($pickup_item_id);
+  if($pui->price == 0){
+    $pu = Pickups::sget($pui->pickup_id);
+    $pickup_date = substr($pu->created, 0, 10);
+    require_once('prices.class.php');
+    $prices = new Prices(array('product_id' => $pui->product_id, 'start<=' => $pickup_date, 'end>=' => $pickup_date));
+    require_once('products.class.php');
+    $product = Products::sget($pui->product_id);
+    $updates = array(
+      'price' => $prices[$pui->product_id]->price,
+      'amount_per_bundle' => $prices[$pui->product_id]->amount_per_bundle,
+      'price_bundle' => $prices[$pui->product_id]->price_bundle,
+      'tax' => $prices[$pui->product_id]->tax,
+    );
+    if($product->type == 'p'){
+      $updates['price_type'] = 'p';
+    }else{ //k or w
+      $updates['price_type'] = 'k';
+    }
+    $pui->update($updates);
+    #logger("update_pickup_item_price_sum pui update ".print_r($updates,1));
+    $pui = PickupItems::sget($pickup_item_id);
+  }
+  #logger("update_pickup_item_price_sum pui ".print_r($pui,1));
   $amount = 0;
   if($pui->price_type == 'k'){
     $amount = $pui->amount_weight;
@@ -302,11 +327,12 @@ function update_pickup_item_price_sum($pickup_item_id){
     return;
   }
   $price = $pui->price;
-  logger("update_pickup_item_price_sum $amount ".print_r($pui,1));
+  #logger("update_pickup_item_price_sum $amount ".print_r($pui,1));
   if(($pui->amount_per_bundle > 0) && ($pui->price_bundle > 0) && ($amount >= $pui->amount_per_bundle)){
     $price = $pui->price_bundle;
   }
   $price_sum = round($amount * $price, 2);
+  #logger("update_pickup_item_price_sum ".$pui->price_sum." ".$price_sum);
   if($pui->price_sum != $price_sum){
     $pui->update(array('price_sum' => $price_sum));
   }

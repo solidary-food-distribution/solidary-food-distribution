@@ -109,24 +109,24 @@ function execute_orders(){
   require_once('products.class.php');
   $products = new Products(array('id' => $product_ids));
 
-  $product_sums = array();
   $supplier_ids = array();
+  $member_orders = array();
+  $order_items_array = array();
   foreach($order_items as $order_item){
     if($order_item->amount_pieces == 0 && $order_item->amount_weight == 0){
       continue;
     }
+    $order = $orders[$order_item->order_id];
+    $member_orders[$order->member_id] = $order;
     $product_id = $order_item->product_id;
-    $member_id = $orders[$order_item->order_id]->member_id;
     $supplier_id = $products[$product_id]->supplier_id;
     $supplier_ids[$supplier_id] = 1;
-    $product_sums[$member_id][$supplier_id] += 1;
+    $order_items_array[$order->id][$supplier_id.' '.$products[$product_id]->name] = $order_item;
   }
-
-  ksort($product_sums);
 
   require_once('members.class.php');
   $suppliers = new Members(array('id' => array_keys($supplier_ids)));
-  $members = new Members(array('id' => array_keys($product_sums)));
+  $members = new Members(array('id' => array_keys($member_orders)));
 
-  return array('members' => $members, 'product_sums' => $product_sums, 'suppliers' => $suppliers);
+  return array('member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'products' => $products, 'suppliers' => $suppliers);
 }
