@@ -4,6 +4,35 @@ function document_ready(){
   $('div[onclick]').each(function(){
     $(this).click(highlight_click);
   });
+  $('main').on('scroll', function(){
+    var scrollTop = $('main').scrollTop();
+    if(scrollTop == 0){
+      $('#scrollup').hide();
+    }else{
+      $('#scrollup').show();
+    }
+    var scrollHeight = $('#main').outerHeight();
+    var displayHeight = $('main').outerHeight();
+    if(scrollTop + displayHeight >= scrollHeight){
+      $('#scrolldown').hide();
+    }else{
+      $('#scrolldown').show();
+    }
+  });
+  $('main').trigger('scroll');
+}
+
+function main_scroll(y){
+  event.stopPropagation();
+  var scrollTo = $('main').scrollTop() + y;
+  if(scrollTo < 0){
+    scrollTo = 0;
+  }else if(scrollTo > $('#main').outerHeight()){
+    scrollTo = $('#main').outerHeight();
+  }
+  $('main').animate({
+    scrollTop: scrollTo
+  }, 250);
 }
 
 var highlight_click_timer = 0;

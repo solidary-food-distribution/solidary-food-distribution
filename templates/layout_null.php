@@ -1,3 +1,6 @@
+<script>
+  $(document).ready(document_ready);
+</script>
 <?php
 
 if(isset($PROPERTIES['header'])){
@@ -7,3 +10,5 @@ echo $CONTENT;
 if(isset($PROPERTIES['footer'])){
   echo '<FOOTER>'.$PROPERTIES['footer'].'</FOOTER>';
 }
+
+

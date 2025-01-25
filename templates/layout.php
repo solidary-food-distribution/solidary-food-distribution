@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202501232014';
+$version='202501250225';
 $body_class='';
 $header='';
 $footer='';
@@ -68,6 +68,22 @@ if($authed){
     <div id="background"></div>
     <div id="main">
       <?php echo $CONTENT ?>
+    </div>
+    <div id="scrollup" onclick="main_scroll(-200)">
+      <div class="center">
+        <i class="fas fa-angle-up"></i>
+      </div>
+      <div class="right" onclick="main_scroll(-2000)">
+        <i class="fas fa-angle-double-up"></i>
+      </div>
+    </div>
+    <div id="scrolldown" onclick="main_scroll(200)">
+      <div class="center">
+        <i class="fas fa-angle-down"></i>
+      </div>
+      <div class="right" onclick="main_scroll(2000)">
+        <i class="right fas fa-angle-double-down"></i>
+      </div>
     </div>
   </main>
   <footer id="footer">

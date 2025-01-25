@@ -171,8 +171,46 @@ a{
 
 #main{
   position: relative;
-  height: 100%;
+  padding-bottom: 3.5em;
 }
+
+#scrollup,#scrolldown{
+  display: none;
+  position: fixed;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  top:2.5em;
+  width: 100%;
+  max-width: 42em;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+.header_h5 #scrollup{
+  top: 5em;
+}
+#scrolldown{
+  top: unset;
+  bottom: 1em;
+}
+.footer_h4 #scrolldown{
+  bottom: 4em;
+}
+.footer_h8 #scrolldown{
+  bottom: 8em;
+}
+#scrollup i,#scrolldown i{
+  font-size: 2em;
+  padding: 0.1em;
+}
+#scrollup div.right,#scrolldown div.right{
+  position: absolute;
+  top: 0;
+  right: 1em;
+}
+
 
 div.mt0_5{
   margin-top: 0.5em;
