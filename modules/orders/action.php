@@ -7,7 +7,7 @@ function execute_index(){
   global $user;
   require_once('orders.class.php');
   $orders = new Orders(array('member_id' => $user['member_id']),array('pickup_date'=>'DESC'), 0, 10);
-  $pickup_dates = array('2025-01-24' => 0, '2025-02-07' => 0);
+  $pickup_dates = array('2025-02-07' => 0, '2025-02-21' => 0);
   foreach($orders as $order){
     $pickup_dates[$order->pickup_date] = 1;
   }

@@ -25,7 +25,6 @@ function execute_index(){
   return array('pickups'=>$pickups_array, 'pickup_items' => $pickup_items, 'products' => $products);
 }
 
-
 function execute_delete_ajax(){
   global $user;
   $pickup_id = get_request_param('pickup_id');

@@ -86,7 +86,7 @@ function execute_orders_csv(){
   require_once('members.class.php');
   $supplier = member_get($supplier_id);
 
-  $pickup_date = '2025-01-24';
+  $pickup_date = '2025-02-07';
   $product_sums = orders_get_product_sums($pickup_date);
 
   return array('product_sums' => $product_sums, 'supplier' => $supplier, 'pickup_date' => $pickup_date);
@@ -100,7 +100,7 @@ function execute_orders(){
   }
   #require_once('sql.class.php');
   #$qry = "SELECT pickup_date, count(*) ...
-  $pickup_date = '2025-01-24';
+  $pickup_date = '2025-02-07';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   require_once('order_items.class.php');

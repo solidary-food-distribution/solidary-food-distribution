@@ -12,7 +12,14 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
+<?php
+$last_pickup = '';
+?>
+
 <?php foreach($pickups as $pickup): ?>
+  <?php
+    $last_pickup = $pickup->created;
+  ?>
   <div class="row">
     <div class="col4">
       <div>
@@ -47,6 +54,8 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php endforeach ?>
 
-<div class="main_button button" onclick="location.href='/pickup/new'">Neue Abholung anlegen</div>
+<?php if(substr($last_pickup,0,10) != date('Y-m-d')): ?>
+  <div class="main_button button" onclick="location.href='/pickup/new'">Abholung für <?php echo format_date(date('Y-m-d H:i:s')); ?> anlegen</div>
+<?php endif ?>
 
 <?php require('scroll_down.part.php') ?>

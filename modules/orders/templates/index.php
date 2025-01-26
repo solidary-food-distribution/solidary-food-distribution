@@ -9,7 +9,7 @@ $PROPERTIES['pathbar']=array('/orders'=>'Bestellungen');
         Bestellung zum <?php echo format_date($order->pickup_date) ?>
       </div>
       <div class="col1 right last">
-        <?php if($order->pickup_date>'2025-01-24'): ?>
+        <?php if($order->pickup_date>'2025-02-07'): ?>
           <span class="button large disabled">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </span>

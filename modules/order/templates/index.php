@@ -88,7 +88,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
     $locked = false;
-    if($order->pickup_date != '2025-01-24'){
+    if($order->pickup_date != '2025-02-07'){
       $locked = true;
     }
     if($supplier->producer == 1){

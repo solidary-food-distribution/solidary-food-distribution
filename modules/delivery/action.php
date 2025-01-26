@@ -125,7 +125,7 @@ function execute_new_create(){
   $supplier_id=get_request_param('supplier_id');
   $delivery_id = Delivery::create($supplier_id, $user['user_id']);
   $delivery = Deliveries::sget($delivery_id);
-  $pickup_date = '2025-01-24';
+  $pickup_date = '2025-02-07';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   $order_ids = $orders->keys();
