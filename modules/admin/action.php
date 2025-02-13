@@ -29,6 +29,71 @@ function execute_index(){
   );
 }
 
+function execute_products(){
+  if(!user_has_access('products')){
+    forward_to_noaccess();
+  }
+  $supplier_id = get_request_param('supplier_id');
+  if(!$supplier_id){
+    forward_to_page('/admin/products_suppliers');
+  }
+  $status = get_request_param('status');
+  require_once('members.class.php');
+  $suppliers = new Members(array('id' => $supplier_id, 'producer>' => '0'));
+  $supplier = $suppliers->first();
+
+  require_once('products.class.php');
+  $filter = array('supplier_id' => $supplier_id);
+  if($status !== ''){
+    $filter['status'] = $status;
+  }
+  $products = new Products($filter);
+
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => $products->keys()));
+
+  return array('supplier' => $supplier, 'products' => $products, 'prices' => $prices, 'status' => $status);
+}
+
+function execute_products_filter_ajax(){
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+  set_request_param($field, $value);
+  $return = execute_products();
+  $return['template'] = 'products.php';
+  $return['layout'] = 'layout_null.php';
+  return $return;
+}
+
+function execute_products_update_ajax(){
+  $product_id = get_request_param('product_id');
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+
+  if(strpos(',purchase,price', $field)){
+    $value = str_replace(',', '.', $value);
+    require_once('prices.class.php');
+    $prices = new Prices(array('product_id' => $product_id, 'start<=' => date('Y-m-d'), 'end>=' => date('Y-m-d')));
+    foreach($prices as $price){
+      $price->update(array($field => $value));
+    }
+  }else{
+    require_once('products.class.php');
+    $product = Products::sget($product_id);
+    $product->update(array($field => $value));
+  }
+  echo json_encode(array('result' => '1'));
+  exit();
+}
+
+function execute_products_suppliers(){
+  require_once('members.class.php');
+  $suppliers = new Members(array('producer>' => '0'));
+  return array('suppliers' => $suppliers);
+}
+
+
+
 function execute_purchases(){
   if(!user_has_access('purchases')){
     forward_to_noaccess();

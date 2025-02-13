@@ -209,7 +209,6 @@ function find_current_order_id($orders){
 }
 
 function execute_filter_ajax(){
-  $order_id = get_request_param('order_id');
   $field = get_request_param('field');
   $value = get_request_param('value');
   set_request_param($field, $value);

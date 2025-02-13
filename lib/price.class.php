@@ -17,7 +17,7 @@ class Price{
     $qry = 
       "UPDATE msl_prices SET ";
     $qry .= SQL::buildUpdateQuery($updates).' ';
-    $qry .= "WHERE id='".intval($this->id)."'";
+    $qry .= "WHERE product_id='".intval($this->product_id)."' AND `start`='".SQL::escapeString($this->start)."' AND `end`='".SQL::escapeString($this->end)."'";
     SQL::update($qry);
   }
 
