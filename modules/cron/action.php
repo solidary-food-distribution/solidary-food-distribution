@@ -118,6 +118,7 @@ function send_purchase_email($purchase_id){
     $html .= '</td></tr>';
   }
   $html .= '</table>';
+  $html .= '<br>Wir bitten um Bestätigung, dass die E-Mail angekommen ist und die Bestellung möglich ist.<br>';
   $html .= '<br>Diese E-Mail ist automatisch erzeugt worden, und dennoch:<br>';
   $html .= 'Wir bedanken uns und wünschen von Herzen alles Gute!<br><br>';
   $html .= 'Stefan D, Mathias und Stefan O und alle Mitglieder';

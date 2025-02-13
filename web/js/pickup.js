@@ -105,7 +105,7 @@ function scale_show(el){
   scale_row = $(el).closest('.row');
   $('#scale_title').html($(el).data('title'));
   if(scale_edit_mode){
-    $('#scale_display').text(scale_row.find('.value').text());
+    $('#scale_display').text(scale_row.find('.amount_ordered').text());
     $('#scale_ok').show();
   }else{
     $('#scale_display').text('Verbindung zur Waage...');
@@ -243,8 +243,12 @@ function scale_hide(){
 }
 
 function scale_edit(){
+  if(scale_read_timeout){
+    clearTimeout(scale_read_timeout);
+    scale_read_timeout=0;
+  }
   scale_edit_mode = 1;
-  $('#scale_display').text(scale_row.find('.value').text());
+  $('#scale_display').text(scale_row.find('.amount_ordered').text());
   $('#scale_display').addClass('input').addClass('active');
   $('#scale_keyboard').show();
   $('#scale_edit').css('display', 'none');

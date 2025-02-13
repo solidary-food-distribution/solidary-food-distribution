@@ -18,8 +18,11 @@ $totalsum=0;
     </div>
   <?php foreach($debits[$member_id] as $debit_id => $debit): ?>
     <div class="inner_row">
-      <div class="col8">
+      <div class="col13">
         <div>Abholung am <?php echo date('d.m.Y', strtotime($pickups[$debit->pickup_id]->created)) ?></div>
+      </div>
+      <div class="col1 right">
+        <?php echo format_amount($debit->tax) ?>%
       </div>
       <div class="col4 right last">
         <div>

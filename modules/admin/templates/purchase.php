@@ -21,7 +21,10 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   <?php foreach($product_sums as $product_id => $oi_sum): ?>
     <div class="inner_row">
       <div class="col8">
-        <?php 
+        <?php
+          if($products[$product_id]->supplier_id == 35){
+            echo htmlentities($products[$product_id]->supplier_product_id.' ');
+          }
           echo htmlentities($products[$product_id]->name);
         ?>
       </div>

@@ -255,7 +255,7 @@ function execute_change_ajax(){
     }elseif($amount_new > $product->amount_max){
       $amount_new = $product->amount_max;
     }
-    logger("amount_field $amount_field amount_new $amount_new");
+    #logger("amount_field $amount_field amount_new $amount_new");
     $pui->update(array($amount_field => $amount_new));
     update_pickup_item_price_sum($pui->id);
     require_once('inventory.inc.php');
@@ -283,7 +283,14 @@ function execute_scale_ajax(){
     logger("ERROR wrong pickup item $pickup_item_id");
     exit;
   }
-  $pui->update(array('amount_weight' => floatval($value)));
+  $updates = array('amount_weight' => floatval($value));
+  if(floatval($value) && $pui->amount_pieces == 0){
+    require_once('order_items.class.php');
+    $ois = new OrderItems(array('id' => $pui->order_item_id));
+    $oi = $ois->first();
+    $updates['amount_pieces'] = $oi->amount_pieces;
+  }
+  $pui->update($updates);
   update_pickup_item_price_sum($pui->id);
   $return=execute_index();
   $return['template']='index.php';

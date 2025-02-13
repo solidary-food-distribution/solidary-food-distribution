@@ -136,7 +136,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <?php endif ?>
       <div class="" style="width:6em;text-align:right;margin-right:0.2em;">
         <?php if($amount_ordered): ?>
-          <span><?php echo format_amount($amount_ordered) ?></span>
+          <span class="amount_ordered"><?php echo format_amount($amount_ordered) ?></span>
         <?php endif ?>
         <?php
           $needs_todo = ($amount_ordered != $amount);

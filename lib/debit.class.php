@@ -6,6 +6,7 @@ class Debit{
   public $created;
   public $member_id;
   public $pickup_id;
+  public $tax;
   public $amount;
   public $due_date;
   public $status;

@@ -68,12 +68,18 @@ function update_debits(){
   #logger("update_debits missing ".print_r($missing,1));
   foreach($missing as $pickup_id){
     $pickup = $pickups[$pickup_id];
-    $debit = Debit::create($pickup->member_id);
-    $qry = "SELECT SUM(price_sum) amount FROM msl_pickup_items WHERE pickup_id='".intval($pickup_id)."'";
-    $amount = SQL::selectOne($qry)['amount'];
-    $debit->update(array(
-      'pickup_id' => $pickup->id,
-      'amount' => $amount,
-    ));
+    $qry = "SELECT tax, SUM(price_sum) amount FROM msl_pickup_items WHERE pickup_id='".intval($pickup_id)."' GROUP BY tax";
+    $amounts = SQL::selectKey2Val($qry, 'tax', 'amount');
+    foreach($amounts as $tax => $amount){
+      if(!round($amount,2)){
+        continue;
+      }
+      $debit = Debit::create($pickup->member_id);
+      $debit->update(array(
+        'pickup_id' => $pickup->id,
+        'tax' => $tax,
+        'amount' => $amount,
+      ));
+    }
   }
 }
