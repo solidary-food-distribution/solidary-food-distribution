@@ -122,38 +122,7 @@ function execute_new(){
 
 function execute_new_create(){
   global $user;
-  $supplier_id=get_request_param('supplier_id');
-  $delivery_id = Delivery::create($supplier_id, $user['user_id']);
-  $delivery = Deliveries::sget($delivery_id);
-  $pickup_date = '2025-02-07';
-  require_once('orders.class.php');
-  $orders = new Orders(array('pickup_date' => $pickup_date));
-  $order_ids = $orders->keys();
-  require_once('order_items.class.php');
-  $order_items = new OrderItems(array('order_id' => $order_ids));
-  $product_ids = array(0 => 0);
-  $product_amounts = array();
-  foreach($order_items as $order_item){
-    if($order_item->amount_pieces || $order_item->amount_weight){
-      $product_ids[$order_item->product_id] = 1;
-      $product_amounts[$order_item->product_id]['amount_pieces'] += $order_item->amount_pieces;
-      $product_amounts[$order_item->product_id]['amount_weight'] += $order_item->amount_weight;
-    }
-  }
-  require_once('products.class.php');
-  $products = new Products(array('id' => array_keys($product_ids)));
-  foreach($products as $product_id => $product){
-    if($product->supplier_id == $supplier_id){
-      $item = DeliveryItem::create($delivery_id, $product_id);
-      if($product->supplier_id == 35 && $product->amount_per_bundle > 1){
-        $amount = $product_amounts[$product_id]['amount_pieces'];
-        $product_amounts[$product_id]['amount_bundles'] = ceil($amount / $product->amount_per_bundle);
-        $product_amounts[$product_id]['amount_pieces'] = ceil($amount / $product->amount_per_bundle) * $product->amount_per_bundle;
-      }
-      $item->update($product_amounts[$product_id]);
-    }
-  }
-
+  //now in /cron/run create_delivery
   forward_to_page('/delivery/index', 'delivery_id='.$delivery_id);
 }
 

@@ -142,30 +142,13 @@ function execute_purchase(){
   return array('purchase' => $purchase, 'delivery_date' => $delivery_date, 'product_sums' => $product_sums, 'products' => $products, 'supplier' => $supplier);
 }
 
-function execute_orders_csv(){
-  if(!user_has_access('orders')){
-    forward_to_noaccess();
-  }
-  $supplier_id = get_request_param('supplier_id');
-
-  require_once('members.class.php');
-  $supplier = member_get($supplier_id);
-
-  $pickup_date = '2025-02-07';
-  $product_sums = orders_get_product_sums($pickup_date);
-
-  return array('product_sums' => $product_sums, 'supplier' => $supplier, 'pickup_date' => $pickup_date);
-
-}
-
-
 function execute_orders(){
   if(!user_has_access('orders')){
     forward_to_noaccess();
   }
   #require_once('sql.class.php');
   #$qry = "SELECT pickup_date, count(*) ...
-  $pickup_date = '2025-02-07';
+  $pickup_date = '2025-02-21';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   require_once('order_items.class.php');

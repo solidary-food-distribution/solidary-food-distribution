@@ -40,6 +40,6 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php endforeach ?>
 
-<div class="main_button button" onclick="location.href='/delivery/new'">Neue Anlieferung anlegen</div>
+<!--<div class="main_button button" onclick="location.href='/delivery/new'">Neue Anlieferung anlegen</div>-->
 
 <?php require('scroll_down.part.php') ?>

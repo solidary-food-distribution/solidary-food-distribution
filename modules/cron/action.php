@@ -48,6 +48,15 @@ function cron_may_send_purchases(){
   }
 }
 
+function cron_may_create_deliveries(){
+  require_once('purchases.class.php');
+  $now = date('Y-m-d H:i:s');
+  $purchases = new Purchases(array('id>=' => 9, 'datetime<=' => $now, 'sent!=' => '0000-00-00 00:00:00'), array('id' => 'DESC'), 0, 8);
+  foreach($purchases as $purchase){
+    create_delivery($purchase->id);
+  }
+}
+
 function send_purchase($purchase_id){
   require_once('purchases.class.php');
   $purchase = Purchases::sget($purchase_id);
@@ -139,4 +148,35 @@ function send_purchase_email($purchase_id){
   $subject = 'Bestellung zur Abholung am '.format_date($delivery_date->date).' von '.$supplier->name;
   send_email($to, $subject, $html, $headers);
   $purchase->update(array('content' => $html));
+}
+
+
+function create_delivery($purchase_id){
+  logger("create_delivery $purchase_id");
+  require_once('purchases.class.php');
+  $purchase = Purchases::sget($purchase_id);
+  require_once('purchase_items.class.php');
+  $purchase_items = new PurchaseItems(array('purchase_id' => $purchase_id));
+  require_once('deliveries.class.php');
+  $deliveries = new Deliveries(array('purchase_id' => $purchase_id));
+  if($deliveries->count()){
+    return;
+  }
+  $delivery = Delivery::create($purchase->supplier_id, 1);
+  $delivery->update(array(
+    'purchase_id' => $purchase_id,
+  ));
+  require_once('delivery_items.class.php');
+  foreach($purchase_items as $purchase_item){
+    $delivery_item = DeliveryItem::create($delivery->id, $purchase_item->product_id);
+    $updates = array(
+      'amount_pieces' => $purchase_item->amount_pieces,
+      'amount_bundles' => $purchase_item->amount_bundles,
+      'amount_weight' => $purchase_item->amount_weight,
+      'price_type' => $purchase_item->price_type,
+      'purchase' => $purchase_item->purchase,
+      'purchase_sum' => $purchase_item->purchase_sum,
+    );
+    $delivery_item->update($updates);
+  }
 }

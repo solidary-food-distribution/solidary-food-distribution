@@ -14,8 +14,22 @@ class Delivery{
       "INSERT INTO msl_deliveries ".
         "(supplier_id, creator_id, created) VALUES ".
         "('" . intval($supplier_id) . "', '" . intval($creator_id) . "', NOW())";
-    $delivery_id = SQL::insert($qry);
-    return $delivery_id;
+    $id = SQL::insert($qry);
+    if(!$id){
+      return false;
+    }
+    $values = SQL::selectOne("SELECT * FROM msl_deliveries WHERE id=".intval($id));
+    $object = new Delivery();
+    $object->_init_values($values); 
+    return $object;
+  }
+
+  public function _init_values( $values ){
+    foreach($values as $key => $value){
+      if(property_exists($this, $key)){
+        $this->{$key} = $value;
+      }
+    }
   }
 
   public function update( array $updates = array() ){
