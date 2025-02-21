@@ -157,6 +157,8 @@ function create_delivery($purchase_id){
   $purchase = Purchases::sget($purchase_id);
   require_once('purchase_items.class.php');
   $purchase_items = new PurchaseItems(array('purchase_id' => $purchase_id));
+  require_once('delivery_dates.class.php');
+  $delivery_date = DeliveryDates::sget($purchase->delivery_date_id);
   require_once('deliveries.class.php');
   $deliveries = new Deliveries(array('purchase_id' => $purchase_id));
   if($deliveries->count()){
@@ -165,6 +167,7 @@ function create_delivery($purchase_id){
   $delivery = Delivery::create($purchase->supplier_id, 1);
   $delivery->update(array(
     'purchase_id' => $purchase_id,
+    'created' => $delivery_date->date,
   ));
   require_once('delivery_items.class.php');
   foreach($purchase_items as $purchase_item){
