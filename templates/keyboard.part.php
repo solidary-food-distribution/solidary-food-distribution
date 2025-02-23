@@ -1,5 +1,8 @@
 <div id="keyboard" style="display:none">
   <div id="keyboard_window">
+    <div id="keyboard_close">
+      <span onclick="keyboard_key('Close')"><i class="fa-regular fa-circle-xmark"></i></span>
+    </div>
     <div id="keyboard_header">
       <div class="button" onclick="keyboard_prev_input()"><span><i class="fa-solid fa-caret-left"></i></span></div>
       <div id="keyboard_info"></div>

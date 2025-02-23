@@ -280,10 +280,20 @@ function show_timer_hide(){
 function keyboard_show(el){
   var type = $(el).data('type');
   $('#keyboard_window').removeClass().addClass(type);
+  if($(el).hasClass('close')){
+    $('#keyboard_close').show();
+  }else{
+    $('#keyboard_close').hide();
+  }
   $('#keyboard_info').html($(el).data('info'));
   $('#key_shift').hide();
   $('.keyboard_sub').hide();
-  if(type == 'weight' || type == 'pieces' || type == 'money'){
+  if(type == 'weight' || type == 'pieces' || type == 'money' || type == 'number'){
+    if(type == 'number'){
+      $('#keyboard_key_comma').addClass('none');
+    }else{
+      $('#keyboard_key_comma').removeClass('none');
+    }
     $('#keyboard_numbers').show();
   }else if(type == 'options'){
     $('#keyboard_options').html('');
@@ -308,6 +318,17 @@ function keyboard_show(el){
   $('body').off('keydown');
   $('body').keydown(keyboard_keydown);
   $('#keyboard').show();
+  scrollIntoViewIfNotVisible($("#keyboard_ctrl")[0]);
+}
+
+function scrollIntoViewIfNotVisible(target) { 
+    if (target.getBoundingClientRect().bottom > window.innerHeight) {
+        target.scrollIntoView(false);
+    }
+    
+    if (target.getBoundingClientRect().top < 0) {
+        target.scrollIntoView();
+    } 
 }
 
 function keyboard_keydown(event){
@@ -342,9 +363,7 @@ function keyboard_key(key){
   }else if(key.substr(-5) == 'Shift'){
     keyboard_toggle_shift();
   }else if(key.substr(-6) == 'Escape'){
-    $('body').off('keydown');
-    $('#keyboard').hide();
-    $('#keyboard').html('');
+    keyboard_escape();
   }else if(key.substr(-2) == 'F5'){
     return false;
   }else{
@@ -365,7 +384,15 @@ var keyboard_close_func = 0;
 function keyboard_close(){
   if(keyboard_close_func){
     keyboard_close_func();
+  }else{
+    keyboard_escape();
   }
+}
+
+function keyboard_escape(){
+  $('body').off('keydown');
+  $('#keyboard').hide();
+  $('.input.active').removeClass('active');
 }
 
 function keyboard_option(el){

@@ -96,10 +96,6 @@ $PROPERTIES['pathbar']=array(
   </div>
 <?php endforeach ?>
 
-<?php require('scale.part.php'); ?>
-<?php require('keyboard.part.php'); ?>
-
-
 <?php if($supplier->id == 35): ?>
   <div class="row">
     <div class="inner_row">
@@ -111,23 +107,34 @@ $PROPERTIES['pathbar']=array(
       <div class="col2">
         Artikelnr
       </div>
-      <div class="col2">
+      <div class="col4">
         <?php echo html_input(array(
-          'type' => 'input_text',
+          'type' => 'number',
           'field' => 'supplier_product_id',
           'value' => $supplier_product_id,
+          'class' => 'close',
           )); ?>
-      </div>
-      <div class="col2">
-        <div class="button" onclick="delivery_add_product()">anlegen</div>
+        <script type="text/javascript">
+          keyboard_ok_func=function(){
+            delivery_add_product();
+          }
+        </script>
       </div>
     </div>
     <?php if(isset($error)): ?>
       <div class="inner_row mt1">
         <b><?php echo htmlentities($error) ?></b>
+        <?php if($error): ?>
+          <script type="text/javascript">
+            $('div[data-field="supplier_product_id"]').click();
+          </script>
+        <?php endif ?>
       </div>
     <?php endif ?>
   </div>
 <?php endif ?>
+
+<?php require('scale.part.php'); ?>
+<?php require('keyboard.part.php'); ?>
 
 <div style="height:20em;"></div>

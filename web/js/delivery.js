@@ -33,7 +33,7 @@ function delivery_change(el,change){
 }
 
 function delivery_add_product(){
-  var supplier_product_id = $('input[data-field="supplier_product_id"]').val().trim();
+  var supplier_product_id = $('div[data-field="supplier_product_id"]').text().trim();
   if(supplier_product_id == ''){
     return;
   }
