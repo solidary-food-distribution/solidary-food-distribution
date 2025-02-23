@@ -26,10 +26,20 @@ $PROPERTIES['body_class']='header_h5';
   </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
-<?php if($modus == 's'): ?>
-  <div class="row">
-    Noch nicht umgesetzt
+<?php if($modus == 's' && $start == 0): ?>
+  <div class="input" style="margin:auto;width:50%;display:block;margin-top:0.5em;padding:0.5em;">
+    <div style="display:block"><small>Produktname, Hersteller, Strichcode-Nummer...</small></div>
+    <div style="display:block">
+      <input class="filter" type="text" id="search" value="<?php echo htmlentities($search) ?>" onkeyup="inventory_search_keyup(event)" style="padding:0.2em;" />
+      <div class="button search" id="search_button" onclick="inventory_filter(this)" style="padding-top:0em;padding-bottom:0em;";>suchen</div>
+    </div>
   </div>
+
+  <?php if(count($products) == 0 && $search!=''): ?>
+    <div class="row">
+      Keine Produkte gefunden
+    </div>
+  <?php endif ?>
 <?php endif ?>
 
 <?php foreach($products as $product): ?>

@@ -11,6 +11,11 @@ function execute_index(){
   if(empty($modus)){
     $modus = '1';
   }
+  $search = trim(get_request_param('search'));
+  $limit = intval(get_request_param('limit'));
+  if($limit == 0){
+    $limit = 20;
+  }
 
   update_inventory();
   $data = get_inventory();
@@ -21,6 +26,10 @@ function execute_index(){
     require_once('members.class.php');
     $suppliers = new Members(array('producer' => 2));
     $product_ids = search_products($search, $suppliers, $limit);
+    if(empty($product_ids)){
+      $product_ids=array('0');
+    }
+    require_once('products.class.php');
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
   }else{
     require_once('members.class.php');
@@ -49,6 +58,7 @@ function execute_index(){
     'modus' => $modus,
     'suppliers' => $suppliers,
     'brands' => $brands,
+    'search' => $search,
   );
 }
 

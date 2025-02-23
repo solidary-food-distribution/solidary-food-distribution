@@ -64,6 +64,12 @@ function inventory_update(el, change){
   });
 }
 
+function inventory_search_keyup(event){
+  if(event && event.keyCode == 13){
+    $('#search_button').click();
+  }
+}
+
 /*
 function inventory_remove_product(product_id){
   active_input_post_value();
