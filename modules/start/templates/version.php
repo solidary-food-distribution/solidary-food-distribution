@@ -1,4 +1,7 @@
 <div class="row">
+  2025-02-24 21:25 TARE nun auch per Bildschirm<br>
+</div>
+<div class="row">
   2025-01-27 00:25 Abholung anlegen klarer, manuelle Gewichteingabe besser<br>
 </div>
 <div class="row">

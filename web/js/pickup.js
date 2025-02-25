@@ -190,7 +190,9 @@ function scale_read(){
       out = out.replace('.', ',');
       $('#scale_display').html(out);
       $('#scale_ok').show();
-      scale_read_timeout = setTimeout(scale_read, 200);
+      if($('#scale').css('display') != 'none'){
+        scale_read_timeout = setTimeout(scale_read, 250);
+      }
     },
     error: function (xhr, ajaxOptions, thrownError){
       var error = '';
@@ -230,6 +232,26 @@ function scale_show_bar(value){
   $('#bar').css('width', 'calc('+width.toString()+'% - 2px)');
   $('#bar_okay').css('left' , Math.round(scale_min / scale_max * 100).toString()+'%');
   $('#bar_exact').css('left' , Math.round(scale_exact / scale_max * 100).toString()+'%');
+}
+
+function scale_tare(){
+  $.ajax({
+    type: 'GET',
+    url: 'http://127.0.0.1:8008/scale?do=tare',
+    dataType: "json",
+    timeout: 3000,
+    success: function(data) {
+      //console.log(data);
+    },
+    error: function (xhr, ajaxOptions, thrownError){
+      var error = '';
+      if(xhr.status == 0 && xhr.statusText == 'error'){
+        error = 'Verbindungsfehler?';
+      }
+      $('#scale_ok').hide();
+      $('#scale_display').html('Waage Fehler: '+xhr.statusText+' '+error);
+    }
+  });
 }
 
 function scale_hide(){

@@ -44,6 +44,7 @@
       <div>
         <div id="scale_edit" onclick="scale_edit()"><span><i class="fa-solid fa-pencil"></i></span></div>
         <div id="scale_scale" onclick="scale_scale()"><span><i class="fa-solid fa-weight-scale"></i></span></div>
+        <div id="scale_tare" onclick="scale_tare()"><span>TARE<br>0</span></div>
         <div onclick="scale_hide()"><span><i class="fa-solid fa-xmark"></i></span></div>
         <div onclick="scale_ok()" id="scale_ok"><span><i class="fa-solid fa-check"></i></span></div>
       </div>

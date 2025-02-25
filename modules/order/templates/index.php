@@ -88,9 +88,6 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
     $locked = false;
-    if($order->pickup_date != '2025-02-21'){
-      $locked = true;
-    }
     if($supplier->producer == 1){
       if($supplier->id == 20){
         $lock_date = date('Y-m-d', strtotime('-4 days', strtotime($order->pickup_date))).' 18:00:00';
