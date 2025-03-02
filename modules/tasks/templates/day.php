@@ -35,7 +35,7 @@ global $user;
       </div>
     </div>
     <?php if(!empty($task->description)): ?>
-      <div class="inner_row">
+      <div class="inner_row mb1">
         <div class="col5"></div>
         <div class="col8">
           <?php echo $task->description; ?>
