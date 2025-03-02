@@ -34,6 +34,14 @@ global $user;
         <?php echo htmlentities($task->title) ?>
       </div>
     </div>
+    <?php if(!empty($task->description)): ?>
+      <div class="inner_row">
+        <div class="col5"></div>
+        <div class="col8">
+          <?php echo $task->description; ?>
+        </div> 
+      </div>
+    <?php endif ?>
     <?php foreach($task_users[$task->task_id] as $task_user): ?>
       <?php
         if($task_user->user_id == $user['user_id']){

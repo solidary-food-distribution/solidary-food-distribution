@@ -36,7 +36,7 @@ class Tasks extends ArrayObject{
     }
     require_once('sql.class.php');
     $qry=
-      "SELECT t.task_id, t.title, t.starts, t.interval, t.effort, ".
+      "SELECT t.task_id, t.title, t.description, t.starts, t.interval, t.effort, ".
         "tu.user_id, tu.assign, tu.start tu_start, tu.end tu_end, tu.comment tu_comment ".
       "FROM msl_tasks t ".
         "LEFT JOIN msl_task_users tu ON (t.task_id = tu.task_id) ".
@@ -64,6 +64,7 @@ class Tasks extends ArrayObject{
       $task = new Task();
       $task->task_id = $data['task_id'];
       $task->title = $data['title'];
+      $task->description = $data['description'];
       $task->interval = $data['interval'];
       $task->effort = $data['effort'];
       $task->starts = $data['starts'];

@@ -6,6 +6,7 @@ require_once('task_user.class.php');
 class Task{
   public $task_id;
   public $title;
+  public $description;
   public $interval;
   public $effort;
   public $starts;
