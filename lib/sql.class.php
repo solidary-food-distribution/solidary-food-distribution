@@ -80,6 +80,7 @@ class SQL{
   static function selectID($qry,$id){
     global $mysqli;
     $res=mysqli_query($mysqli,$qry);
+    #self::log_info($qry,'');
     if(empty($res)){
       self::log_error($qry);
     }
@@ -138,7 +139,7 @@ class SQL{
         if(empty($value)){
           $qry .= ' AND 1=2 ';
         }else{
-          $qry .= ' AND '.$field_escaped.' IN ('.SQL::escapeArray($value).') ';
+          $qry .= ' AND '.$field_escaped.' '.(substr($field, -2, 2) == '!='?'NOT':'').' IN ('.SQL::escapeArray($value).') ';
         }
       }else{
         $qry .= ' AND '.$field_escaped;

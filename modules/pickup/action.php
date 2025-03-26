@@ -115,6 +115,12 @@ function execute_new(){
   forward_to_page('/pickup', 'pickup_id='.$pickup->id);
 }
 
+function execute_update_items(){
+  $pickup_id = get_request_param('pickup_id');
+  update_pickup_items($pickup_id);
+  die("updated.");
+}
+
 function execute_filter_ajax(){
   $pickup_id = get_request_param('pickup_id');
   $field = get_request_param('field');
@@ -142,7 +148,7 @@ function update_pickup_items($pickup_id){
   }
 
   require_once('delivery_dates.class.php');
-  $delivery_dates = new DeliveryDates(array('date<=' => date('Y-m-d')), array('date' => 'ASC'), 0, 1);
+  $delivery_dates = new DeliveryDates(array('date<=' => $pickup->created), array('date' => 'DESC'), 0, 1);
   $delivery_date = $delivery_dates->first();
   $pickup_date = $delivery_date->date;
 
@@ -354,11 +360,11 @@ function get_info_others(){
   foreach($pickup_items as $pickup_item){
     if($pickup_item->amount_pieces > 0 || $pickup_item->amount_weight > 0){
       $pickup_members[$pickups[$pickup_item->pickup_id]->member_id] = 1;
-      break;
     }
   }
 
   $pickup_members[$user['member_id']] = 1;
+  #logger(print_r($pickup_members,1));
 
   $others = array();
   $product_amounts = array();
@@ -366,6 +372,7 @@ function get_info_others(){
 
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $last, 'member_id!=' => array_keys($pickup_members)));
+  #logger(print_r($orders,1));
   $order_items = new OrderItems(array('order_id' => $orders->keys()));
   foreach($order_items as $order_item){
     if($order_item->amount_pieces > 0){
@@ -378,6 +385,7 @@ function get_info_others(){
       $product_orders[$order_item->product_id][$order_item->order_id] = $order_item->amount_weight;
     }
   }
+  #logger(print_r($others,1));
 
   return array(
     'others' => count($others),
