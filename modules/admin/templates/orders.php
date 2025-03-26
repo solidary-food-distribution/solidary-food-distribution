@@ -6,6 +6,14 @@ $PROPERTIES['pathbar']=array(
 $PROPERTIES['body_class']='header_h5 footer_h8';
 ?>
 
+<?php ob_start(); ?>
+  <div class="controls">
+    <div class="control filter">
+      <div class="button"><?php echo format_date($pickup_date) ?></div>
+    </div>
+  </div>
+<?php $PROPERTIES['header']=ob_get_clean(); ?>
+
 <?php foreach($member_orders as $member_id => $order): ?>
   <div class="row">
     <div class="inner_row">

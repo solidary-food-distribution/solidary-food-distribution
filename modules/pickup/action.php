@@ -137,11 +137,14 @@ function pickup_get($pickup_id, $member_id){
 function update_pickup_items($pickup_id){
   global $user;
   $pickup = pickup_get($pickup_id, $user['member_id']);
-  #TODO
-  $pickup_date = '2025-03-21';
-  if($pickup_date > date('Y-m-d')){
+  if($pickup->status != 'o'){
     return;
   }
+
+  require_once('delivery_dates.class.php');
+  $delivery_dates = new DeliveryDates(array('date<=' => date('Y-m-d')), array('date' => 'ASC'), 0, 1);
+  $delivery_date = $delivery_dates->first();
+  $pickup_date = $delivery_date->date;
 
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date, 'member_id' => $user['member_id']));

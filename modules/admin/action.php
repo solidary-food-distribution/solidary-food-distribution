@@ -146,9 +146,11 @@ function execute_orders(){
   if(!user_has_access('orders')){
     forward_to_noaccess();
   }
-  #require_once('sql.class.php');
-  #$qry = "SELECT pickup_date, count(*) ...
-  $pickup_date = '2025-03-07';
+  require_once('delivery_dates.class.php');
+  $delivery_dates = new DeliveryDates(array('date>=' => date('Y-m-d',strtotime('-3 DAYS',time()))), array('date' => 'ASC'), 0, 1);
+  $delivery_date = $delivery_dates->first();
+  $pickup_date = $delivery_date->date;
+
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   require_once('order_items.class.php');
@@ -176,5 +178,5 @@ function execute_orders(){
   $suppliers = new Members(array('id' => array_keys($supplier_ids)));
   $members = new Members(array('id' => array_keys($member_orders)));
 
-  return array('member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'products' => $products, 'suppliers' => $suppliers);
+  return array('pickup_date' => $pickup_date, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'products' => $products, 'suppliers' => $suppliers);
 }

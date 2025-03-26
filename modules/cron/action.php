@@ -18,6 +18,14 @@ function execute_run(){
   exit;
 }
 
+function cron_close_pickups(){
+  require_once('pickups.class.php');
+  $pickups = new Pickups(array('created<' => date('Y-m-d'), 'created<=' => date('Y-m-d H:i:s', strtotime('-2 HOURS',time())), 'status' => 'o'));
+  foreach($pickups as $pickup){
+    $pickup->update(array('status' => 'a'));
+  }
+}
+
 function cron_update_delivery_dates(){
   require_once('sql.class.php');
   $qry = "SELECT * FROM msl_delivery_dates WHERE `date`>=CURDATE() ORDER BY `date`";
