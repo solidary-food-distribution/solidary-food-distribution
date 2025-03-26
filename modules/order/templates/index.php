@@ -14,7 +14,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
             'o' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
             'f' => '<i class="fa-solid fa-heart" title="Bisher bestellt"></i> Lieblinge',
             '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
-            '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Großhandel',
+            '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Ökoring',
             's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> Suche'
           );
           echo html_input(array(

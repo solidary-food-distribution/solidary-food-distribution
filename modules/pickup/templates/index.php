@@ -183,8 +183,19 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <?php else: ?>
         <div style="width:1.7em;font-size:2em;">&nbsp;</div>
       <?php endif ?>
-      <?php if($product->type!='p'): ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>">
+      <?php if($product->type != 'p'): ?>
+        <?php 
+          $scale_bottom = '';
+          if($product->type == 'k' || $product->type == 'w'){
+            if($others['product_amounts'][$product_id]){
+              $others_count = count($others['product_orders'][$product_id]);
+              $scale_bottom = 'Weitere Abholende: '.$others_count.' mit gesamt '.format_amount($others['product_amounts'][$product_id]).' '.($product->type=='k'?'kg':'St.');
+            }else{
+              $scale_bottom = 'Keine weiteren Abholende für dieses Produkt.';
+            }
+          }
+        ?>
+        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>" data-bottom="<?php echo htmlentities($scale_bottom) ?>">
           <i class="fa-solid fa-weight-scale"></i>
         </div>
       <?php elseif($modus != 'd' && $amount_ordered > 0): ?>
@@ -225,8 +236,16 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           <div class="col3 right"><small><?php echo format_money($sum['trader_paid']) ?> EUR</small></div>
           <div class="col3 right"><small><?php echo format_money($sum['trader_sum'] - $sum['trader_paid']) ?> EUR</small></div>
         </div>
-        <div class="inner_row">
+        <div class="inner_row mt1">
           <div class="col12">
+            <small>
+            <?php if($others['others']): ?>
+              Weitere Abholende: <?php echo $others['others'] ?>
+            <?php else: ?>
+              Nach Dir keine weiteren Abholenden.
+            <?php endif ?>
+            <?php #print_r($others) ?>
+            </small>
           </div>
           <div class="col6 right last">
             <small>Die Abholung bleibt gespeichert</small>

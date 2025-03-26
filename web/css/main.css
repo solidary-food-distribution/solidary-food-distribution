@@ -1,7 +1,7 @@
 html{
   margin: 0;
   padding: 0;
-  font-size: 19px;
+  font-size: 26px;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -462,40 +462,40 @@ div.mr1{
   align-items: flex-start;
 }
 .row .col1{
-  width: 2.2em;
+  width: 2.19em;
 }
 .row .col2{
-  width: 4.4em;
+  width: 4.38em;
 }
 .row .col3{
-  width: 6.6em;
+  width: 6.57em;
 }
 .row .col4{
-  width: 8.8em;
+  width: 8.76em;
 }
 .row .col5{
-  width: 11em;
+  width: 10.95em;
 }
 .row .col6{
-  width: 13.2em;
+  width: 13.14em;
 }
 .row .col7{
-  width: 15.4em;
+  width: 15.33em;
 }
 .row .col8{
-  width: 17.6em;
+  width: 17.52em;
 }
 .row .col9{
-  width: 19.8em;
+  width: 19.71em;
 }
 .row .col10{
-  width: 22em;
+  width: 21.9em;
 }
 .row .col11{
-  width: 24.2em;
+  width: 24.09em;
 }
 .row .col12{
-  width: 26.4em;
+  width: 26.28em;
 }
 .row .col13{
   width: 28.6em;

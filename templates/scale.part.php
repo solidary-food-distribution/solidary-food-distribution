@@ -49,5 +49,6 @@
         <div onclick="scale_ok()" id="scale_ok"><span><i class="fa-solid fa-check"></i></span></div>
       </div>
     </div>
+    <div id="scale_bottom"></div>
   </div>
 </div>

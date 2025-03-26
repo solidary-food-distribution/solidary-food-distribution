@@ -148,7 +148,7 @@ function execute_orders(){
   }
   #require_once('sql.class.php');
   #$qry = "SELECT pickup_date, count(*) ...
-  $pickup_date = '2025-02-21';
+  $pickup_date = '2025-03-07';
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
   require_once('order_items.class.php');

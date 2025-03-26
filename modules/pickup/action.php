@@ -91,16 +91,9 @@ function execute_index(){
 
   require_once('sql.class.php');
   $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
-  /*
-  $others = array();
-  $last_pickup = array();
-  if($product_type == 'v'){
-    $others = get_info_others();
-  }else{
-    $pickup_history = get_pickup_history($pickup);
-  }
-  */
-  #logger(print_r($inventory,1));
+
+  $others = get_info_others();
+
   return array(
     'modus' => $modus,
     'pickup' => $pickup,
@@ -111,9 +104,7 @@ function execute_index(){
     'brands' => $brands,
     'prices' => $prices,
     'inventory' => $inventory,
-    //'product_type' => $product_type,
-    //'others' => $others,
-    //'pickup_history' => $pickup_history
+    'others' => $others,
   );
 }
 
@@ -146,7 +137,8 @@ function pickup_get($pickup_id, $member_id){
 function update_pickup_items($pickup_id){
   global $user;
   $pickup = pickup_get($pickup_id, $user['member_id']);
-  $pickup_date = '2025-02-21';
+  #TODO
+  $pickup_date = '2025-03-21';
   if($pickup_date > date('Y-m-d')){
     return;
   }
@@ -348,42 +340,47 @@ function update_pickup_item_price_sum($pickup_item_id){
 
 function get_info_others(){
   global $user;
-  require_once('deliveries.class.php');
-  $deliveries = new Deliveries(array('supplier_id' => array(11 /*Sigi Klein*/)), array('d.id' => 'DESC'), 0, 1);
-  $delivery = $deliveries->first();
-  $last = $delivery->created->format('Y-m-d H:i');
-  $pickups = new Pickups(array('created>' => $last, 'm.id!=' => $user['member_id']));
-  $pickup_sum = 0;
-  $pickup_count = array();
-  #logger(print_r($pickups,1));
-  foreach($pickups as $pickup){
-    foreach($pickup->items as $item){
-      if($item->product->type == 'v' && $item->price_sum > 0){
-        $pickup_sum += $item->price_sum;
-        $pickup_count[$pickup->member->id]=1;
-      }
+  require_once('delivery_dates.class.php');
+  $delivery_dates = new DeliveryDates(array('date<=' => date('Y-m-d')), array('date' => 'DESC'), 0, 1);
+  $last = $delivery_dates->first()->date;
+
+  $pickup_members = array();
+
+  $pickups = new Pickups(array('created>' => $last, 'member_id!=' => $user['member_id']));
+  $pickup_items = new PickupItems(array('pickup_id' => $pickups->keys()));
+  foreach($pickup_items as $pickup_item){
+    if($pickup_item->amount_pieces > 0 || $pickup_item->amount_weight > 0){
+      $pickup_members[$pickups[$pickup_item->pickup_id]->member_id] = 1;
+      break;
     }
   }
+
+  $pickup_members[$user['member_id']] = 1;
+
+  $others = array();
+  $product_amounts = array();
+  $product_orders = array();
+
   require_once('orders.class.php');
-  $orders = new Orders(array('o.member_id!=' => $user['member_id'], 'p.type' => 'b'));
-  $orders_sum = 0;
-  $orders_count = 0;
-  $open_sum = 0;
-  foreach($orders as $order){
-    if($order->product->type == 'b' && $order->amount > 0 && $order->product->id != 59){
-      $orders_sum += $order->amount;
-      if(!isset($pickup_count[$order->member->id])){
-        $open_sum += $order->amount;
-      }
-      $orders_count++;
+  $orders = new Orders(array('pickup_date' => $last, 'member_id!=' => array_keys($pickup_members)));
+  $order_items = new OrderItems(array('order_id' => $orders->keys()));
+  foreach($order_items as $order_item){
+    if($order_item->amount_pieces > 0){
+      $others[$order_item->order_id] = 1;
+      $product_amounts[$order_item->product_id] += $order_item->amount_pieces;
+      $product_orders[$order_item->product_id][$order_item->order_id] = $order_item->amount_pieces;
+    }elseif($order_item->amount_weight > 0){
+      $others[$order_item->order_id] = 1;
+      $product_amounts[$order_item->product_id] += $order_item->amount_weight;
+      $product_orders[$order_item->product_id][$order_item->order_id] = $order_item->amount_weight;
     }
   }
+
   return array(
-    'pickup_sum' => $pickup_sum,
-    'pickup_count' => count($pickup_count),
-    'orders_sum' => $orders_sum,
-    'orders_count' => $orders_count,
-    'open_sum' => $open_sum);
+    'others' => count($others),
+    'product_amounts' => $product_amounts,
+    'product_orders' => $product_orders,
+  );
 }
 
 function get_pickup_history($pickup){
