@@ -146,13 +146,33 @@ function execute_orders(){
   if(!user_has_access('orders')){
     forward_to_noaccess();
   }
+  $date = get_request_param('date');
+  if($date == ''){
+    $date = date('Y-m-d',strtotime('-3 DAYS',time()));
+  }
+  
   require_once('delivery_dates.class.php');
-  $delivery_dates = new DeliveryDates(array('date>=' => date('Y-m-d',strtotime('-3 DAYS',time()))), array('date' => 'ASC'), 0, 1);
+  $delivery_dates = new DeliveryDates(array('date>=' => $date), array('date' => 'ASC'), 0, 1);
   $delivery_date = $delivery_dates->first();
-  $pickup_date = $delivery_date->date;
+  $date = $delivery_date->date;
+
+  $delivery_dates = new DeliveryDates(array('date<' => $date), array('date' => 'DESC'), 0, 1);
+  $delivery_date = $delivery_dates->first();
+  $date_prev = $delivery_date->date;
+
+  $delivery_dates = new DeliveryDates(array('date>' => $date), array('date' => 'ASC'), 0, 1);
+  $delivery_date = $delivery_dates->first();
+  $date_next = $delivery_date->date;
+
+  #logger("date $date_prev $date $date_next");
+
+  $orders_next = $date_next;
+  if(!$orders_next){
+    $orders_next=date('Y-m-d',strtotime('+1 DAYS',strtotime($date)));
+  }
 
   require_once('orders.class.php');
-  $orders = new Orders(array('pickup_date' => $pickup_date));
+  $orders = new Orders(array('pickup_date>=' => $date, 'pickup_date<' => $orders_next));
   require_once('order_items.class.php');
   $order_items = new OrderItems(array('order_id' => $orders->keys()));
   $product_ids = $order_items->get_product_ids();
@@ -167,16 +187,32 @@ function execute_orders(){
       continue;
     }
     $order = $orders[$order_item->order_id];
-    $member_orders[$order->member_id] = $order;
+    $member_orders[$order->member_id][$order->id] = $order;
     $product_id = $order_item->product_id;
     $supplier_id = $products[$product_id]->supplier_id;
     $supplier_ids[$supplier_id] = 1;
     $order_items_array[$order->id][$supplier_id.' '.$products[$product_id]->name] = $order_item;
   }
 
+  require_once('pickups.class.php');
+  $pickups = new Pickups(array('created>' => $date, 'created<' => $orders_next));
+  require_once('pickup_items.class.php');
+  $pickup_items = new PickupItems(array('pickup_id' => $pickups->keys()));
+  $pui_product_ids = $pickup_items->get_product_ids();
+  $pui_product_ids = array_diff($pui_product_ids, $product_ids);
+  #logger(print_r($pui_product_ids,1));
+  $pickup_items_array = array();
+  foreach($pickup_items as $pickup_item){
+    $id = $pickup_item->order_item_id;
+    if(!$id){
+      'noi'.$pickup_item->id;
+    }
+    $pickup_items_array[$id]=$pickup_item;
+  }
+
   require_once('members.class.php');
   $suppliers = new Members(array('id' => array_keys($supplier_ids)));
   $members = new Members(array('id' => array_keys($member_orders)));
 
-  return array('pickup_date' => $pickup_date, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'products' => $products, 'suppliers' => $suppliers);
+  return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'pickup_items_array' => $pickup_items_array, 'products' => $products, 'suppliers' => $suppliers);
 }
