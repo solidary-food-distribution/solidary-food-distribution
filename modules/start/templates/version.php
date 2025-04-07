@@ -1,4 +1,7 @@
 <div class="row">
+  2025-04-07 23:15 Modul "Infos" eingebaut<br>
+</div>
+<div class="row">
   2025-03-26 02:10 Weitere Abholende werden angezeigt<br>
 </div>
 <div class="row">

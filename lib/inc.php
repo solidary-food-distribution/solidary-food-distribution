@@ -196,6 +196,22 @@ function format_date($date, $format='j.n.Y', $weekday=true){
   return $ret;
 }
 
+function format_content($content){
+  #$regex = '@((https?://)?([-\\w]+\\.[-\\w\\.]+)+\\w(:\\d+)?(/([-\\w/_\\.]*(\\?\\S+)?)?)*)@';
+  $regex = "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i";
+  $matches = array();
+  preg_match_all($regex, $content, $matches);
+  foreach($matches as $match_id => $match){
+    $content = str_replace($match[0], '*URLREPLACE'.$match_id.'*', $content);
+  }
+  $content = htmlentities($content);
+  $content = nl2br($content);
+  foreach($matches as $match_id => $match){
+    $content = str_replace('*URLREPLACE'.$match_id.'*', '<a href="'.$match[0].'">'.htmlentities($match[0]).'</a>', $content);
+  }
+  return $content;
+}
+
 function send_email($to, $subject, $text, $headers = array()){
   if(!isset($headers['From'])){
     $headers['From'] = '"Mit Sinn Leben eG" <buchen@mit-sinn-leben.de>';

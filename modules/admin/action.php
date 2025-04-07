@@ -14,7 +14,8 @@ function execute_index(){
   $debits = user_has_access('debits');
   $remote = user_has_access('remote');
   $mails = user_has_access('mails');
-  if(!$products && !$members && !$users && !$orders && !$purchases && !$debits && !$remote && !$mails){
+  $infos = user_has_access('infos');
+  if(!$products && !$members && !$users && !$orders && !$purchases && !$debits && !$remote && !$mails && !$infos){
     forward_to_noaccess();
   }
   return array(
@@ -26,6 +27,7 @@ function execute_index(){
     'debits' => $debits,
     'remote' => $remote,
     'mails' => $mails,
+    'infos' => $infos,
   );
 }
 
@@ -219,4 +221,50 @@ function execute_orders(){
   $members = new Members(array('id' => array_keys($member_orders)));
 
   return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'pickup_items_array' => $pickup_items_array, 'products' => $products, 'suppliers' => $suppliers);
+}
+
+function execute_infos(){
+  if(!user_has_access('infos')){
+    forward_to_noaccess();
+  }
+  require_once('infos.class.php');
+  $infos = new Infos();
+  return array('infos' => $infos);
+}
+
+function execute_info(){
+  if(!user_has_access('infos')){
+    forward_to_noaccess();
+  }
+  $info_id = get_request_param('info_id');
+  require_once('infos.class.php');
+  $info = Infos::sget($info_id);
+  if(empty($info)){
+    http_response_code(404);
+    die('This info was not found');
+  }
+  return array('info' => $info);
+}
+
+function execute_info_ajax(){
+  if(!user_has_access('infos')){
+    forward_to_noaccess();
+  }
+  $info_id = get_request_param('info_id');
+  $field = get_request_param('field');
+  $type = get_request_param('type');
+  $value = get_request_param('value');
+  if($field == 'status'){
+    $field = 'published';
+    if($value == '0'){
+      $value = '0000-00-00 00:00:00';
+    }else{
+      $value = date('Y-m-d H:i:s');
+    }
+  }
+  require_once('infos.class.php');
+  $info = Infos::sget($info_id);
+  $info->update(array($field => $value));
+  echo json_encode(array('value' => $value));
+  exit;
 }

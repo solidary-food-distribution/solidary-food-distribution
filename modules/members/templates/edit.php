@@ -34,7 +34,7 @@ $PROPERTIES['pathbar']=array(
         <div>Lieferant</div>
       </div>
     </div>
-    <div class="col7">
+    <div class="col9">
       <div>
         <div><?php
           echo html_input(array(

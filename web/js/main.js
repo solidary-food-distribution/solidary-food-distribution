@@ -321,14 +321,17 @@ function keyboard_show(el){
   scrollIntoViewIfNotVisible($("#keyboard_ctrl")[0]);
 }
 
-function scrollIntoViewIfNotVisible(target) { 
-    if (target.getBoundingClientRect().bottom > window.innerHeight) {
-        target.scrollIntoView(false);
-    }
-    
-    if (target.getBoundingClientRect().top < 0) {
-        target.scrollIntoView();
-    } 
+function scrollIntoViewIfNotVisible(target) {
+  if(!target || target == undefined){
+    return;
+  }
+  if(target.getBoundingClientRect().bottom > window.innerHeight){
+    target.scrollIntoView(false);
+  }
+  
+  if(target.getBoundingClientRect().top < 0){
+    target.scrollIntoView();
+  } 
 }
 
 function keyboard_keydown(event){
