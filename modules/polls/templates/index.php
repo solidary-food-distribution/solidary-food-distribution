@@ -18,6 +18,5 @@ $PROPERTIES['body_class']='header_h5';?>
         <i class="fa-solid fa-arrow-up-right-from-square"></i>
       </span>
     </div>
-    </div>
   </div>
 <?php endforeach ?>

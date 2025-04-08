@@ -21,7 +21,7 @@ function execute_poll(){
   }
   require_once('poll_answers.class.php');
   $poll_answers = new PollAnswers(array('poll_id' => $poll_id), array('answer' => 'ASC'));
-  if($poll->type == 'm' && $poll->has_votes && count($poll_answers)){
+  if(($poll->type == 'm' || $poll->type == 'r') && $poll->has_votes && count($poll_answers)){
     $answers = array();
     $user_answers = array();
     foreach($poll_answers as $poll_answer){
@@ -56,9 +56,11 @@ function execute_answer_vote_ajax(){
   $poll_answer_id = get_request_param('poll_answer_id');
   $value = get_request_param('value');
 
+  logger("$poll_answer_id $value");
   require_once('poll_answers.class.php');
   $poll_answer = poll_answer_get($poll_answer_id);
   if($poll_answer){
+    require_once('polls.class.php');
     $poll = poll_get($poll_answer->poll_id);
     if(!$poll){
       exit;

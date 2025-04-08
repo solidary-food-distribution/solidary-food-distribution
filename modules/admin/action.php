@@ -232,6 +232,15 @@ function execute_infos(){
   return array('infos' => $infos);
 }
 
+function execute_info_new(){
+  if(!user_has_access('infos')){
+    forward_to_noaccess();
+  }
+  require_once('info.class.php');
+  $info = Info::create();
+  forward_to_page('/admin/info?info_id='.$info->id);
+}
+
 function execute_info(){
   if(!user_has_access('infos')){
     forward_to_noaccess();

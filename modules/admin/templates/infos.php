@@ -53,3 +53,5 @@ $PROPERTIES['body_class']='header_h5';
     </div>
   </div>
 <?php endforeach ?>
+
+<div class="button" onclick="if(confirm('Neue Info anlegen?')){location.href='/admin/info_new';}">Neue Info anlegen</div>

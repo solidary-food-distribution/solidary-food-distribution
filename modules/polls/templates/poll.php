@@ -41,7 +41,7 @@ if($poll->close_datetime!='0000-00-00 00:00:00' && strtotime($poll->close_dateti
   </div>
 <?php endforeach ?>
 
-<?php if(!$poll_closed): ?>
+<?php if($poll->type=='m' && !$poll_closed): ?>
   <div class="row">
     <div class="inner_row">
       <div class="col12">Weiteren Produktvorschlag hinzufügen:</div>
