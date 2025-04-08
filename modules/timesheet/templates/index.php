@@ -15,6 +15,7 @@ $topics = array(
   'ws'=>'Webseite',
   'pp'=>'Produkte&Preise',
   'is'=>'Infrastruktur',
+  'mm'=>'Verwaltung',
   'sw'=>'Software',
   'cs'=>'Konfliktlösung',
 );
