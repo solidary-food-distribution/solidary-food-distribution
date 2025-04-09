@@ -212,7 +212,10 @@ function oekoring_import_bnn($file){
   $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.5,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
   SQL::update($qry);
 
-  $qry= "UPDATE msl_prices pr, msl_products p SET p.status='d' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET p.status='d' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  SQL::update($qry);
+
+  $qry = "UPDATE msl_products SET status='d' WHERE category='Tiefkühlprodukte'";
   SQL::update($qry);
 
   return 'ok '.print_r($header,1);
