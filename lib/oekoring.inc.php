@@ -55,6 +55,7 @@ function oekoring_import_bnn($file){
   }
 
   $brands = SQL::selectKey2Val("SELECT bnn,id FROM msl_brands", 'bnn', 'id');
+  $categories = SQL::selectKey2Val("SELECT wg_nr,(CASE WHEN wg_ersatz>0 THEN (SELECT wg_name FROM msl_wg_oeko wg2 WHERE wg2.wg_nr=wg.wg_ersatz) ELSE wg_name END) wg_name FROM msl_wg_oeko wg", 'wg_nr' , 'wg_name');
 
   $products = array();
   $prices = array();
@@ -67,6 +68,10 @@ function oekoring_import_bnn($file){
     }
     $status = (strpos('ANWR',$line[2])!==false)?'o':'d';
     $name = $line[7];
+    $category = '';
+    if(isset($categories[$line[19]])){
+      $category = $categories[$line[19]];
+    }
     $brand_id = 0;
     $brand_bnn = iconv('CP850', 'UTF-8', $line[11]);
     if(isset($brands[$brand_bnn])){
@@ -89,6 +94,7 @@ function oekoring_import_bnn($file){
       $brand_id,
       $line[5], //gtin_piece
       $line[6], //gtin_bundle
+      $category,
     );
     $products[$linenr]=SQL::escapeArray($row);
     $start = $prices_start;
@@ -138,18 +144,82 @@ function oekoring_import_bnn($file){
   }
   fclose($h);
 
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=NOW() AND end>=NOW()";
+  $category_replace = array(
+    'Bananen' => 'Gemüse, Obst usw',
+    'Cidre, Apfelmost' => 'Getränke',
+    'Deko' => 'Non-Food',
+    'Duftöle' => 'Non-Food',
+    'Einmalartikel 7 %' => '',
+    'Eintöpfe, Suppen, Fertiggerichte' => 'Fertiggerichte',
+    'Essig' => 'Essig, Öl',
+    'Fertiggerichte gekühlt' => 'Fertiggerichte',
+    'Fertigsalate/Halbfertigprodukte' => 'Fertiggerichte',
+    'Fruchtsäfte' => 'Getränke',
+    'Fruchtschnitten' => 'Naschen',
+    'frische Pasta' => 'Nudeln',
+    'Gemüsesäfte' => 'Getränke',
+    'Gemüsebrühe, Würzmittel' => 'Würzmittel',
+    'Gewürze' => 'Würzmittel',
+    'Getreide' => 'Getreideprodukte',
+    'Honig' => 'Süßungsmittel',
+    'Hülsenfrüchte' => 'Hülsenfrüchte, Saaten usw',
+    'Hygieneartikel' => 'Non-Food',
+    'Kaffee, Getreidekaffee,Kakao' => 'Kaffee, Tee usw',
+    'Keimsaaten' => 'Hülsenfrüchte, Saaten usw',
+    'Kekse, Süßigkeiten' => 'Naschen',
+    'Knabbersachen pikant, Brote' => 'Naschen',
+    'Tee' => 'Kaffee, Tee usw',
+    'Konserven fruchtig' => 'Konserven',
+    'Konserven pikant' => 'Konserven',
+    'Kosmetik' => 'Non-Food',
+    'Limonade' => 'Getränke',
+    'Mineralwasser' => 'Getränke',
+    'Nüsse, frisch' => 'Nüsse',
+    'Nußmuse' => 'Aufstriche',
+    'Obst' => 'Gemüse, Obst usw',
+    'Ölsaaten' => 'Hülsenfrüchte, Saaten usw',
+    'P f a n d' => '',
+    'Pilze' => 'Gemüse, Obst usw',
+    'Pudding, Desserts' => 'Naschen',
+    'Pudding' => 'Naschen',
+    'Reiswaffeln' => 'Naschen',
+    'lavera' => 'Kosmetik',
+    'Salz' => 'Würzmittel',
+    'Seifen' => 'Non-Food',
+    'Speiseöle' => 'Essig, Öl',
+    'Sojasaucen' => 'Würzmittel',
+    'Waschmittel' => 'Non-Food',
+    'Wein' => 'Alkohol',
+    'Sekt, Champagner, Prosecco' => 'Alkohol',
+    'Schnäpse, Liköre' => 'Alkohol',
+    'Fruchtaufstriche' => 'Aufstriche',
+    'pikante Brotaufstriche' => 'Aufstriche',
+    'Verkaufshilfen' => '',
+    'Wurzel und Knollengemüse' => 'Gemüse, Obst usw',
+    'Texte/Zeitschriften' => '',
+
+  );
+  foreach($category_replace as $search => $replace){
+    $qry = "UPDATE msl_products SET category='".SQL::escapeString($replace)."' WHERE category='".SQL::escapeString($search)."'";
+    SQL::update($qry);
+  }
+
+
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=CURDATE() AND end>=CURDATE()";
   SQL::update($qry);
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.6,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=NOW() AND pr.end>=NOW()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.6,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
   SQL::update($qry);
-  $qry = "UPDATE msl_prices pr, msl_products p  SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.5,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=NOW() AND pr.end>=NOW()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.5,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  SQL::update($qry);
+
+  $qry= "UPDATE msl_prices pr, msl_products p SET p.status='d' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
   SQL::update($qry);
 
   return 'ok '.print_r($header,1);
 }
 
 function oekoring_insert_products_prices($products, $prices){
-  $qry = "INSERT INTO msl_products (supplier_id, supplier_product_id, name, type, status, import_status, amount_per_bundle, brand_id, gtin_piece, gtin_bundle) VALUES (".implode('),(', $products).") ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), import_status=VALUES(import_status), amount_per_bundle=VALUES(amount_per_bundle), brand_id=VALUES(brand_id), gtin_piece=VALUES(gtin_piece), gtin_bundle=VALUES(gtin_bundle), updated=NOW()";
+  $qry = "INSERT INTO msl_products (supplier_id, supplier_product_id, name, type, status, import_status, amount_per_bundle, brand_id, gtin_piece, gtin_bundle, category) VALUES (".implode('),(', $products).") ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), import_status=VALUES(import_status), amount_per_bundle=VALUES(amount_per_bundle), brand_id=VALUES(brand_id), gtin_piece=VALUES(gtin_piece), gtin_bundle=VALUES(gtin_bundle), category=VALUES(category), updated=NOW()";
   SQL::update($qry);
   $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='35' AND supplier_product_id IN (".SQL::escapeArray(array_keys($prices)).")";
   $pids = SQL::selectKey2Val($qry, 'supplier_product_id', 'id');

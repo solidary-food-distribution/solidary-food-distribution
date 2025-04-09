@@ -8,6 +8,7 @@ function execute_index(){
   $order_id = get_request_param('order_id');
   $modus = get_request_param('modus');
   $search = get_request_param('search');
+  $scategories = get_request_param('categories');
   $limit = intval(get_request_param('limit'));
   if($limit == 0){
     $limit = 10;
@@ -33,6 +34,14 @@ function execute_index(){
   }elseif($modus == ''){
     forward_to_page('/order/?order_id='.$order_id.'&modus=1');
   }
+
+  if(trim($scategories) != ''){
+    $scategories = explode('|', $scategories);
+    $scategories = array_flip($scategories);
+  }else{
+    $scategories = array();
+  }
+
   require_once('products.class.php');
   require_once('members.class.php');
   if($modus == 'o'){
@@ -54,15 +63,29 @@ function execute_index(){
     $suppliers = new Members(array('producer' => $modus));
     $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o', 'type' => array('k', 'p', 'w')));
     $product_ids = $products->keys();
-  }elseif($modus == 's' && trim($search)!=''){
+  }elseif($modus == 's' && (trim($search) != '' || !empty($scategories))){
     $suppliers = new Members(array('producer>=' => 1));
-    $product_ids = search_products($search, $suppliers, $limit);
+    $product_ids = search_products($search, $scategories, $suppliers);
     if(empty($product_ids)){
       $product_ids=array('0');
     }
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
   }elseif($modus == 's'){
-    $products = array();
+    $suppliers = new Members(array('producer>=' => 1));
+    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => array('o', 's')));
+  }
+  $categories = array();
+  if($modus == 's'){
+    foreach($products as $product){
+      $categories[$product->category] += 1;
+    }
+    if(isset($categories[''])){
+      $categories['-'] = $categories[''];
+      unset($categories['']);
+    }
+    if(trim($search) == '' && empty($scategories)){
+      $products = array();
+    }
   }
 
   $brands = array();
@@ -97,10 +120,10 @@ function execute_index(){
     }
   }
 
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
 }
 
-function search_products($search, $suppliers, $limit){
+function search_products($search, $scategories, $suppliers){
   require_once('sql.class.php');
   $qry = "SELECT p.id FROM msl_members m,msl_products p LEFT JOIN msl_brands b ON (brand_id=b.id) WHERE m.id = p.supplier_id AND p.supplier_id IN (".SQL::escapeArray($suppliers->keys()).") AND p.status IN ('o', 's') AND p.type IN ('k', 'p') AND (";
   if(is_numeric($search)){
@@ -119,7 +142,21 @@ function search_products($search, $suppliers, $limit){
     }
     $qry .= implode(' AND ', $wheres);
   }
-  $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC LIMIT ".intval($limit);
+  if(!empty($scategories)){
+    $wheres = array();
+    if(isset($scategories['-'])){
+      unset($scategories['-']);
+      $scategories['']=1;
+    }
+    foreach($scategories as $scategory => $dummy){
+      $wheres[] = "p.category = '".SQL::escapeString($scategory)."'";
+    }
+    if($search!=''){
+      $qry .= ' AND ';
+    }
+    $qry .= implode(' AND ', $wheres);
+  }
+  $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC";
   #logger($qry);
   $res = SQL::selectKey2Val($qry, 'id', 'id');
   return $res;

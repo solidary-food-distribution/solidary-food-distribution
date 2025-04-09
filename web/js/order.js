@@ -3,6 +3,14 @@ function order_filter(el){
   if($(el).hasClass('search')){
     data['field'] = 'search';
     data['value'] = $('#search').val();
+  }else if($(el).hasClass('category')){
+    $(el).toggleClass('selected');
+    var categories = [];
+    $('.category.selected').each(function(){
+      categories.push($(this).data('value'));
+    });
+    data['field'] = 'categories';
+    data['value'] = categories.join('|');
   }else if($(el).attr('id') == 'show_more'){
     var limit = data['limit'];
     if(limit == undefined){
@@ -11,7 +19,7 @@ function order_filter(el){
     limit = parseInt(limit) + 10;
     data['limit'] = limit;
     data['field'] = 'limit';
-    data['value'] = limit;
+    data['value'] = limit.toString();
   }else{
     data['field'] = $(el).closest('.options').data('field');
     data['value'] = $(el).data('value');
@@ -31,7 +39,9 @@ function order_filter(el){
         $('main').scrollTop(0);
       }
       params.delete(data['field']);
-      params.append(data['field'], data['value']);
+      if(data['value'].length){
+        params.append(data['field'], data['value']);
+      }
       var newURL = '/order/?' + params.toString();
       history.pushState({}, null, newURL);
       if(data['field'] == 'modus' && data['value'] == 's'){
@@ -71,6 +81,9 @@ function order_change(el,dir){
 }
 
 function order_show_more(){
+  if(!$('#show_more').length){
+    return;
+  }
   if($('#show_more').offset().top-50 > $('footer').offset().top){
     return;
   }
@@ -90,8 +103,8 @@ function order_infos_lazy_load(product_ids){
     dataType: "json",
     success: function(json){
       for (const [product_id, infos] of Object.entries(json)) {
-        console.log(product_id);
-        console.log(infos);
+        //console.log(product_id);
+        //console.log(infos);
         var html = '';
         if(infos.link != ''){
           html = '<a href="' + infos.link + '" target="_blank">';

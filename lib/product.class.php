@@ -17,6 +17,7 @@ class Product{
   public string $gtin_piece;
   public string $gtin_bundle;
   public string $infos;
+  public string $category;
 
   public static function create($inserts){
     require_once('sql.class.php');

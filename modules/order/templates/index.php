@@ -1,6 +1,10 @@
 <?php
 $PROPERTIES['pathbar']=array('/orders'=>'Bestellungen',''=>format_date($order->pickup_date));
-$PROPERTIES['body_class']='header_h5 footer_h8';
+$body_class='header_h5';
+if($modus == 'o'){
+  $body_class .= ' footer_h8';
+}
+$PROPERTIES['body_class']=$body_class;
 ?>
 
 <?php echo $start ?>
@@ -39,6 +43,13 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     </div>
   </div>
 
+  <div>
+    <?php ksort($categories); ?>
+    <?php foreach($categories as $category => $ccount): ?>
+      <div class="button category<?php echo isset($scategories[$category])?' selected':'' ?>" onclick="order_filter(this)" data-value="<?php echo htmlentities($category) ?>"><?php echo htmlentities($category).' ('.$ccount.')' ?></div>
+    <?php endforeach ?>
+  </div>
+
   <?php if(count($products) == 0 && $search!=''): ?>
     <div class="row">
       Keine Produkte gefunden
@@ -50,10 +61,15 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
 <?php
   $sum = array();
   $infos_lazy_load = array();
+  $product_count = 0;
 ?>
 
 <?php foreach($products as $product_id => $product): ?>
   <?php
+    $product_count++;
+    if($product_count >= $limit){
+      break;
+    }
     if(isset($order_items[$product_id])){
       $order_item = $order_items[$product_id];
       if($product->type == 'k'){
@@ -177,7 +193,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   </div>
 <?php endforeach ?>
 
-<?php if($modus=='s' && count($products)==$limit): ?>
+<?php if($modus=='s' && $product_count>0 && $product_count==$limit): ?>
   <div id="show_more" class="button" style="float:right;margin:0.5em" onclick="order_show_more_load()">Weitere anzeigen...</div>
   <script>
     $('main').on('scroll',order_show_more);

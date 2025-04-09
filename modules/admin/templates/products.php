@@ -89,6 +89,14 @@ if($supplier->id != 35){
             'url' => '/admin/products_update_ajax?product_id='.$product_id,
           )); ?><span>EUR Verkauf inkl. Steuer</span>
         </div>
+        <div class="inner_row">
+          <select onchange="admin_products_update_ajax(this)" data-field="category" data-url="/admin/products_update_ajax?product_id=<?php echo $product_id ?>">
+            <option value="">Kategorie wählen...</option>
+            <?php foreach($categories as $category => $count): ?>
+              <option value="<?php echo htmlentities($category) ?>"<?php echo ($category!='' && $product->category == $category)?' selected':'' ?>><?php echo htmlentities($category).' ('.$count.')' ?></option>
+            <?php endforeach ?>
+          </select>
+        </div>
       </div>
     </div>
   </div>

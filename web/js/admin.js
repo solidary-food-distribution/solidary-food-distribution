@@ -32,3 +32,19 @@ function admin_products_filter(el){
     }
   });
 }
+
+function admin_products_update_ajax(el){
+  var field = $(el).data('field');
+  var value = $(el).val();
+  var url = $(el).data('url');
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    data: {'field': field, 'value': value},
+    url: url,
+    dataType: "json",
+    success: function(html){
+      $('#loading').hide();
+    }
+  });
+}

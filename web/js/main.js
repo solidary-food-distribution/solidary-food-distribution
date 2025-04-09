@@ -77,21 +77,30 @@ function get_ts(){
 }
 
 function replace_header_main_footer(html){
-  var header_pos=html.indexOf('</HEADER>');
-  if(header_pos>=0){
-    var header=html.substr(0,header_pos+9);
-    html=html.substr(header_pos+9);
-    header=header.replace('<HEADER>','').replace('</HEADER>','');
-    $('#header').html(header);
+  var extract = '';
+  var [html, extract] = extract_tag(html,'BODY_CLASS');
+  if(extract != undefined){
+    $('body').attr('class',extract);
   }
-  var footer_pos=html.indexOf('<FOOTER>');
-  if(footer_pos>=0){
-    var footer=html.substr(footer_pos);
-    html=html.substr(0,footer_pos);
-    footer=footer.replace('<FOOTER>','').replace('</FOOTER>','');
-    $('#footer').html(footer);
+  var [html, extract] = extract_tag(html,'HEADER');
+  if(extract != undefined){
+    $('#header').html(extract);
+  }
+  var [html, extract] = extract_tag(html,'FOOTER');
+  if(extract != undefined){
+    $('#footer').html(extract);
   }
   $('#main').html(html);
+}
+function extract_tag(html,tag){
+  var start = html.indexOf('<'+tag+'>');
+  var extract = undefined;
+  if(start>=0){
+    var end = html.indexOf('</'+tag+'>');
+    var extract = html.substr(start+tag.length+2,end-start-tag.length-2);
+    html = html.substr(0,start) + html.substr(end+tag.length+3);
+  }
+  return [html,extract];
 }
 
 /*

@@ -45,6 +45,13 @@ function execute_products(){
   $supplier = $suppliers->first();
 
   require_once('products.class.php');
+  $categories = array();
+  $products = new Products(array('status' => array('o', 's')));
+  foreach($products as $product){
+    $categories[$product->category] += 1;
+  }
+  ksort($categories);
+
   $filter = array('supplier_id' => $supplier_id);
   if($status !== ''){
     $filter['status'] = $status;
@@ -54,7 +61,7 @@ function execute_products(){
   require_once('prices.class.php');
   $prices = new Prices(array('product_id' => $products->keys()));
 
-  return array('supplier' => $supplier, 'products' => $products, 'prices' => $prices, 'status' => $status);
+  return array('supplier' => $supplier, 'products' => $products, 'prices' => $prices, 'categories' => $categories, 'status' => $status);
 }
 
 function execute_products_filter_ajax(){

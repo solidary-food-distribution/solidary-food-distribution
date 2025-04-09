@@ -1,4 +1,7 @@
 <div class="row">
+  2025-04-09 13:30 Suche-Kategorien eingebaut<br>
+</div>
+<div class="row">
   2025-04-07 23:15 Modul "Infos" eingebaut<br>
 </div>
 <div class="row">
