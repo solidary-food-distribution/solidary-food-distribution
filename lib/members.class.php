@@ -56,6 +56,7 @@ class Members extends ArrayObject{
     foreach($ms as $id=>$m){
       $member = new Member();
       $member->id = intval($m['id']);
+      $member->created = $m['created'];
       $member->name = $m['name'];
       $member->identification = $m['identification'];
       $member->producer = intval($m['producer']);

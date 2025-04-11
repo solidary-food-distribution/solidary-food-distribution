@@ -8,10 +8,24 @@ require_once('members.class.php');
 require_once('users.class.php');
 
 function execute_index(){
-  $members = new Members();
+  $sort = get_request_param('sort');
+
+  if($sort == 'name'){
+    $sort_array = array($sort => 'ASC');
+  }else{ //created
+    $sort = 'created';
+    $sort_array = array('created' => 'DESC', 'name' => 'ASC');
+  }
+  $members = new Members(array(),$sort_array);
+  $sorts = array(
+    'created' => 'Angelegt neu->alt',
+    'name' => 'Name a->z',
+  );
   return array(
     'members' => $members,
-    'users' => get_users()
+    'users' => get_users(),
+    'sorts' => $sorts,
+    'sort' => $sort,
   );
 }
 

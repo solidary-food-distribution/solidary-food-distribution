@@ -467,6 +467,7 @@ div.mr1{
 .row .col11,
 .row .col12,
 .row .col13,
+.row .col17,
 .row .col18{
   display: flex;
   justify-content: flex-start;
@@ -510,6 +511,9 @@ div.mr1{
 }
 .row .col13{
   width: 28.6em;
+}
+.row .col17{
+  width: 37.23em;
 }
 .row .col18{
   width: 39.42em;

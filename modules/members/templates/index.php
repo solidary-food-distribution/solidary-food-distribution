@@ -3,21 +3,42 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration',''=>'Mitglieder');
 $PROPERTIES['body_class']='header_h5';
 ?>
 
+<?php ob_start(); ?>
+<div class="controls">
+  <div class="control input">
+    <select class="center" name="sort" onchange="location.href='/members?sort='+$(this).val();">
+      <?php foreach($sorts as $sk => $sv): ?>
+        <option value="<?php echo $sk ?>" <?php echo $sort==$sk?'selected="selected"':'' ?> ><?php echo htmlentities($sv) ?></option>
+      <?php endforeach ?>
+    </select>
+  </div>
+</div>
+<?php $PROPERTIES['header']=ob_get_clean(); ?>
+
 <?php foreach($members as $member): ?>
   <div class="row">
-    <div class="col8">
-      <div>
-        <div>Mitglied: <?php echo $member->name ?></div>
+    <div class="inner_row">
+      <div class="col8">
+        <div>
+          <div>Mitglied: <?php echo $member->name ?></div>
+        </div>
+      </div>
+      <div class="col4">
+        <div>
+          <div>Abholer: <?php echo $member->consumer?'ja':'nein' ?></div>
+        </div>
+      </div>
+      <div class="col4">
+        <div>
+          <div>Lieferant: <?php echo translate_supplier($member->producer) ?></div>
+        </div>
       </div>
     </div>
-    <div class="col4">
-      <div>
-        <div>Abholer: <?php echo $member->consumer?'ja':'nein' ?></div>
-      </div>
-    </div>
-    <div class="col4">
-      <div>
-        <div>Lieferant: <?php echo translate_supplier($member->producer) ?></div>
+    <div class="inner_row">
+      <div class="col8">
+        <div>
+          <div>Angelegt: <?php echo format_date($member->created) ?></div>
+        </div>
       </div>
     </div>
     <?php if(!empty($users[$member->id])): ?>
@@ -60,7 +81,7 @@ $PROPERTIES['body_class']='header_h5';
       <?php endforeach ?>
     <?php endif ?>
     <div class="col1 right last">
-      <span class="button large" onclick="location.href='/members/edit?member_id=<?php echo $member->id ?>';">
+      <span class="button" onclick="location.href='/members/edit?member_id=<?php echo $member->id ?>';">
         <i class="fa-solid fa-pencil"></i>
       </span>
     </div>
