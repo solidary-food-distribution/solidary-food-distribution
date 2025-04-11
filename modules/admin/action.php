@@ -236,7 +236,8 @@ function execute_pickup_emails(){
 
   $users = array();
   $members = $data['members'];
-  if(count($members)){
+  if($members->count()){
+    $pickup_items_array = $data['pickup_items_array'];
     $member_ids = array();
     foreach($members as $member_id => $member){
       if(!isset($pickup_items_array[$member_id])){
