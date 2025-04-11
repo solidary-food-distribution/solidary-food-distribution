@@ -6,15 +6,25 @@ $PROPERTIES['pathbar']=array(
 $PROPERTIES['body_class']='header_h5';
 ?>
 
+<?php
+$date_until = '';
+if($date_next){
+  $date_until = date('Y-m-d',strtotime('-1 DAYS',strtotime($date_next)));
+}
+?>
+
 <?php ob_start(); ?>
 <div class="controls">
   <div class="control_l input <?php echo $date_prev?'':'disabled' ?>" onclick="<?php echo $date_prev?'location.href=\'/admin/orders?date='.$date_prev.'\'':'' ?>">
     <i class="fa-solid fa-caret-left"></i>
   </div><div class="control_m input">
-    <?php echo format_date($date).($date_next?' - '.format_date(date('Y-m-d',strtotime('-1 DAYS',strtotime($date_next)))):''); ?>
+    Abholung: <?php echo format_date($date).($date_next?' - '.format_date($date_until):''); ?>
   </div><div class="control_r input <?php echo $date_next?'':'disabled' ?>" onclick="<?php echo $date_next?'location.href=\'/admin/orders?date='.$date_next.'\'':'' ?>">
     <i class="fa-solid fa-caret-right"></i>
   </div>
+  <?php if(count($members) && $date_until >= date('Y-m-d') && $date_prev < date('Y-m-d')): ?>
+    <div class="button" onclick="location.href='/admin/pickup_emails?date=<?php echo $date ?>';">Noch Abholende E-Mails</div>
+  <?php endif ?>
 </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 

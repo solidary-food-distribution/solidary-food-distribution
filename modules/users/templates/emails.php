@@ -3,15 +3,17 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration','/users'=>'Benutzer',''=
 ?>
 
 <div class="row">
-  <?php 
-    $index=0;
-    $list='';
-    foreach($users as $user){
-      if(strpos(' '.$user['name'],'GEKÜNDIGT') || strpos(' '.$user['email'],'GEKÜNDIGT') || !strpos($user['email'],'@')){
-        continue;
+  <textarea style="width:100%;" rows="30">
+    <?php 
+      $index=0;
+      $list='';
+      foreach($users as $user){
+        if(strpos(' '.$user['name'],'GEKÜNDIGT') || strpos(' '.$user['email'],'GEKÜNDIGT') || !strpos($user['email'],'@')){
+          continue;
+        }
+        $list.=$user['name'].' <'.$user['email'].'>, ';
       }
-      $list.=$user['name'].' <'.$user['email'].'>, ';
-    }
-    echo htmlentities(trim($list,', '));
-  ?>
+      echo htmlentities(trim($list,', '));
+    ?>
+  </textarea>
 </div>

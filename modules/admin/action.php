@@ -230,6 +230,25 @@ function execute_orders(){
   return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'pickup_items_array' => $pickup_items_array, 'products' => $products, 'suppliers' => $suppliers);
 }
 
+function execute_pickup_emails(){
+  $data = execute_orders();
+  $date = $data['date'];
+
+  $users = array();
+  $members = $data['members'];
+  if(count($members)){
+    $member_ids = array();
+    foreach($members as $member_id => $member){
+      if(!isset($pickup_items_array[$member_id])){
+        $member_ids[] = $member_id;
+      }
+    }
+    require_once('users.class.php');
+    $users = new Users(array('member_id' => $member_ids));
+  }
+  return array('date' => $date, 'users' => $users);
+}
+
 function execute_infos(){
   if(!user_has_access('infos')){
     forward_to_noaccess();
