@@ -39,7 +39,7 @@ function order_filter(el){
         $('main').scrollTop(0);
       }
       params.delete(data['field']);
-      if(data['value'].length){
+      if(data['value'].toString().length){
         params.append(data['field'], data['value']);
       }
       var newURL = '/order/?' + params.toString();
