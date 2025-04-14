@@ -108,9 +108,17 @@ function execute_purchases(){
     forward_to_noaccess();
   }
 
-  $mindate = date('Y-m-d', strtotime('-21 DAYS', time()));
+  $dates = get_delivery_dates();
+  $date = $dates['date'];
+  $date_prev = $dates['date_prev'];
+  $date_next = $dates['date_next'];
+
+  require_once('delivery_dates.class.php');
+  $delivery_dates = new DeliveryDates(array('date' => $date));
+  $delivery_date = $delivery_dates->first();
+
   require_once('purchases.class.php');
-  $purchases = new Purchases(array('datetime>=' => $mindate));
+  $purchases = new Purchases(array('delivery_date_id' => $delivery_date->id));
   $member_ids = array();
   $delivery_date_ids = array();
   foreach($purchases as $purchase){
@@ -121,10 +129,9 @@ function execute_purchases(){
   require_once('members.class.php');
   $suppliers = new Members(array('id' => array_keys($member_ids)));
 
-  require_once('delivery_dates.class.php');
-  $delivery_dates = new DeliveryDates(array('id' => array_keys($delivery_date_ids)));
+  
 
-  return array('purchases' => $purchases, 'delivery_dates' => $delivery_dates, 'suppliers' => $suppliers);
+  return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'purchases' => $purchases, 'delivery_dates' => $delivery_dates, 'suppliers' => $suppliers);
 }
 
 function execute_purchase(){
@@ -140,7 +147,7 @@ function execute_purchase(){
 
   require_once('purchases.inc.php');
   $product_sums = purchases_get_product_sums($delivery_date->date, $purchase->supplier_id);
-  logger("product_sums ".print_r($product_sums,1));
+  #logger("product_sums ".print_r($product_sums,1));
 
   require_once('products.class.php');
   $products = new Products(array('id' => array_keys($product_sums)));
@@ -151,10 +158,7 @@ function execute_purchase(){
   return array('purchase' => $purchase, 'delivery_date' => $delivery_date, 'product_sums' => $product_sums, 'products' => $products, 'supplier' => $supplier);
 }
 
-function execute_orders(){
-  if(!user_has_access('orders')){
-    forward_to_noaccess();
-  }
+function get_delivery_dates(){
   $date = get_request_param('date');
   if($date == ''){
     $date = date('Y-m-d',strtotime('-3 DAYS',time()));
@@ -173,6 +177,18 @@ function execute_orders(){
   $delivery_date = $delivery_dates->first();
   $date_next = $delivery_date->date;
 
+  return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next);
+}
+
+function execute_orders(){
+  if(!user_has_access('orders')){
+    forward_to_noaccess();
+  }
+
+  $dates = get_delivery_dates();
+  $date = $dates['date'];
+  $date_prev = $dates['date_prev'];
+  $date_next = $dates['date_next'];
   #logger("date $date_prev $date $date_next");
 
   $orders_next = $date_next;
