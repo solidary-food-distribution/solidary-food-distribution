@@ -106,7 +106,7 @@ $PROPERTIES['body_class']=$body_class;
     $locked = false;
     if($supplier->producer == 1){
       if($supplier->id == 20){
-        $lock_date = date('Y-m-d', strtotime('-4 days', strtotime($order->pickup_date))).' 18:00:00';
+        $lock_date = date('Y-m-d', strtotime('-3 days', strtotime($order->pickup_date))).' 18:00:00';
       }else{
         $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
       }
