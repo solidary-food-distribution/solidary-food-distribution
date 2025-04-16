@@ -57,6 +57,7 @@ function execute_login_ajax(){
     }
   }
   if(empty($error)){
+    unset($_SESSION['browser']);
     $user->set_session();
     #logger(print_r($_SESSION['user'],1));
   }
