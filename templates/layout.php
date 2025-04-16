@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202504140845';
+$version='202504170040';
 $body_class='';
 $header='';
 $footer='';
@@ -13,9 +13,17 @@ if($authed){
   $footer=isset($PROPERTIES['footer'])?$PROPERTIES['footer']:'';
   $footer=str_replace('%VERSION%',$version,$footer);
 }
+$scale = isset($_SESSION['scale']) && intval($_SESSION['scale']);
+if($scale){
+  $body_class = trim($body_class.' scale');
+}
+$html_class = '';
+if(isset($_SESSION['browser'])){
+  $html_class .= 'browser_set';
+}
 ?>
 <!doctype html>
-<html>
+<html class="<?php echo $html_class ?>">
 <head>
 <title>Mit Sinn Leben eG</title>
 <script data-cfasync="false" type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
@@ -50,7 +58,7 @@ if($authed){
               }
             ?>
           </div>
-          <div class="logout" onclick="location.href='/auth/logout';"><?php echo (isset($_SESSION['scale']) && intval($_SESSION['scale']))?($user['name'].' - '):'' ?>Logout</div>
+          <div class="logout" onclick="location.href='/auth/logout';"><?php echo $scale?($user['name'].' - '):'' ?>Logout</div>
       <?php else: ?>
           <div class="center headline">
             <div class="image">
@@ -65,6 +73,7 @@ if($authed){
     </div>
   </header>
   <main>
+    <div id="ppcm"></div>
     <div id="background"></div>
     <div id="main">
       <?php echo $CONTENT ?>

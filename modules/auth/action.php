@@ -2,6 +2,22 @@
 
 require_once('inc.php');
 
+function execute_browser_set(){
+  $ppcm = get_request_param('ppcm');
+  $w_width = get_request_param('w_width');
+  $w_height = get_request_param('w_height');
+  $browser = array(
+    'ppcm' => $ppcm,
+    'w_width' => $w_width,
+    'w_height' => $w_height,
+    'agent' => $_SERVER['HTTP_USER_AGENT'],
+  );
+  $_SESSION['browser'] = $browser;
+  file_put_contents($_SERVER['DOCUMENT_ROOT'].'/../log/browser.log', date('Y-m-d H:i:s').' '.intval($_SESSION['user']['user_id']).' '.json_encode($browser)."\n", FILE_APPEND);
+  echo json_encode(array('result' => '1'));
+  exit;
+}
+
 function execute_login(){
   if(isset($_SESSION['user'])){
     forward_to_page('/');

@@ -1,6 +1,11 @@
 function document_ready(){
   //var mobile=is_mobile();
   //calc_scroll_filler();
+  $(window).on('resize', function(){
+    $('html').removeClass('browser_set');
+    send_browser();
+  });
+  send_browser();
   $('div[onclick]').each(function(){
     $(this).click(highlight_click);
   });
@@ -20,6 +25,32 @@ function document_ready(){
     }
   });
   $('main').trigger('scroll');
+}
+
+var send_browser_timeout = 0;
+function send_browser(){
+  if($('html').hasClass('browser_set')){
+    return;
+  }
+  if(send_browser_timeout){
+    window.clearTimeout(send_browser_timeout);
+  }
+  send_browser_timeout = window.setTimeout(send_browser_func, 200);
+}
+function send_browser_func(){
+  var data = {
+    ppcm: $('#ppcm').outerWidth(),
+    w_width: window.innerWidth,
+    w_height: window.innerHeight
+  };
+  $.ajax({
+    type: 'POST',
+    url: '/auth/browser_set',
+    data: data,
+    dataType: 'json',
+    success: function(data){
+    }
+  });
 }
 
 function main_scroll(y){
@@ -80,7 +111,10 @@ function replace_header_main_footer(html){
   var extract = '';
   var [html, extract] = extract_tag(html,'BODY_CLASS');
   if(extract != undefined){
-    $('body').attr('class',extract);
+    if($('body').hasClass('scale')){
+      extract = extract + ' scale';
+    }
+    $('body').attr('class',extract.trim());
   }
   var [html, extract] = extract_tag(html,'HEADER');
   if(extract != undefined){
