@@ -7,43 +7,69 @@ user_needs_access('debits');
 require_once('debits.class.php');
 
 function execute_index(){
+  $month = get_request_param('month');
+  if($month == ''){
+    $month = date('Y-m');
+  }
+
   update_debits();
-  return get_debits_data();
+
+  $months = array();
+  $mindate = date('Y-m-d', strtotime('-13 MONTHS'));
+  $date = date('Y-m-d');
+  while($date > $mindate){
+    $months[substr($date, 0, 7)] = translate_month(substr($date, 5, 2)).' '.substr($date, 0, 4);
+    $date = date('Y-m-d', strtotime('-1 MONTHS', strtotime($date)));
+  }
+
+  $month_prev = date('Y-m', strtotime('-1 MONTHS', strtotime($month.'-01')));
+  $month_next = date('Y-m', strtotime('+1 MONTHS', strtotime($month.'-01')));
+  if($month_next > date('Y-m')){
+    $month_next = '';
+  }
+
+  $return = get_debits_data($month);
+  $return['month'] = $month;
+  $return['month_prev'] = $month_prev;
+  $return['month_next'] = $month_next;
+  $return['months'] = $months;
+  return $return;
 }
 
 
 function execute_export_csv(){
+  $month = get_request_param('month');
   $now = time();
-  $data = get_debits_data();
+  $data = get_debits_data($month);
   foreach($data['debits'] as $member_id => $debits){
     foreach($debits as $debit){
-      $debit->update(array(
-        'status' => 'e',
-        'exported' => date('Y-m-d H:i:s', $now)
-      ));
+      if($debit->status == 'o'){
+        $debit->update(array(
+          'status' => 'e',
+          'exported' => date('Y-m-d H:i:s', $now)
+        ));
+      }
     }
   }
   $data['now'] = $now;
+  $data['month'] = $month;
   return $data;
 }
 
-function get_debits_data(){
-  $ds = new Debits(array('status' => 'o'));
+function get_debits_data($month){
+  require_once('pickups.class.php');
+  $pickups = new Pickups(array('created' => $month.'%'));
+
+  $ds = new Debits(array('pickup_id' => $pickups->keys()));
   $debits = array();
   $member_ids = array();
-  $pickup_ids = array();
   foreach($ds as $d){
     $debits[$d->member_id][$d->id] = $d;
     $member_ids[$d->member_id] = 1;
-    $pickup_ids[$d->pickup_id] = 1;
   }
-  #logger(print_r($ds,1));
 
   require_once('members.class.php');
   $members = new Members(array('id' => array_keys($member_ids)));
-
-  require_once('pickups.class.php');
-  $pickups = new Pickups(array('id' => array_keys($pickup_ids)));
 
   return array('members' => $members, 'debits' => $debits, 'pickups' => $pickups);
 }

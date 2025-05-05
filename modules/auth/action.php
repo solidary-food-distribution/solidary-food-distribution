@@ -6,10 +6,12 @@ function execute_browser_set(){
   $ppcm = get_request_param('ppcm');
   $w_width = get_request_param('w_width');
   $w_height = get_request_param('w_height');
+  $devicePixelRatio = get_request_param('devicePixelRatio');
   $browser = array(
     'ppcm' => $ppcm,
     'w_width' => $w_width,
     'w_height' => $w_height,
+    'devicePixelRatio' => $devicePixelRatio,
     'agent' => $_SERVER['HTTP_USER_AGENT'],
   );
   $_SESSION['browser'] = $browser;

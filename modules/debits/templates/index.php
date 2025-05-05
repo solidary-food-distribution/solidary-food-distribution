@@ -4,8 +4,22 @@ $PROPERTIES['body_class']='header_h5 footer_h4';
 $totalsum=0;
 ?>
 <?php ob_start(); ?>
-  <div class="button" onclick="debits_export()">Exportieren</div>
+<div class="controls">
+  <div class="control_l input <?php echo $month_prev?'':'disabled' ?>" onclick="<?php echo $month_prev?'location.href=\'/debits?month='.$month_prev.'\'':'' ?>">
+    <i class="fa-solid fa-caret-left"></i>
+  </div><div class="control_m input">
+    <select class="center" name="month" onchange="location.href='/debits?month='+$(this).val();">
+      <?php foreach($months as $m=>$mv): ?>
+        <option value="<?php echo $m ?>" <?php echo $month==$m?'selected="selected"':'' ?> ><?php echo $mv ?></option>
+      <?php endforeach ?>
+    </select>
+  </div><div class="control_r input <?php echo $month_next?'':'disabled' ?>" onclick="<?php echo $month_next?'location.href=\'/debits?month='.$month_next.'\'':'' ?>">
+    <i class="fa-solid fa-caret-right"></i>
+  </div>
+  <div class="button" onclick="debits_export('<?php echo $month ?>')">Exportieren</div>
+</div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
+
 <?php foreach($members as $member_id => $member): ?>
   <div class="row">
   <?php

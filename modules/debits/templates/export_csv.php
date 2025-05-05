@@ -1,6 +1,6 @@
 <?php
 
-$filename = '/tmp/debits_'.date('Y-m-d-H-i-s', $now).'.csv';
+$filename = '/tmp/debits_'.$month.'_'.date('Y-m-d-H-i-s', $now).'.csv';
 
 $h = fopen($filename, 'w');
 $header = array(

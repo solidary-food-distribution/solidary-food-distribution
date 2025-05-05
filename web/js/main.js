@@ -38,10 +38,15 @@ function send_browser(){
   send_browser_timeout = window.setTimeout(send_browser_func, 200);
 }
 function send_browser_func(){
+  var devicePixelRatio = -1;
+  if(typeof window.devicePixelRatio !== 'undefined'){
+    devicePixelRatio = window.devicePixelRatio;
+  }
   var data = {
     ppcm: $('#ppcm').outerWidth(),
     w_width: window.innerWidth,
-    w_height: window.innerHeight
+    w_height: window.innerHeight,
+    devicePixelRatio: devicePixelRatio
   };
   $.ajax({
     type: 'POST',
