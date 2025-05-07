@@ -1,5 +1,5 @@
 <?php
-declare(strict_types=1);
+declare(strict_types=0);
 
 class Price{
   public int $product_id;
@@ -11,6 +11,25 @@ class Price{
   public float $tax;
   public float $purchase;
   public float $suggested_retail;
+
+  public static function create($product_id){
+    require_once('sql.class.php');
+    $qry = "INSERT INTO msl_prices (`product_id`, `start`, `end`, tax, purchase) VALUES (".intval($product_id).", 
+      CURDATE(), '9999-12-31', 0, 0)";
+    SQL::insert($qry);
+    $values = SQL::selectOne("SELECT * FROM msl_prices WHERE product_id=".intval($product_id));
+    $object = new Price();
+    $object->_init_values($values);
+    return $object;
+  }
+
+  public function _init_values( $values ){
+    foreach($values as $key => $value){
+      if(property_exists($this, $key)){
+        $this->{$key} = $value;
+      }
+    }
+  }
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

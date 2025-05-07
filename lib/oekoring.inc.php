@@ -54,7 +54,7 @@ function oekoring_import_bnn($file){
     SQL::update("UPDATE msl_products SET import_status='n' WHERE supplier_id='35'");
   }
 
-  $brands = SQL::selectKey2Val("SELECT bnn,id FROM msl_brands", 'bnn', 'id');
+  $brands = SQL::selectKey2Val("SELECT bnn,id FROM msl_brands WHERE supplier_id=35", 'bnn', 'id');
   $categories = SQL::selectKey2Val("SELECT wg_nr,(CASE WHEN wg_ersatz>0 THEN (SELECT wg_name FROM msl_wg_oeko wg2 WHERE wg2.wg_nr=wg.wg_ersatz) ELSE wg_name END) wg_name FROM msl_wg_oeko wg", 'wg_nr' , 'wg_name');
 
   $products = array();

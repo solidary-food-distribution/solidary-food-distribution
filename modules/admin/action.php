@@ -44,6 +44,8 @@ function execute_products(){
   $suppliers = new Members(array('id' => $supplier_id, 'producer>' => '0'));
   $supplier = $suppliers->first();
 
+  $product_id = get_request_param('product_id');
+
   require_once('products.class.php');
   $categories = array();
   $products = new Products(array('status' => array('o', 's')));
@@ -56,12 +58,18 @@ function execute_products(){
   if($status !== ''){
     $filter['status'] = $status;
   }
+  if($product_id){
+    $filter['id'] = $product_id;
+  }
   $products = new Products($filter);
+
+  require_once('sql.class.php');
+  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands WHERE supplier_id='".intval($supplier_id)."' ORDER BY name", 'id', 'name');
 
   require_once('prices.class.php');
   $prices = new Prices(array('product_id' => $products->keys()));
 
-  return array('supplier' => $supplier, 'products' => $products, 'prices' => $prices, 'categories' => $categories, 'status' => $status);
+  return array('supplier' => $supplier, 'products' => $products, 'prices' => $prices, 'categories' => $categories, 'status' => $status, 'brands' => $brands);
 }
 
 function execute_products_filter_ajax(){
@@ -79,7 +87,7 @@ function execute_products_update_ajax(){
   $field = get_request_param('field');
   $value = get_request_param('value');
 
-  if(strpos(',purchase,price', $field)){
+  if(strpos(',purchase,price,tax', $field)){
     $value = str_replace(',', '.', $value);
     require_once('prices.class.php');
     $prices = new Prices(array('product_id' => $product_id, 'start<=' => date('Y-m-d'), 'end>=' => date('Y-m-d')));
@@ -89,10 +97,25 @@ function execute_products_update_ajax(){
   }else{
     require_once('products.class.php');
     $product = Products::sget($product_id);
-    $product->update(array($field => $value));
+    $updates = array($field => $value);
+    if($field == 'name' && $supplier_id != 35){
+      $updates['supplier_product_id'] = $value;
+    }
+    $product->update($updates);
   }
   echo json_encode(array('result' => '1'));
   exit();
+}
+
+function execute_product_new(){
+  $supplier_id = get_request_param('supplier_id');
+  require_once('product.class.php');
+  $product = Product::create(array('supplier_id' => $supplier_id, 'status' => 'n'));
+
+  require_once('prices.class.php');
+  $price = Price::create($product->id);
+
+  forward_to_page('/admin/products', 'supplier_id='.$supplier_id.'&product_id='.$product->id);
 }
 
 function execute_products_suppliers(){

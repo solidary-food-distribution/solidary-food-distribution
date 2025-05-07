@@ -32,6 +32,7 @@ if($supplier->id != 35){
   <?php
     $purchase = $prices[$product_id]->purchase;
     $price = $prices[$product_id]->price;
+    $tax = $prices[$product_id]->tax;
   ?>
   <div class="row product" data-id="<?php echo $product_id ?>">
     <div class="col2">
@@ -59,9 +60,27 @@ if($supplier->id != 35){
       </div>
     </div>
     <div class="col8">
-      <div>
-        <?php echo htmlentities($product->name) ?><br>
-        <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
+      <div style="width:98%">
+        <?php echo html_input(array(
+          'type' => 'string',
+          'field' => 'name',
+          'value' => $product->name,
+          'url' => '/admin/products_update_ajax?product_id='.$product_id,
+          )); ?><br><br>
+        <?php if(!empty($brands)): ?>
+          <select onchange="admin_products_update_ajax(this)" data-field="brand_id" data-url="/admin/products_update_ajax?product_id=<?php echo $product_id ?>">
+            <option value="0">Marke/Herkunft...</option>
+            <?php foreach($brands as $brand_id => $brand): ?>
+              <option value="<?php echo $brand_id ?>"<?php echo ($product->brand_id == $brand_id)?' selected':'' ?>><?php echo htmlentities($brand) ?></option>
+            <?php endforeach ?>
+          </select><br><br>
+        <?php endif ?>
+        <select onchange="admin_products_update_ajax(this)" data-field="category" data-url="/admin/products_update_ajax?product_id=<?php echo $product_id ?>">
+          <option value="">Kategorie wählen...</option>
+          <?php foreach($categories as $category => $count): ?>
+            <option value="<?php echo htmlentities($category) ?>"<?php echo ($category!='' && $product->category == $category)?' selected':'' ?>><?php echo htmlentities($category).' ('.$count.')' ?></option>
+          <?php endforeach ?>
+        </select>
       </div>
     </div>
     <div class="col8">
@@ -71,6 +90,13 @@ if($supplier->id != 35){
           'options' => $status_options,
           'field' => 'status',
           'value' => $product->status,
+          'url' => '/admin/products_update_ajax?product_id='.$product_id,
+        )); ?>
+        <?php echo html_input(array(
+          'type' => 'options',
+          'options' => array('p' => 'St.', 'k' => 'kg', 'w' => 'St/kg', 'b' => 'Budget'),
+          'field' => 'type',
+          'value' => $product->type,
           'url' => '/admin/products_update_ajax?product_id='.$product_id,
         )); ?>
         <div class="inner_row">
@@ -88,16 +114,20 @@ if($supplier->id != 35){
             'value' => format_money($price),
             'url' => '/admin/products_update_ajax?product_id='.$product_id,
           )); ?><span>EUR Verkauf inkl. Steuer</span>
+          <span>
+            <?php echo html_input(array(
+              'type' => 'options',
+              'options' => array('0.00' => '0%', '7.00' => '7%', '19.00' => '19%'),
+              'field' => 'tax',
+              'value' => $tax,
+              'url' => '/admin/products_update_ajax?product_id='.$product_id,
+            )); ?>
+          </span>
         </div>
-        <div class="inner_row">
-          <select onchange="admin_products_update_ajax(this)" data-field="category" data-url="/admin/products_update_ajax?product_id=<?php echo $product_id ?>">
-            <option value="">Kategorie wählen...</option>
-            <?php foreach($categories as $category => $count): ?>
-              <option value="<?php echo htmlentities($category) ?>"<?php echo ($category!='' && $product->category == $category)?' selected':'' ?>><?php echo htmlentities($category).' ('.$count.')' ?></option>
-            <?php endforeach ?>
-          </select>
-        </div>
+
       </div>
     </div>
   </div>
 <?php endforeach ?>
+
+<div class="button" onclick="if(confirm('Neues Produkt anlegen?')){location.href='/admin/product_new?supplier_id=<?php echo $supplier->id ?>';}">Neues Produkt anlegen</div>

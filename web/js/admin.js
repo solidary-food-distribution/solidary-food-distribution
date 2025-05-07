@@ -1,5 +1,10 @@
 function admin_products_filter(el){
   var data = get_url_params();
+  console.log(data);
+  if(data.product_id != undefined){
+    delete data.product_id;
+  }
+  console.log(data);
   if($(el).hasClass('search')){
     //data['field'] = 'search';
     //data['value'] = $('#search').val();
