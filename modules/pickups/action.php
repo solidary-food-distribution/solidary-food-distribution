@@ -20,7 +20,9 @@ function execute_index(){
     $order_item_ids[] = $pui->order_item_id;
   }
 
-  may_auto_create_pickup($order_item_ids);
+  if(isset($_SESSION['scale']) && $_SESSION['scale']){
+    may_auto_create_pickup($order_item_ids);
+  }
 
   $product_ids = $puis->get_product_ids();
   require_once('products.class.php');
