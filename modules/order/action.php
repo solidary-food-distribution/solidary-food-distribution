@@ -89,7 +89,7 @@ function execute_index(){
   }
 
   $brands = array();
-  if($modus != '1' && !empty($products)){
+  if(!empty($products)){
     require_once('sql.class.php');
     $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
   }

@@ -102,7 +102,6 @@ $PROPERTIES['body_class']=$body_class;
     $purchase_incl_tax = round($amount_price * round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2), 2);
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
-    $brand = '';
     $locked = false;
     if($supplier->producer == 1){
       if($supplier->id == 20){
@@ -122,9 +121,11 @@ $PROPERTIES['body_class']=$body_class;
       }
       $sum['trader_paid'] = $sum['trader_paid'] + $purchase_incl_tax;
       $sum['trader_sum'] = $sum['trader_sum'] + $price_row;
-      if($product->brand_id){
-        $brand = $brands[$product->brand_id];
-      }
+    }
+
+    $brand = '';
+    if($product->brand_id){
+      $brand = $brands[$product->brand_id];
     }
 
     $price_title = "EK: ".format_money(round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2))." EUR";

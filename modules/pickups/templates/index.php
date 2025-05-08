@@ -14,10 +14,12 @@ $PROPERTIES['body_class']='header_h5';
 
 <?php
 $last_pickup = '';
+$pickups_counter = 0;
 ?>
 
 <?php foreach($pickups as $pickup): ?>
   <?php
+    $pickups_counter++;
     $last_pickup = $pickup->created;
   ?>
   <div class="row">
@@ -33,7 +35,7 @@ $last_pickup = '';
         <?php
           $items = '';
           foreach($pickup_items[$pickup->id] as $item){
-            if($item->amount_pieces || $item->amount_weight){
+            if($item->amount_pieces || $item->amount_weight || (count($pickups) == $pickups_counter)){
               $items .= $products[$item->product_id]->name.', ';
             }
           }

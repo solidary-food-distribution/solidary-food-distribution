@@ -88,7 +88,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $supplier = $suppliers[$product->supplier_id];
     $brand = '';
     $locked = false;
-    if($pickup->status == 'c'){
+    if($pickup->status != 'o'){
       $locked = true;
     }
     $locked_less = false;

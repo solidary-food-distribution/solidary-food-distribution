@@ -1,7 +1,5 @@
 <?php
 
-#500515,515041,515039,510511,302375,
-
 function oekoring_download_bnns(){
   $ftp = ftp_connect('www.biooffice.de',21);
   if(!$ftp){
@@ -208,12 +206,14 @@ function oekoring_import_bnn($file){
     SQL::update($qry);
   }
 
+  $piece_factor = 0.7;
+  $bundle_factor = 0.6;
 
   $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=CURDATE() AND end>=CURDATE()";
   SQL::update($qry);
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.6,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$piece_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
   SQL::update($qry);
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*0.5,2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$bundle_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
   SQL::update($qry);
 
   $qry = "UPDATE msl_prices pr, msl_products p SET p.status='n' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
