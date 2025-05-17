@@ -1,5 +1,9 @@
 <?php
 
+#debug
+#require_once('inc.php');
+#purchases_get_product_sums('2025-05-16',13);
+
 function purchases_get_product_sums($pickup_date, $supplier_id){
   require_once('orders.class.php');
   $orders = new Orders(array('pickup_date' => $pickup_date));
@@ -20,6 +24,9 @@ function purchases_get_product_sums($pickup_date, $supplier_id){
 
   require_once('inventory.inc.php');
   $inventory = get_inventory(array_keys($order_amounts));
+  if($supplier_id!=35){
+    $inventory=array(); //only Oekoring
+  }
 
   #logger("purchases_get_product_sums inventory ".print_r($inventory,1));
 
