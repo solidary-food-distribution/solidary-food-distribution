@@ -147,6 +147,7 @@
   line-height: 1em;
 }
 #scale_bottom{
-  font-size: 0.8em;
+  font-size: 1em;
   text-align: center;
+  margin-bottom: 0.2em;
 }

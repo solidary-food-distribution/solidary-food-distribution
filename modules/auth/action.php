@@ -30,9 +30,16 @@ function execute_login(){
   }elseif($scale == '0'){ //explicit!
     $_SESSION['scale'] = 0;
   }
+  $others = 0;
+  if($_SESSION['scale'] == 1){
+    require_once('pickups.inc.php');
+    $info_others = pickups_get_info_others();
+    $others = $info_others['others'];
+  }
   //_forward/_query: see inc.php ensure_authed_user()
   return array(
-    'email' => get_request_param('email'), 
+    'email' => get_request_param('email'),
+    'others' => $others,
     '_forward' => get_request_param('_forward'), 
     '_query' => get_request_param('_query')
   );

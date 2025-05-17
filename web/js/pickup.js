@@ -112,7 +112,7 @@ function scale_show(el){
     $('#scale_ok').hide();
   }
   $('#scale_title2').text($(el).data('title2'));
-  $('#scale_bottom').text($(el).data('bottom'));
+  $('#scale_bottom').html($(el).data('bottom'));
   scale_exact = $(el).data('value_exact');
   scale_min = $(el).data('value_min');
   scale_max = $(el).data('value_max');

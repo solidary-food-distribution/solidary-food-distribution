@@ -49,7 +49,7 @@ $pickups_counter = 0;
           <i class="fa-regular fa-trash-can"></i>
         </span>
       <?php endif ?>
-      <span class="button large" onclick="location.href='/pickup?pickup_id=<?php echo $pickup->id ?>';">
+      <span class="button large" onclick="location.href='/pickup?pickup_id=<?php echo $pickup->id.(empty($items)?'&modus=d':'') ?>';">
         <i class="fa-solid fa-arrow-up-right-from-square"></i>
       </span>
     </div>

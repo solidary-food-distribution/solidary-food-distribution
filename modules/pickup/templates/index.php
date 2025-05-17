@@ -189,7 +189,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           if($product->type == 'k' || $product->type == 'w'){
             if($others['product_amounts'][$product_id]){
               $others_count = count($others['product_orders'][$product_id]);
-              $scale_bottom = 'Weitere Abholende: '.$others_count.' mit gesamt '.format_amount($others['product_amounts'][$product_id]).' '.($product->type=='k'?'kg':'St.');
+              $scale_bottom = 'Weitere Abholende: <b>'.$others_count.' mit gesamt '.format_amount($others['product_amounts'][$product_id]).' '.($product->type=='k'?'kg':'St.').'</b>';
             }else{
               $scale_bottom = 'Keine weiteren Abholende für dieses Produkt.';
             }
