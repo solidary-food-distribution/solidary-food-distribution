@@ -451,6 +451,7 @@ div.mr1{
   display: flex;
   flex-flow: row wrap;
   background-color: white;
+  position: relative;
 }
 .row.bottom_no_radius{
   border-bottom-left-radius: unset;
@@ -547,6 +548,22 @@ div.mr1{
   border: 1px solid black;
   border-radius: 0.5em;
   background-color: #dddddd;
+}
+.row .favorite:before{
+  position: absolute;
+  color: #37662d;
+  font-family: "Font Awesome 6 Free";
+  content: "\f004";
+  display:inline-block;
+  left:0em;
+  top:0em;
+  padding:0.7em;
+  padding-top:0.5em;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.row .favorite.set:before{
+  font-weight: bold;
 }
 .row .info{
   display: inline-block;

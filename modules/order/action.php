@@ -88,9 +88,11 @@ function execute_index(){
     }
   }
 
+  require_once('sql.class.php');
+  $favorites = SQL::selectKey2Val("SELECT product_id, 1 AS value FROM msl_favorites WHERE member_id=".intval($user['member_id']), 'product_id', 'value');
+
   $brands = array();
   if(!empty($products)){
-    require_once('sql.class.php');
     $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
   }
 
@@ -120,7 +122,7 @@ function execute_index(){
     }
   }
 
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
 }
 
 function search_products($search, $scategories, $suppliers){
@@ -364,4 +366,18 @@ function get_oekoring_order_sum($pickup_date){
   require_once('purchases.inc.php');
   $order_sum = purchases_get_sum($pickup_date, 35);
   return $order_sum;
+}
+
+function execute_favorite(){
+  global $user;
+  $product_id = get_request_param('product_id');
+  $set = get_request_param('set');
+  require_once('sql.class.php');
+  if(intval($set)){
+    SQL::update("INSERT INTO msl_favorites (member_id, product_id, created) VALUES (".intval($user['member_id']).",".intval($product_id).",NOW())");
+  }else{
+    SQL::update("DELETE FROM msl_favorites WHERE member_id=".intval($user['member_id'])." AND product_id=".intval($product_id));
+  }
+  echo json_encode(array('set' => $set));
+  exit;
 }

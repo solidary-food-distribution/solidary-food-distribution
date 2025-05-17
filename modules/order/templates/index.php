@@ -16,7 +16,7 @@ $PROPERTIES['body_class']=$body_class;
         <?php
           $options = array(
             'o' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
-            'f' => '<i class="fa-solid fa-heart" title="Bisher bestellt"></i> Lieblinge',
+            'f' => '<i class="fa-solid fa-heart" title="Lieblinge"></i> Lieblinge',
             '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
             '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Handel',
             's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> Suche'
@@ -159,6 +159,7 @@ $PROPERTIES['body_class']=$body_class;
           }
         ?>
       </div>
+      <div class="favorite<?php echo isset($favorites[$product_id])?' set':'' ?>" onclick="favorite_set(this)"></div>
     </div>
     <div class="col6">
       <div>

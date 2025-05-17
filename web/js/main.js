@@ -567,3 +567,24 @@ function keyboard_next_input(){
   inputs[index].click();
 }
 
+function favorite_set(el){
+  var product_id = $(el).closest('.row').data('id');
+  var set = 1;
+  if($(el).hasClass('set')){
+    var set = 0;
+  }
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/order/favorite?product_id='+product_id+'&set='+set,
+    dataType: "json",
+    success: function(json){
+      $('#loading').hide();
+      if(set){
+        $(el).addClass('set');
+      }else{
+        $(el).removeClass('set');
+      }
+    }
+  });
+}
