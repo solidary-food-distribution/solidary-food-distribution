@@ -75,10 +75,13 @@ var highlight_click_timer = 0;
 var highlight_click_element = 0;
 var highlight_click_save = '';
 function highlight_click(){
+  highlight_click_func($(this));
+}
+function highlight_click_func(el){
   highlight_click_timer_func();
-  highlight_click_element = $(this);
-  highlight_click_save = $(this).css('background-color');
-  $(this).css('background-color','#44cc44');
+  highlight_click_element = el;
+  highlight_click_save = el.css('background-color');
+  el.css('background-color','#44cc44');
   highlight_click_timer = setTimeout(highlight_click_timer_func, 100);
 }
 function highlight_click_timer_func(){
@@ -585,6 +588,7 @@ function favorite_set(el){
       }else{
         $(el).removeClass('set');
       }
+      highlight_input($('#header .controls .filter[data-field="modus"] .option[data-value="f"]'));
     }
   });
 }
