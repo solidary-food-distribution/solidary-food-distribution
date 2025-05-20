@@ -6,6 +6,7 @@ $PROPERTIES['body_class']='header_h5';
 <?php ob_start(); ?>
   <div class="controls">
     <div class="button" onclick="location.href='/users/emails';">Benutzer E-Mails</div>
+    <div class="button" onclick="location.href='/users/pins';">Türcodes</div>
   </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
