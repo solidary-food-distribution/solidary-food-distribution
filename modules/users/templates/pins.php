@@ -5,8 +5,8 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration','/users'=>'Benutzer',''=
 
 <?php foreach($users as $user): ?>
   <div class="row">
-    <div class="col5">
-      <?php echo $user['created'] ?>
+    <div class="col3">
+      <?php echo substr($user['created'], 0, 10) ?>
     </div>
     <div class="col2">
       <?php echo $user['pickup_pin'] ?>

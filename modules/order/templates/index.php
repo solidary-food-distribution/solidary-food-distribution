@@ -107,7 +107,7 @@ $PROPERTIES['body_class']=$body_class;
       if($supplier->id == 20){
         $lock_date = date('Y-m-d', strtotime('-4 days', strtotime($order->pickup_date))).' 18:00:00';
       }else{
-        $lock_date = date('Y-m-d', strtotime('-3 days', strtotime($order->pickup_date))).' 21:00:00';
+        $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
       }
       if(date('Y-m-d H:i:s') >= $lock_date){
         $locked = true;
@@ -115,7 +115,7 @@ $PROPERTIES['body_class']=$body_class;
       $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
       $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
     }elseif($supplier->producer == 2){
-      $lock_date = date('Y-m-d', strtotime('-3 days', strtotime($order->pickup_date))).' 21:00:00';
+      $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
       if(date('Y-m-d H:i:s') >= $lock_date){
         $locked = true;
       }

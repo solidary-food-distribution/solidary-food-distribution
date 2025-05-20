@@ -70,5 +70,5 @@ function execute_emails(){
 }
 
 function execute_pins(){
-  return array('users' => get_users(0, 'u.created DESC'));
+  return array('users' => get_users(0, 'u.created DESC, u.id DESC'));
 }
