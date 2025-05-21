@@ -11,8 +11,11 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration','/users'=>'Benutzer',''=
     <div class="col2">
       <?php echo $user['pickup_pin'] ?>
     </div>
-    <div class="col8">
+    <div class="col10">
       <?php echo htmlentities($user['name']) ?>
+      <?php if($user['name'] != $user['um_name']): ?>
+        <?php echo htmlentities('('.$user['um_name'].')') ?>
+      <?php endif ?>
     </div>
   </div>
 <?php endforeach ?>

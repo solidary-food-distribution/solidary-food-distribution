@@ -12,7 +12,7 @@ function execute_index(){
 function get_users($user_id = 0, $order_by = 'u.name,m_name,a.access'){
   require_once('sql.class.php');
   $qry=
-    "SELECT u.id,u.created,u.name,u.email,u.pickup_pin,a.member_id,m.name AS m_name,m.identification,a.access,a.start,a.end ".
+    "SELECT u.id,u.created,u.name,u.email,u.pickup_pin,(SELECT um.name FROM msl_members um WHERE um.id=u.member_id) AS um_name,a.member_id,m.name AS m_name,m.identification,a.access,a.start,a.end ".
     "FROM msl_users u ".
       "LEFT JOIN msl_access a ON (a.user_id=u.id) ".
       "LEFT JOIN msl_members m ON (a.member_id=m.id) ";
@@ -29,6 +29,7 @@ function get_users($user_id = 0, $order_by = 'u.name,m_name,a.access'){
     $users[$v['id']]['name']=$v['name'];
     $users[$v['id']]['email']=$v['email'];
     $users[$v['id']]['pickup_pin']=$v['pickup_pin'];
+    $users[$v['id']]['um_name']=$v['um_name'];
     if(!empty($v['access'])){
       $users[$v['id']]['access'][$v['member_id']]['name']=$v['m_name'];
       $users[$v['id']]['access'][$v['member_id']]['access'][$v['access']]['start']=$v['start'];
