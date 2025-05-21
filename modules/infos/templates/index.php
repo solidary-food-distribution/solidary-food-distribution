@@ -5,32 +5,27 @@ $PROPERTIES['pathbar']=array(
 $PROPERTIES['body_class']='header_h5';
 ?>
 
-<?php /*ob_start(); ?>
+<?php ob_start(); ?>
 <div class="controls">
-  <div class="control_l input <?php echo $month_prev?'':'disabled' ?>" onclick="<?php echo $month_prev?'location.href=\'/timesheet?month='.$month_prev.'\'':'' ?>">
+  <div class="control_l input <?php echo $date_prev?'':'disabled' ?>" onclick="<?php echo $date_prev?'location.href=\'/infos?date='.$date_prev.'\'':'' ?>">
     <i class="fa-solid fa-caret-left"></i>
   </div><div class="control_m input">
-    <select class="center" name="month" onchange="location.href='/timesheet?month='+$(this).val();">
-      <?php foreach($months as $m=>$mv): ?>
-        <option value="<?php echo $m ?>" <?php echo $month==$m?'selected="selected"':'' ?> ><?php echo $mv ?></option>
+    <select class="center" name="month" onchange="location.href='/infos?date='+$(this).val();">
+      <?php foreach($dates as $d=>$dv): ?>
+        <option value="<?php echo $d ?>" <?php echo $date==$d?'selected="selected"':'' ?> ><?php echo $dv ?></option>
       <?php endforeach ?>
     </select>
-  </div><div class="control_r input <?php echo $month_next?'':'disabled' ?>" onclick="<?php echo $month_next?'location.href=\'/timesheet?month='.$month_next.'\'':'' ?>">
+  </div><div class="control_r input <?php echo $date_next?'':'disabled' ?>" onclick="<?php echo $date_next?'location.href=\'/infos?date='.$date_next.'\'':'' ?>">
     <i class="fa-solid fa-caret-right"></i>
   </div>
 </div>
-<?php $PROPERTIES['header']=ob_get_clean();*/ ?>
+<?php $PROPERTIES['header']=ob_get_clean(); ?>
 
 <?php foreach($infos as $info): ?>
   <div class="row">
     <div class="inner_row">
       <div class="col4">
-        <?php if($info->published == '0000-00-00 00:00:00'): ?>
-          Entwurf<br>
-          <?php echo format_date($info->created) ?>
-        <?php else: ?>
-          <b><?php echo format_date($info->published) ?></b>
-        <?php endif ?>
+        <b><?php echo format_date($info->published) ?></b>
       </div>
       <div class="col13">
         <b><?php echo htmlentities($info->subject) ?></b>
