@@ -120,7 +120,26 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   ?>
   <div class="row product" data-id="<?php echo $product_id ?>" data-pickup_id="<?php echo $pickup->id ?>" data-item_id="<?php echo $pickup_item->id ?>">
     <div class="col2">
-      <div style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;"></div>
+      <div class="image" style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;">
+        <?php
+          $infos = array();
+          if(!empty($product->infos)){
+            $infos = json_decode($product->infos, true);
+            if(strpos($infos['link'], 'duckduckgo')){
+              $infos = array();
+            }
+          }
+          if(isset($infos['link'])){
+            echo '<a href="'.$infos['link'].'" target="_blank">';
+          }
+          if(isset($infos['image'])){
+            echo '<img src="'.$infos['image'].'" />';
+          }
+          if(isset($infos['link'])){
+            echo '</a>';
+          }
+        ?>
+      </div>
     </div>
     <div class="col5">
       <div>
