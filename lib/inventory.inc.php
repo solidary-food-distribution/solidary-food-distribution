@@ -3,6 +3,10 @@
 require_once('inventories.class.php');
 
 function update_inventory(){
+  require_once('products.class.php');
+  $products = new Products(array('status' => array('o', 'e'), 'supplier_id' => array(35)));
+  $products_ids = $products->keys();
+
   $product_ids = array();
 
   $delivery_item_modified = '0000-00-00 00:00:00';
@@ -11,7 +15,7 @@ function update_inventory(){
     $delivery_item_modified = $inventories->first()->modified;
   }
   require_once('delivery_items.class.php');
-  $delivery_items = new DeliveryItems(array('modified>=' => $delivery_item_modified));
+  $delivery_items = new DeliveryItems(array('modified>=' => $delivery_item_modified, 'product_id' => $products_ids));
   foreach($delivery_items as $delivery_item){
     $product_ids[$delivery_item->product_id] = 1;
   }
@@ -22,7 +26,7 @@ function update_inventory(){
     $pickup_item_modified = $inventories->first()->modified;
   }
   require_once('pickup_items.class.php');
-  $pickup_items = new PickupItems(array('modified>=' => $pickup_item_modified));
+  $pickup_items = new PickupItems(array('modified>=' => $pickup_item_modified, 'product_id' => $products_ids));
   foreach($pickup_items as $pickup_item){
     $product_ids[$pickup_item->product_id] = 1;
   }

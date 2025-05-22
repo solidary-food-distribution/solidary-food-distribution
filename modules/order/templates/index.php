@@ -178,7 +178,7 @@ $PROPERTIES['body_class']=$body_class;
           <?php if($product->type == 'w'): ?>
             <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
           <?php endif ?>
-          <?php if($product->status == 'o' || (!$prices[$product_id]->price_bundle)): ?>
+          <?php if($product->status == 'o' || $product->status == 'e' || (!$prices[$product_id]->price_bundle)): ?>
             <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
           <?php endif ?>
           <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>

@@ -61,7 +61,7 @@ function execute_index(){
     $suppliers = new Members(array('producer>=' => 1));
   }elseif($modus == '1' || $modus == '2'){
     $suppliers = new Members(array('producer' => $modus));
-    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o', 'type' => array('k', 'p', 'w')));
+    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => array('o','e'), 'type' => array('k', 'p', 'w')));
     $product_ids = $products->keys();
   }elseif($modus == 's' && (trim($search) != '' || !empty($scategories))){
     $suppliers = new Members(array('producer>=' => 1));
@@ -312,6 +312,8 @@ function execute_change_ajax(){
       $oi->update($updates);
       update_order_item_prices($oi->id);
     }
+    require_once('inventory.inc.php');
+    update_inventory_product($product_id);
   }
   $return=execute_index();
   $return['template']='index.php';
