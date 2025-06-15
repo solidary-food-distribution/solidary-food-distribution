@@ -7,6 +7,7 @@ class Purchase{
   public $delivery_date_id;
   public $supplier_id;
   public $datetime;
+  public $status;
   public $sent;
 
   public static function create( $supplier_id, $datetime){

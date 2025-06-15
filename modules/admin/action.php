@@ -152,9 +152,61 @@ function execute_purchases(){
   require_once('members.class.php');
   $suppliers = new Members(array('id' => array_keys($member_ids)));
 
-  
-
   return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'purchases' => $purchases, 'delivery_dates' => $delivery_dates, 'suppliers' => $suppliers);
+}
+
+function execute_purchase_date_ajax(){
+  if(!user_has_access('purchases')){
+    forward_to_noaccess();
+  }
+  $purchase_id = get_request_param('purchase_id');
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+
+  require_once('purchases.class.php');
+  $purchase = Purchases::sget($purchase_id);
+
+  if($field != ''){
+    $updates = array();
+    $date = substr($purchase->datetime,0,10);
+    $time = substr($purchase->datetime,11,8);
+    if($field == 'date'){
+      $date = date('Y-m-d',strtotime(($value == 'prev'?'-':'+').'1 DAYS',strtotime($date)));
+    }elseif($field == 'time'){
+      $time = date('H:i:s',strtotime(($value == 'prev'?'-':'+').'1 HOURS',strtotime($time)));
+    }
+    $datetime = $date.' '.$time;
+    if($datetime != $purchase->datetime){
+      $updates['datetime'] = $datetime;
+    }
+    if(!empty($updates)){
+      $purchase->update($updates);
+      $purchase = Purchases::sget($purchase_id);
+    }
+  }
+
+  require_once('delivery_dates.class.php');
+  $delivery_date = DeliveryDates::sget($purchase->delivery_date_id);
+
+  require_once('members.class.php');
+  $supplier = Members::sget($purchase->supplier_id);
+
+  return array('purchase' => $purchase, 'delivery_date' => $delivery_date, 'supplier' => $supplier, 'layout' => 'layout_null.php');
+}
+
+function execute_purchase_status_ajax(){
+  if(!user_has_access('purchases')){
+    forward_to_noaccess();
+  }
+  $purchase_id = get_request_param('purchase_id');
+  require_once('purchases.class.php');
+  $purchase = Purchases::sget($purchase_id);
+  if($purchase->status=='n'){
+    $purchase->update(array('status'=>'a'));
+  }else{
+    $purchase->update(array('status'=>'n'));
+  }
+  exit;
 }
 
 function execute_purchase(){
@@ -162,6 +214,7 @@ function execute_purchase(){
     forward_to_noaccess();
   }
   $purchase_id = get_request_param('purchase_id');
+
   require_once('purchases.class.php');
   $purchase = Purchases::sget($purchase_id);
 

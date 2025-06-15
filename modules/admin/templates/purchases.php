@@ -3,7 +3,7 @@ $PROPERTIES['pathbar']=array(
   '/admin'=>'Administration',
   ''=>'Lieferanten Bestellungen'
 );
-$PROPERTIES['body_class']='header_h5 footer_h8';
+$PROPERTIES['body_class']='header_h5';
 ?>
 
 <?php
@@ -28,15 +28,19 @@ if($date_next){
 <?php foreach($purchases as $purchase): ?>
   <div class="row">
     <div class="inner_row">
-      <div class="col5">
-        <b><?php echo format_date($purchase->datetime, 'j.n.Y H:i') ?></b>
+      <div class="col6">
+        <span class="onoff" onclick="admin_purchase_status(<?php echo $purchase->id ?>);"><i class="fa-solid fa-toggle-<?php echo $purchase->status=='a'?'on':'off' ?>"></i></span>&nbsp;
+        <b class="<?php echo $purchase->status=='a'?'':'disabled' ?>"><?php echo format_date($purchase->datetime, 'j.n.Y H:i') ?></b>
+        <span class="button small" onclick="admin_purchase_date(<?php echo $purchase->id ?>,'','');">
+          <i class="fa-solid fa-pencil"></i>
+        </span>
       </div>
-      <div class="col10">
+      <div class="col10 <?php echo $purchase->status=='a'?'':'disabled' ?>">
         <?php echo htmlentities($suppliers[$purchase->supplier_id]->name) ?>
       </div>
     </div>
     <div class="inner_row">
-      <div class="col5">
+      <div class="col5 <?php echo $purchase->status=='a'?'':'disabled' ?>">
         <small>für <?php echo format_date($delivery_dates[$purchase->delivery_date_id]->date, 'j.n.Y') ?></small>
       </div>
       <div class="col1 right last">

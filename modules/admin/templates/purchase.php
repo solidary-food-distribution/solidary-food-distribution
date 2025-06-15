@@ -4,7 +4,7 @@ $PROPERTIES['pathbar']=array(
   '/admin/purchases'=>'Lieferanten Bestellungen',
   '' => format_date($purchase->datetime, 'j.n.Y H:i').' '.$supplier->name
 );
-$PROPERTIES['body_class']='header_h5 footer_h8';
+$PROPERTIES['body_class']='header_h5';
 ?>
 
 <div class="row">

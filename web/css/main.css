@@ -312,6 +312,15 @@ div.mr1{
   height: 1.2em;
   margin: 0;
 }
+.button.small{
+  font-size: 0.8em;
+  width: 1em;
+  height: 1em;
+  min-width: 1em;
+  padding: 0em;
+}
+.button.small i{
+}
 .button.category.selected{
   font-weight: bold;
 }
@@ -320,6 +329,10 @@ div.mr1{
   content: "\f00d";
   display:inline-block;
   margin-left: 0.2em;
+}
+
+.onoff{
+  cursor: pointer;
 }
 
 .input{
@@ -621,6 +634,25 @@ div.mr1{
 }
 
 
+.popup_screen{
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.popup_window{
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  top:10%;
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 3px solid black;
+  border-radius: 1em;
+  width: 35em;
+  padding: 1em;
+}
 
 
 

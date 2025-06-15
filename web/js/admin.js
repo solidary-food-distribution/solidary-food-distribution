@@ -53,3 +53,34 @@ function admin_products_update_ajax(el){
     }
   });
 }
+
+function admin_purchase_date(purchase_id, field, value){
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    data: {'field': field, 'value': value},
+    url: '/admin/purchase_date_ajax?purchase_id='+purchase_id,
+    dataType: "html",
+    success: function(html){
+      $('#loading').hide();
+      if($('#purchase_date_ajax').length){
+        $('#purchase_date_ajax').replaceWith(html);
+      }else{
+        $('#main').append(html);
+      }
+    }
+  });
+}
+
+function admin_purchase_status(purchase_id){
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/admin/purchase_status_ajax?purchase_id='+purchase_id,
+    dataType: "html",
+    success: function(html){
+      $('#loading').hide();
+      location.reload();
+    }
+  });
+}
