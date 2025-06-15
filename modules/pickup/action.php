@@ -220,8 +220,10 @@ function execute_scale_ajax(){
   if(floatval($value) && $pui->amount_pieces == 0){
     require_once('order_items.class.php');
     $ois = new OrderItems(array('id' => $pui->order_item_id));
-    $oi = $ois->first();
-    $updates['amount_pieces'] = $oi->amount_pieces;
+    if($ois->count()){
+      $oi = $ois->first();
+      $updates['amount_pieces'] = $oi->amount_pieces;
+    }
   }
   $pui->update($updates);
   update_pickup_item_price_sum($pui->id);
