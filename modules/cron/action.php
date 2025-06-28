@@ -72,6 +72,9 @@ function send_purchase($purchase_id){
   $delivery_date = DeliveryDates::sget($purchase->delivery_date_id);
   require_once('purchases.inc.php');
   $product_sums = purchases_get_product_sums($delivery_date->date, $purchase->supplier_id);
+  if(count($product_sums) == 0){
+    return;
+  }
   #logger("product_sums ".print_r($product_sums,1));
   $fields = array('amount_pieces', 'amount_bundles', 'amount_weight', 'price_type', 'purchase', 'purchase_sum');
   $fields = array_flip($fields);
@@ -160,7 +163,7 @@ function send_purchase_email($purchase_id){
 
 
 function create_delivery($purchase_id){
-  logger("create_delivery $purchase_id");
+  #logger("create_delivery $purchase_id");
   require_once('purchases.class.php');
   $purchase = Purchases::sget($purchase_id);
   require_once('purchase_items.class.php');
