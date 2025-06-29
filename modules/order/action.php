@@ -122,7 +122,25 @@ function execute_index(){
     }
   }
 
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
+  $supplier_unlocked = get_supplier_unlocked($order->id);
+
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'supplier_unlocked' => $supplier_unlocked, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
+}
+
+function get_supplier_unlocked($order_id){
+  require_once('orders.class.php');
+  $order = Orders::sget($order_id);
+  require_once('delivery_dates.class.php');
+  $delivery_dates = new DeliveryDates(array('date' => $order->pickup_date));
+  require_once('purchases.class.php');
+  $purchases = new Purchases(array('delivery_date_id' => $delivery_dates->keys(), 'status' => array('a')));
+  $supplier_unlocked = array();
+  foreach($purchases as $purchase){
+    if($purchase->datetime > date('Y-m-d H:i:s')){
+      $supplier_unlocked[$purchase->supplier_id] = $purchase->datetime;
+    }
+  }
+  return $supplier_unlocked;
 }
 
 function search_products($search, $scategories, $suppliers){
@@ -264,56 +282,59 @@ function execute_change_ajax(){
   $product_id=intval(get_request_param('product_id'));
   $dir=get_request_param('dir');
   $modus = get_request_param('modus');
-  logger("$order_id $product_id $dir");
+  #logger("$order_id $product_id $dir");
   if($order_id && $product_id && $dir){
-    require_once('order_items.class.php');
-    $ois = new OrderItems(array('order_id' => $order_id, 'product_id' => $product_id));
-    if(!$ois->count()){
-      $oi = OrderItem::create($order_id, $product_id);
-    }else{
-      $oi = $ois->first();
-    }
+    $supplier_unlocked = get_supplier_unlocked($order_id);
     require_once('products.class.php');
     $product = Products::sget($product_id);
-    if($product->type == 'p' || $product->type == 'w'){
-      $amount = $oi->amount_pieces;
-      $amount_field = 'amount_pieces';
-    }elseif($product->type == 'k'){
-      $amount = $oi->amount_weight;
-      $amount_field = 'amount_weight';
-    }else{
-      throw new Exception("unknown product-type ".print_r($product,1), 1);
-      exit;
-    }
-    $change = ($dir>0)?1:-1;
-    if($product->status == 'o'){
-      $change *= $product->amount_steps;
-    }elseif($product->status == 's'){
-      $change *= $product->amount_per_bundle;
-    }
-
-    $amount_new = round($amount + $change, 3);
-    if($amount_new < $product->amount_min && $dir<0){
-      $amount_new = 0;
-    }elseif($amount_new < $product->amount_min && $dir>0){
-      $amount_new = $product->amount_min;
-    }elseif($amount_new > $product->amount_max){
-      $amount_new = $product->amount_max;
-    }
-    if($modus == 'o' && $amount == 0 && $dir < 0){
-      $oi->delete();
-    }elseif($modus !='o' && $amount_new == 0){
-      $oi->delete();
-    }else{
-      $updates = array($amount_field => $amount_new);
-      if($product->type == 'w'){
-        $updates['amount_weight'] = $amount_new * $product->kg_per_piece;
+    if(isset($supplier_unlocked[$product->supplier_id])){
+      require_once('order_items.class.php');
+      $ois = new OrderItems(array('order_id' => $order_id, 'product_id' => $product_id));
+      if(!$ois->count()){
+        $oi = OrderItem::create($order_id, $product_id);
+      }else{
+        $oi = $ois->first();
       }
-      $oi->update($updates);
-      update_order_item_prices($oi->id);
+      if($product->type == 'p' || $product->type == 'w'){
+        $amount = $oi->amount_pieces;
+        $amount_field = 'amount_pieces';
+      }elseif($product->type == 'k'){
+        $amount = $oi->amount_weight;
+        $amount_field = 'amount_weight';
+      }else{
+        throw new Exception("unknown product-type ".print_r($product,1), 1);
+        exit;
+      }
+      $change = ($dir>0)?1:-1;
+      if($product->status == 'o'){
+        $change *= $product->amount_steps;
+      }elseif($product->status == 's'){
+        $change *= $product->amount_per_bundle;
+      }
+
+      $amount_new = round($amount + $change, 3);
+      if($amount_new < $product->amount_min && $dir<0){
+        $amount_new = 0;
+      }elseif($amount_new < $product->amount_min && $dir>0){
+        $amount_new = $product->amount_min;
+      }elseif($amount_new > $product->amount_max){
+        $amount_new = $product->amount_max;
+      }
+      if($modus == 'o' && $amount == 0 && $dir < 0){
+        $oi->delete();
+      }elseif($modus !='o' && $amount_new == 0){
+        $oi->delete();
+      }else{
+        $updates = array($amount_field => $amount_new);
+        if($product->type == 'w'){
+          $updates['amount_weight'] = $amount_new * $product->kg_per_piece;
+        }
+        $oi->update($updates);
+        update_order_item_prices($oi->id);
+      }
+      require_once('inventory.inc.php');
+      update_inventory_product($product_id);
     }
-    require_once('inventory.inc.php');
-    update_inventory_product($product_id);
   }
   $return=execute_index();
   $return['template']='index.php';

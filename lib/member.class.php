@@ -9,6 +9,7 @@ class Member{
   public string $identification;
   public int $producer;
   public bool $consumer;
+  public string $purchase_name;
 
   public function update( array $updates = array() ){
     require_once('sql.class.php');

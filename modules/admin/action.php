@@ -194,19 +194,22 @@ function execute_purchase_date_ajax(){
   return array('purchase' => $purchase, 'delivery_date' => $delivery_date, 'supplier' => $supplier, 'layout' => 'layout_null.php');
 }
 
-function execute_purchase_status_ajax(){
+function execute_purchase_update_ajax(){
   if(!user_has_access('purchases')){
     forward_to_noaccess();
   }
   $purchase_id = get_request_param('purchase_id');
-  require_once('purchases.class.php');
-  $purchase = Purchases::sget($purchase_id);
-  if($purchase->status=='n'){
-    $purchase->update(array('status'=>'a'));
-  }else{
-    $purchase->update(array('status'=>'n'));
+  $date = get_request_param('date');
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+
+  if($field == 'status'){
+    require_once('purchases.class.php');
+    $purchase = Purchases::sget($purchase_id);
+    $purchase->update(array('status' => $value));
   }
-  exit;
+  echo json_encode(array('result' => '1', 'location_href' => '/admin/purchases?date='.$date));
+  exit();
 }
 
 function execute_purchase(){
@@ -309,7 +312,7 @@ function execute_orders(){
   foreach($pickup_items as $pickup_item){
     $id = $pickup_item->order_item_id;
     if(!$id){
-      'noi'.$pickup_item->id;
+      $id = 'noi'.$pickup_item->id;
     }
     $member_id = $pickups[$pickup_item->pickup_id]->member_id;
     $pickup_items_array[$member_id][$id] = $pickup_item;

@@ -7,10 +7,15 @@ $from = date('Y-m-d', strtotime('-4 days', time()));
 <?php foreach($orders as $order): ?>
   <div class="row">
     <div class="inner_row">
-      <div class="col8">
-        Bestellung zum <?php echo format_date($order->pickup_date) ?>
-      </div>
-      <div class="col1 right last">
+      <div class="col12">
+        <div>
+          <b>Bestellung zum <?php echo format_date($order->pickup_date) ?></b><br>
+          <?php foreach($purchase_dates[$order->pickup_date] as $purchase): ?>
+            <?php echo $members[$purchase->supplier_id]->purchase_name ?><br>
+          <?php endforeach ?>
+          </div>
+        </div>
+      <div class="col2 right last">
         <?php if($order->pickup_date < $from || $set): ?>
           <span class="button large disabled">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>

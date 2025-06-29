@@ -61,6 +61,7 @@ class Members extends ArrayObject{
       $member->identification = $m['identification'];
       $member->producer = intval($m['producer']);
       $member->consumer = boolval($m['consumer']);
+      $member->purchase_name = strval($m['purchase_name']);
       $members[$id] = $member;
     }
 

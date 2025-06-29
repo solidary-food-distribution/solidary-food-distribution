@@ -26,7 +26,7 @@ foreach($members as $member_id => $member){
       continue;
     }
     $data = array(
-      $member->name,
+      trim($member->name),
       str_replace('.', ',', round($tax, 2)),
       str_replace('.', ',', round($amount, 2)),
       trim($subject),

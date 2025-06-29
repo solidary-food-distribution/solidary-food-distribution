@@ -102,23 +102,14 @@ $PROPERTIES['body_class']=$body_class;
     $purchase_incl_tax = round($amount_price * round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2), 2);
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
-    $locked = false;
+    $locked = true;
+    if(isset($supplier_unlocked[$supplier->id])){
+      $locked = false;
+    }
     if($supplier->producer == 1){
-      if($supplier->id == 20){
-        $lock_date = date('Y-m-d', strtotime('-4 days', strtotime($order->pickup_date))).' 18:00:00';
-      }else{
-        $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
-      }
-      if(date('Y-m-d H:i:s') >= $lock_date){
-        $locked = true;
-      }
       $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
       $sum['supplier_sum'] = $sum['supplier_sum'] + $price_row;
     }elseif($supplier->producer == 2){
-      $lock_date = date('Y-m-d', strtotime('-2 days', strtotime($order->pickup_date))).' 21:00:00';
-      if(date('Y-m-d H:i:s') >= $lock_date){
-        $locked = true;
-      }
       $sum['trader_paid'] = $sum['trader_paid'] + $purchase_incl_tax;
       $sum['trader_sum'] = $sum['trader_sum'] + $price_row;
     }

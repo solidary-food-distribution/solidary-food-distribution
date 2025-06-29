@@ -29,13 +29,27 @@ if($date_next){
   <div class="row">
     <div class="inner_row">
       <div class="col6">
-        <span class="onoff" onclick="admin_purchase_status(<?php echo $purchase->id ?>);"><i class="fa-solid fa-toggle-<?php echo $purchase->status=='a'?'on':'off' ?>"></i></span>&nbsp;
+        <?php /*<span class="onoff" onclick="admin_purchase_status(<?php echo $purchase->id ?>);"><i class="fa-solid fa-toggle-<?php echo $purchase->status=='a'?'on':'off' ?>"></i></span>&nbsp;*/?>
         <b class="<?php echo $purchase->status=='a'?'':'disabled' ?>"><?php echo format_date($purchase->datetime, 'j.n.Y H:i') ?></b>
         <span class="button small" onclick="admin_purchase_date(<?php echo $purchase->id ?>,'','');">
           <i class="fa-solid fa-pencil"></i>
         </span>
       </div>
-      <div class="col10 <?php echo $purchase->status=='a'?'':'disabled' ?>">
+      <div class="col5">
+        <?php
+          echo html_input(array(
+            'type' => 'options',
+            'options' => array(
+              'a' => '<i class="fa-solid fa-check" title="aktiv"></i>',
+              'p' => '<i class="fa-regular fa-calendar" title="geplant"></i>',
+              'n' => '<i class="fa-solid fa-xmark" title="nicht aktiv"></i>'),
+            'field' => 'status',
+            'value' => $purchase->status,
+            'url' => '/admin/purchase_update_ajax?purchase_id='.$purchase->id.'&date='.$date,
+          ));
+        ?>
+      </div>
+      <div class="col6 <?php echo $purchase->status=='a'?'':'disabled' ?>">
         <?php echo htmlentities($suppliers[$purchase->supplier_id]->name) ?>
       </div>
     </div>
