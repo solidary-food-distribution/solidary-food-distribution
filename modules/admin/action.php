@@ -240,7 +240,7 @@ function execute_purchase(){
 function get_delivery_dates(){
   $date = get_request_param('date');
   if($date == ''){
-    $date = date('Y-m-d',strtotime('-3 DAYS',time()));
+    $date = date('Y-m-d');
   }
   
   require_once('delivery_dates.class.php');
