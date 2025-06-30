@@ -229,6 +229,7 @@ function active_input_post_value(){
   }else{
     value = input.text().trim();
   }
+  value = value.replace(/\xA0/g, ' ');
   if(input.data('regexp')){
     var regexp = new RegExp(input.data('regexp'));
     if( !regexp.test(value) ){
@@ -404,8 +405,12 @@ function keyboard_key(key){
     keyboard_input_change(key);
   }else if('|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|ä|ö|ü|ß|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
-  }else if('| |-|.|@|_|'.indexOf('|'+key+'|') >= 0 ){
+  }else if('|-|.|@|_|(|)|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
+  }else if('| |'.indexOf('|'+key+'|') >= 0 ){
+    keyboard_input_change('Space');
+  }else if(key == 'Enter'){
+    active_input_post_value();
   }else if(key == 'Ok'){
     keyboard_ok();
   }else if(key == 'Close'){
@@ -421,7 +426,7 @@ function keyboard_key(key){
   }else if(key.substr(-2) == 'F5'){
     return false;
   }else{
-    console.log('keyboard_key '+key);
+    console.log('keyboard_key not handled: |'+key+'|');
   }
   return true;
 }
@@ -464,7 +469,7 @@ function keyboard_input_change(key){
   if(value == '&nbsp;'){
     value = '';
   }else{
-    value = value.replace('&nbsp;', ' ');
+    value = value.replaceAll('&nbsp;', ' ');
   }
   var type = $('.input.active').data('type');
   if(key == 'Backspace'){
@@ -476,6 +481,10 @@ function keyboard_input_change(key){
     if(value.length >= 1){
       value = value.substr(0,value.length-1);
     }
+  }else  if(type == 'options'){
+    return;
+  }else if(key == 'Space'){
+    value += ' ';
   }else if(key == ',' && value.indexOf(',') >= 0){
     //nothing
   }else if(type == 'weight' && value.lastIndexOf(',') >= 0 && value.lastIndexOf(',') <= value.length-4){
@@ -493,6 +502,7 @@ function keyboard_input_change(key){
   }else{
     value += key;
   }
+  /*
   if($('#key_shift').hasClass('active')){
     //after upper letter deactivate Shift
     if(value.length >= 1  && value.substr(-2,1).toUpperCase() == value.substr(-2,1)){
@@ -504,11 +514,12 @@ function keyboard_input_change(key){
       keyboard_toggle_shift();
     }
   }
+  */
 
   if(value.trim() == ''){
     value = ' ';
   }
-  $('.input.active').html(value.replace(' ','&nbsp;'));
+  $('.input.active').html(value.replace(/ /g,'&nbsp;'));
   if(keyboard_input_change_func){
     keyboard_input_change_func();
   }
