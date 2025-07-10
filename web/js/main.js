@@ -229,7 +229,10 @@ function active_input_post_value(){
   }else{
     value = input.text().trim();
   }
-  value = value.replace(/\xA0/g, ' ');
+  if(typeof value == 'undefined'){
+    value = '';
+  }
+  value = value.toString().replaceAll(/\xA0/g, ' ');
   if(input.data('regexp')){
     var regexp = new RegExp(input.data('regexp'));
     if( !regexp.test(value) ){
@@ -469,7 +472,7 @@ function keyboard_input_change(key){
   if(value == '&nbsp;'){
     value = '';
   }else{
-    value = value.replaceAll('&nbsp;', ' ');
+    value = value.toString().replaceAll('&nbsp;', ' ');
   }
   var type = $('.input.active').data('type');
   if(key == 'Backspace'){
@@ -519,7 +522,7 @@ function keyboard_input_change(key){
   if(value.trim() == ''){
     value = ' ';
   }
-  $('.input.active').html(value.replace(/ /g,'&nbsp;'));
+  $('.input.active').html(value.toString().replaceAll(/ /g,'&nbsp;'));
   if(keyboard_input_change_func){
     keyboard_input_change_func();
   }
