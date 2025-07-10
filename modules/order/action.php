@@ -123,8 +123,11 @@ function execute_index(){
   }
 
   $supplier_unlocked = get_supplier_unlocked($order->id);
-
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'supplier_unlocked' => $supplier_unlocked, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => get_oekoring_order_sum($order->pickup_date));
+  $order_sum_oekoring = -1;
+  if(isset($supplier_unlocked[35])){
+    $order_sum_oekoring = get_oekoring_order_sum($order->pickup_date);
+  }
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'supplier_unlocked' => $supplier_unlocked, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => $order_sum_oekoring);
 }
 
 function get_supplier_unlocked($order_id){

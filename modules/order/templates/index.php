@@ -225,7 +225,7 @@ $PROPERTIES['body_class']=$body_class;
         </div>
         <div class="inner_row">
           <div class="col12">
-            <?php if(floor($order_sum_oekoring)<300): ?>
+            <?php if(floor($order_sum_oekoring) < 300 && $order_sum_oekoring >= 0): ?>
               <span style="font-size:70%;border:1px solid grey;border-radius:0.5em;padding:0.2em">Hinweis Ökoring-Bestellung: Noch <?php echo 300-floor($order_sum_oekoring) ?> EUR Bestellwert notwendig.</span>
             <?php endif ?>
           </div>
