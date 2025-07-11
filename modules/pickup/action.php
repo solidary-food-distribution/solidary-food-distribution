@@ -39,10 +39,15 @@ function execute_index(){
       }
       $inventory[$product_id] = $i;
     }
+    require_once('products.class.php');
+    $products = new Products(array('supplier_id' => '35', 'status' => 'o'), array('name' => 'ASC'));
+    $product_ids = $products->keys();
+    /*
     $product_ids = array_keys($inventory);
     if(empty($product_ids)){
       $product_ids[0] = 0;
     }
+    */
     $puis = new PickupItems(array('pickup_id' => $pickup_id, 'product_id' => $product_ids));
     foreach($puis as $pui){
       $pickup_items[$pui->product_id] = $pui;
