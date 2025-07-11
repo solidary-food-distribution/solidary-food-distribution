@@ -10,7 +10,7 @@ $PROPERTIES['body_class']='header_h5';
     <div class="control filter">
       <?php
         $options = array(
-          '1' => '<i class="fa-solid fa-tractor" title="Erzeuger"></i> Erzeuger', 
+          /*'1' => '<i class="fa-solid fa-tractor" title="Erzeuger"></i> Erzeuger',*/
           '2' => '<i class="fa-solid fa-warehouse" title="Großhandel"></i> Großhandel',
           's' => '<i class="fa-solid fa-magnifying-glass" title="Suche"></i> Suche'
         );

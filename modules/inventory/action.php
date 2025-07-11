@@ -9,7 +9,7 @@ require_once('inventory.inc.php');
 function execute_index(){
   $modus = get_request_param('modus');
   if(empty($modus)){
-    $modus = '1';
+    $modus = '2';
   }
   $search = trim(get_request_param('search'));
   $limit = intval(get_request_param('limit'));
@@ -31,17 +31,19 @@ function execute_index(){
     }
     require_once('products.class.php');
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
-  }else{
+  }elseif($modus=='2'){
     require_once('members.class.php');
     $suppliers = new Members(array('producer' => $modus));
     $product_ids = array();
-    foreach($data as $product_id => $pdata){
+    require_once('products.class.php');
+    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o'), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
+    /*foreach($data as $product_id => $pdata){
       if($pdata['user_id'] == 0 || $pdata['amount_pieces'] != 0 || $pdata['amount_pieces'] != 0){
         $product_ids[] = $product_id;
       }
     }
-    require_once('products.class.php');
     $products = new Products(array('id' => $product_ids, 'supplier_id' => $suppliers->keys()), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
+    */
   }
 
   if(!isset($suppliers)){
