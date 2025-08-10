@@ -41,7 +41,7 @@ function cron_update_delivery_dates(){
       $purchase_datetime = date('Y-m-d H:i:s', strtotime($purchase_time, strtotime($delivery_date['date'])));
       $qry .= "'".$purchase_datetime."'),";
     }
-    $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE `datetime`=VALUES(`datetime`)";
+    $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE `delivery_date_id`=VALUES(`delivery_date_id`)";
     SQL::update($qry);
   }
 }
