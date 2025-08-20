@@ -4,9 +4,14 @@ require_once('inc.php');
 
 function execute_run(){
   global $user;
+  $ignore_next_run = get_request_param('ignore_next_run');
   $user = array('user_id' => 1); //for SQL::update-logger
   require_once('sql.class.php');
-  $qry = "SELECT * FROM msl_crons WHERE next_run<='".date('Y-m-d H:i:s')."' ORDER BY next_run";
+  $where = "next_run<='".date('Y-m-d H:i:s')."'";
+  if($ignore_next_run){
+    $where = "1=1";
+  }
+  $qry = "SELECT * FROM msl_crons WHERE $where ORDER BY next_run";
   $crons = SQL::select($qry);
   foreach($crons as $cron){
     if(substr($cron['task'],0,5) == 'cron_' && function_exists($cron['task'])){
@@ -193,4 +198,38 @@ function create_delivery($purchase_id){
     );
     $delivery_item->update($updates);
   }
+}
+
+function cron_polls_mandatory_check(){
+  require_once('polls.class.php');
+  require_once('sql.class.php');
+  $reminded_max = date('Y-m-d H:i:s', strtotime('-48 HOURS',time()));
+  $polls = new Polls(array('mandatory' => 1, 'close_datetime' => '0000-00-00 00:00:00', 'reminded<' => $reminded_max));
+  foreach($polls as $poll){
+    $qry = "SELECT GROUP_CONCAT(m.id) member_ids FROM msl_members m WHERE m.id NOT IN (SELECT u.member_id FROM msl_users u, msl_poll_answers pa, msl_poll_votes pv WHERE pa.poll_answer_id=pv.poll_answer_id AND pv.user_id=u.id) AND m.id NOT IN (1) AND (m.producer=1 OR m.consumer=1)";
+    $member_ids = SQL::selectOne($qry)['member_ids'];
+    $member_ids = explode(',', $member_ids);
+    require_once('members.class.php');
+    $members = new Members(array('id' => $member_ids));
+    require_once('users.class.php');
+    $users = new Users(array('member_id' => $member_ids));
+    foreach($users as $u){
+      if(strpos(' '.$u->name, 'GEKÜNDIGT') || strpos(' '.$u->email, 'GEKÜNDIGT') || !strpos($u->email, '@')){
+        continue;
+      }
+      send_poll_reminder_email($poll, $u, $members[$u->member_id]);
+    }
+    $poll->update(array('reminded' => date('Y-m-d H:i:s')));
+  }
+}
+
+function send_poll_reminder_email($poll, $user, $member){
+  $to = $user->email;
+  $subject = "Erinnerung: Mitmachen bei Umfrage '".$poll->title."'";
+  $content = "Liebes Mitglied,\n";
+  $content .= "Du hast noch nicht bei der Umfrage '".$poll->title."' mitgemacht.\n";
+  $content .= "Hier gehts zur Umfrage:\n";
+  $content .= "https://".$_SERVER['HTTP_HOST']."/polls/poll?poll_id=".$poll->poll_id."\n";
+  $content .= "Lieben Dank.\n";
+  send_email($to, $subject, $content);
 }
