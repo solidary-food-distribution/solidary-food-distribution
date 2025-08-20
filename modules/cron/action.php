@@ -203,10 +203,10 @@ function create_delivery($purchase_id){
 function cron_polls_mandatory_check(){
   require_once('polls.class.php');
   require_once('sql.class.php');
-  $reminded_max = date('Y-m-d H:i:s', strtotime('-48 HOURS',time()));
+  $reminded_max = date('Y-m-d H:i:s', strtotime('-72 HOURS',time()));
   $polls = new Polls(array('mandatory' => 1, 'close_datetime' => '0000-00-00 00:00:00', 'reminded<' => $reminded_max));
   foreach($polls as $poll){
-    $qry = "SELECT GROUP_CONCAT(m.id) member_ids FROM msl_members m WHERE m.id NOT IN (SELECT u.member_id FROM msl_users u, msl_poll_answers pa, msl_poll_votes pv WHERE pa.poll_answer_id=pv.poll_answer_id AND pv.user_id=u.id) AND m.id NOT IN (1) AND (m.producer=1 OR m.consumer=1)";
+    $qry = "SELECT GROUP_CONCAT(m.id) member_ids FROM msl_members m WHERE m.id NOT IN (SELECT u.member_id FROM msl_users u, msl_poll_answers pa, msl_poll_votes pv WHERE pa.poll_answer_id=pv.poll_answer_id AND pv.user_id=u.id AND pa.poll_id=".$poll->poll_id.") AND m.id NOT IN (1) AND m.consumer=1";
     $member_ids = SQL::selectOne($qry)['member_ids'];
     $member_ids = explode(',', $member_ids);
     require_once('members.class.php');
