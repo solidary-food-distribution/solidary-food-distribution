@@ -42,6 +42,11 @@ $PROPERTIES['pathbar']=array('/admin'=>'Administration');
       <span class="label">Abbuchungen</span>
     </div>
   <?php endif ?>
+  <?php if($polls): ?>
+    <div class="item" onclick="location.href='/admin/polls'">
+      <span class="label">Umfragen</span>
+    </div>
+  <?php endif ?>
   <?php if($remote): ?>
     <div class="item" onclick="location.href='/remote'">
       <span class="label">Remote SSH</span>

@@ -15,7 +15,8 @@ function execute_index(){
   $remote = user_has_access('remote');
   $mails = user_has_access('mails');
   $infos = user_has_access('infos');
-  if(!$products && !$members && !$users && !$orders && !$purchases && !$debits && !$remote && !$mails && !$infos){
+  $polls = user_has_access('polls');
+  if(!$products && !$members && !$users && !$orders && !$purchases && !$debits && !$remote && !$mails && !$infos && !$polls){
     forward_to_noaccess();
   }
   return array(
@@ -28,6 +29,7 @@ function execute_index(){
     'remote' => $remote,
     'mails' => $mails,
     'infos' => $infos,
+    'polls' => $polls,
   );
 }
 
@@ -122,6 +124,33 @@ function execute_products_suppliers(){
   require_once('members.class.php');
   $suppliers = new Members(array('producer>' => '0'));
   return array('suppliers' => $suppliers);
+}
+
+
+function execute_products_import_friedls(){
+  $rows = array();
+  #logger(print_r($_FILES,1));
+  if(!empty($_FILES['file']['name']) && $_FILES['file']['size']>0 && $_FILES['file']['error']==0){
+    require_once('SimpleXLSX.php');
+    $xlsx = Shuchkin\SimpleXLSX::parse($_FILES['file']['tmp_name']);
+    $started = 0;
+    foreach($xlsx->rows() as $row){
+      logger(print_r($row,1));
+      if($row[0] == 'Bestellen'){
+        $started = 1;
+      }elseif($started){
+        if($row[0] == 'Pause' || $row[1] == '' || $row[3] == ''){
+          continue;
+        }
+        $rows[] = $row;
+      }
+    }
+  }
+
+  require_once('members.class.php');
+  $supplier = Members::sget(20);
+
+  return array('supplier' => $supplier, 'rows' => $rows);
 }
 
 
@@ -291,11 +320,14 @@ function execute_orders(){
     $product_ids += $pui_product_ids;
   }
   require_once('products.class.php');
+  $products = new Products(array('supplier_id' => 20, 'status!=' => 'd'));
+  $product_ids += $products->keys();
   $products = new Products(array('id' => $product_ids));
 
   $supplier_ids = array();
   $member_orders = array();
   $order_items_array = array();
+  $replaced_items = array();
   foreach($order_items as $order_item){
     if($order_item->amount_pieces == 0 && $order_item->amount_weight == 0){
       continue;
@@ -305,7 +337,10 @@ function execute_orders(){
     $product_id = $order_item->product_id;
     $supplier_id = $products[$product_id]->supplier_id;
     $supplier_ids[$supplier_id] = 1;
-    $order_items_array[$order->id][$supplier_id.' '.$products[$product_id]->name.' '.$product_id] = $order_item;
+    $order_items_array[$order->id][$supplier_id.' '.$products[$product_id]->name.' '.$product_id.' '.$order_item->id] = $order_item;
+    if($order_item->replaces_id){
+      $replaced_items[$order_item->replaces_id][]=$order_item_id;
+    }
   }
 
   $pickup_items_array = array();
@@ -322,7 +357,18 @@ function execute_orders(){
   $suppliers = new Members(array('id' => array_keys($supplier_ids)));
   $members = new Members(array('id' => array_keys($member_orders)));
 
-  return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'pickup_items_array' => $pickup_items_array, 'products' => $products, 'suppliers' => $suppliers);
+  return array('date' => $date, 'date_prev' => $date_prev, 'date_next' => $date_next, 'member_orders' => $member_orders, 'members' => $members, 'order_items_array' => $order_items_array, 'replaced_items' => $replaced_items, 'pickup_items_array' => $pickup_items_array, 'products' => $products, 'suppliers' => $suppliers);
+}
+
+function execute_orders_update_ajax(){
+  if(!user_has_access('orders')){
+    forward_to_noaccess();
+  }
+  $order_item_id = get_request_param('order_item_id');
+  $product_id = get_request_param('product_id');
+  $amount = get_request_param('amount');
+  logger("$order_item_id $product_id $amount");
+  exit;
 }
 
 function execute_pickup_emails(){
@@ -398,4 +444,46 @@ function execute_info_ajax(){
   $info->update(array($field => $value));
   echo json_encode(array('value' => $value));
   exit;
+}
+
+function execute_polls(){
+  if(!user_has_access('polls')){
+    forward_to_noaccess();
+  }
+  require_once('polls.class.php');
+  $polls = new Polls();
+  return array('polls' => $polls);
+}
+
+function execute_poll(){
+  if(!user_has_access('infos')){
+    forward_to_noaccess();
+  }
+  $poll_id = get_request_param('poll_id');
+  require_once('polls.class.php');
+  $poll = poll_get($poll_id);
+  if(!$poll){
+    exit;
+  }
+  require_once('poll_answers.class.php');
+  $poll_answers = new PollAnswers(array('poll_id' => $poll_id), array('ordering' => 'ASC', 'answer' => 'ASC'));
+  if(($poll->type == 'm' || $poll->type == 'r') && $poll->has_votes && count($poll_answers)){
+    require_once('poll_votes.class.php');
+    $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answers->keys(), 'value' => '1'));
+    $votes = array();
+    $user_ids = array();
+    foreach($poll_votes as $poll_vote){
+      $votes[$poll_vote->poll_answer_id][] = $poll_vote;
+      $user_ids[] = $poll_vote->user_id;
+    }
+  }
+  require_once('sql.class.php');
+  $qry = "SELECT GROUP_CONCAT(m.id) member_ids FROM msl_members m WHERE m.id NOT IN (SELECT u.member_id FROM msl_users u, msl_poll_answers pa, msl_poll_votes pv WHERE pa.poll_answer_id=pv.poll_answer_id AND pv.value=1 AND pv.user_id=u.id AND pa.poll_id=".$poll->poll_id.") AND m.id NOT IN (1) AND m.consumer=1";
+  $member_ids = SQL::selectOne($qry)['member_ids'];
+  $member_ids = explode(',', $member_ids);
+  require_once('members.class.php');
+  $missing_members = new Members(array('id' => $member_ids));
+  require_once('users.class.php');
+  $users = new Users();
+  return array('poll' => $poll, 'poll_answers' => $poll_answers, 'votes' => $votes, 'users' => $users, 'missing_members' => $missing_members);
 }
