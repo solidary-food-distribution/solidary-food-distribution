@@ -60,6 +60,10 @@ $PROPERTIES['body_class']='header_h5';
         $amount_weight = $pdata['amount_weight'];
       }
     }
+    $product_name = $product->name;
+    if($product->supplier_id == 35){
+      $product_name = $product->supplier_product_id.' '.$product_name;
+    }
   ?>
   <div class="row product" data-id="<?php echo $product->id ?>">
     <div class="col2">
@@ -67,7 +71,7 @@ $PROPERTIES['body_class']='header_h5';
     </div>
     <div class="col7">
       <div>
-        <?php echo htmlentities($product->name) ?><br>
+        <?php echo htmlentities($product_name) ?><br>
         <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
       </div>
     </div>
