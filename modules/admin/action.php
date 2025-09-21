@@ -128,29 +128,137 @@ function execute_products_suppliers(){
 
 
 function execute_products_import_friedls(){
+  global $user;
+
+  $status = get_request_param('status');
+
   $rows = array();
+  
   #logger(print_r($_FILES,1));
+  require_once('sql.class.php');
   if(!empty($_FILES['file']['name']) && $_FILES['file']['size']>0 && $_FILES['file']['error']==0){
+    
+    $upload_id = SQL::insert("INSERT INTO msl_uploads (filename, user_id) VALUES ('".SQL::escapeString(basename($_FILES['file']['name']))."','".$user['user_id']."')");
+    $target =  $_SERVER['DOCUMENT_ROOT'].'/../data/uploads/'.$upload_id;
+    move_uploaded_file($_FILES['file']['tmp_name'], $target);
     require_once('SimpleXLSX.php');
-    $xlsx = Shuchkin\SimpleXLSX::parse($_FILES['file']['tmp_name']);
+    $xlsx = Shuchkin\SimpleXLSX::parse($target);
     $started = 0;
-    foreach($xlsx->rows() as $row){
-      logger(print_r($row,1));
+    foreach($xlsx->rows() as $row_nr => $row){
       if($row[0] == 'Bestellen'){
         $started = 1;
       }elseif($started){
-        if($row[0] == 'Pause' || $row[1] == '' || $row[3] == ''){
+        if($row[0] == 'Pause' || $row[0] == 'aus' || $row[1] == '' || $row[3] == '' || $row[1] == 'zzgl. Pfand/Kiste inkl. Flaschen'){
           continue;
         }
-        $rows[] = $row;
+        SQL::insert("INSERT INTO msl_product_imports (upload_id, row_nr, info, name, type, purchase, brand) VALUES ('$upload_id', '$row_nr', '".SQL::escapeString(trim($row[0]))."', '".SQL::escapeString(trim($row[1]))."', '".SQL::escapeString(trim($row[2]))."', '".SQL::escapeString(trim($row[3]))."', '".SQL::escapeString(trim($row[4]))."')");
+      }
+    }
+  }
+  $uploads = SQL::selectId("SELECT *,(SELECT COUNT(*) FROM msl_product_imports WHERE upload_id=u.id AND status='') open, (SELECT COUNT(*) FROM msl_product_imports WHERE upload_id=u.id AND status='1') ok FROM msl_uploads u ORDER BY 1 DESC LIMIT 3", 'id');
+
+  if(!isset($upload_id)){
+    $upload_id = intval(get_request_param('upload_id'));
+  }
+  if(!isset($upload_id)){
+    $upload_id = key($uploads);
+  }
+
+  $rows = SQL::selectId("SELECT * FROM msl_product_imports WHERE upload_id='".intval($upload_id)."' AND status='".SQL::escapeString($status)."' ORDER BY 1", 'id');
+  
+  require_once('products.class.php');
+  $products = new Products(array('supplier_id' => 20, 'status!=' => 'd'));
+
+  require_once('prices.class.php');
+  $prices = new Prices(array('product_id' => $products->keys()));
+
+  $products_search = array();
+  foreach($products as $product){
+    $products_search[$product->supplier_name] = $product->id;
+  }
+
+  foreach($rows as $row_id => &$row){
+    if($row['product_id']==-1){
+      continue;
+    }elseif($row['product_id']==0){
+      $search = trim(trim($row['name']).' '.trim($row['brand']));
+      if(isset($products_search[$search])){
+        $row['product_id'] = $products_search[$search];
+        SQL::update("UPDATE msl_product_imports SET product_id='".intval($row['product_id'])."' WHERE id='".intval($row['id'])."'");
       }
     }
   }
 
+  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands WHERE supplier_id=20 ORDER BY name", 'id', 'name');
+
   require_once('members.class.php');
   $supplier = Members::sget(20);
 
-  return array('supplier' => $supplier, 'rows' => $rows);
+  return array('uploads' => $uploads, 'supplier' => $supplier, 'products' => $products, 'prices' => $prices, 'brands' => $brands, 'rows' => $rows);
+}
+
+function execute_products_import_friedls_update_ajax(){
+  $row_id = get_request_param('row_id');
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+  require_once('products.class.php');
+  require_once('sql.class.php');
+  $row = SQL::selectOne("SELECT * FROM msl_product_imports WHERE id='".intval($row_id)."'");
+  if($field == 'ok'){
+    products_import_friedls_update_field($row, 'status', 'o');
+    products_import_friedls_update_field($row, 'purchase', $row['purchase']);
+    SQL::update("UPDATE msl_product_imports SET status='1' WHERE id='".intval($row_id)."'");
+  }else{
+    products_import_friedls_update_field($row, $field, $value);
+  }
+  logger("row_id:$row_id\nfield:$field\nvalue:$value");
+  set_request_param('upload_id', $row['upload_id']);
+  $return = execute_products_import_friedls();
+  $return['template'] = 'products_import_friedls.php';
+  $return['layout'] = 'layout_null.php';
+  return $return;
+}
+function products_import_friedls_update_field($row,$field,$value){
+  if($field == 'product_id' && trim($value)!==''){
+    if(intval($value)){
+      $search = trim(trim($row['name']).' '.trim($row['brand']));
+      $products = new Products(array('supplier_name' => $search));
+      foreach($products as $product){
+        $product->update(array('supplier_name' => '')); //reset/unlink
+      }
+      $product = Products::sget(intval($value));
+      $product->update(array('supplier_name' => $search));
+      SQL::update("UPDATE msl_product_imports SET product_id='".intval($product->id)."' WHERE id='".intval($row['id'])."'");
+    }else{
+      SQL::update("UPDATE msl_product_imports SET product_id=-1 WHERE id='".intval($row['id'])."'");
+    }
+  }elseif($field == 'new_product_name'){
+    $supplier_name = trim(trim($row['name']).' '.trim($row['brand']));
+    $product = Product::create(array('supplier_id' => 20, 'status' => 'n', 'supplier_name' => $supplier_name, 'supplier_product_id' => $supplier_name, 'name' => trim($value)));
+    require_once('prices.class.php');
+    $price = Price::create($product->id);
+    $price->update(array('purchase' => $row['purchase'], 'tax' => 7));
+    SQL::update("UPDATE msl_product_imports SET product_id='".intval($product->id)."' WHERE id='".intval($row['id'])."'");
+  }elseif($row['product_id']>0 && strpos(',purchase,tax,price', $field)){
+    require_once('prices.class.php');
+    $prices = new Prices(array('product_id' => intval($row['product_id'])));
+    if($prices->count()){
+      $price = $prices->first();
+    }else{
+      $price = Price::create($row['product_id']);
+      $price->update(array('purchase' => $row['purchase'], 'tax' => 7));
+    }
+    $value = str_replace(',', '.', $value);
+    logger($price->id." prices ".$field." ".$value);
+    $price->update(array($field => $value));
+  }elseif($row['product_id']>0){
+    $product = Products::sget(intval($row['product_id']));
+    if(strpos(',kg_per_piece,amount_steps', $field)){
+      $value = str_replace(',', '.', $value);
+    }
+    logger($product->id." ".$field." ".$value);
+    $product->update(array($field => $value));
+  }
 }
 
 

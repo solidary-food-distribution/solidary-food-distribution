@@ -304,3 +304,18 @@ function html_input($data){
   $return .= '</div>';
   return $return;
 }
+
+function create_random($length){
+  $ret='';
+  for($i=0;$i<8;$i++){
+    $rt=random_int(0,2);
+    if($rt==0){
+      $ret.=chr(random_int(65,90)); //A-Z
+    }elseif($rt==1){
+      $ret.=chr(random_int(97,122)); //a-z
+    }elseif($rt==2){
+      $ret.=chr(random_int(48,57)); //0-9
+    }
+  }
+  return $ret;
+}

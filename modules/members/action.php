@@ -10,19 +10,28 @@ require_once('users.class.php');
 function execute_index(){
   $sort = get_request_param('sort');
 
+  require_once('sql.class.php');
+  $qry = "SELECT member_id,MAX(created) created FROM msl_pickups GROUP BY member_id ORDER BY created DESC";
+  $last_pickups = SQL::selectKey2Val($qry, 'member_id', 'created');
+
   if($sort == 'name'){
     $sort_array = array($sort => 'ASC');
+  }elseif($sort == 'last_pickup'){
+    $sort_array = array('FIELD(id,'.implode(',',array_keys($last_pickups)).')' => 'ASC', 'created' => 'DESC');
   }else{ //created
     $sort = 'created';
     $sort_array = array('created' => 'DESC', 'name' => 'ASC');
   }
   $members = new Members(array(),$sort_array);
+
   $sorts = array(
     'created' => 'Angelegt neu->alt',
+    'last_pickup' => 'Letzte Abholung',
     'name' => 'Name a->z',
   );
   return array(
     'members' => $members,
+    'last_pickups' => $last_pickups,
     'users' => get_users(),
     'sorts' => $sorts,
     'sort' => $sort,

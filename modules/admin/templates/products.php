@@ -25,6 +25,9 @@ if($supplier->id != 35){
       'value' => $status,
       'onclick' => 'admin_products_filter',
     )); ?>
+    <?php if($supplier->id == 20): ?>
+      <div class="button" onclick="location.href='/admin/products_import_friedls';">XLS importieren</div>
+    <?php endif ?>
   </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 

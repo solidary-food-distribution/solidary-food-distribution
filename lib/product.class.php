@@ -4,6 +4,7 @@ declare(strict_types=1);
 class Product{
   public int $id;
   public string $name;
+  public string $supplier_name;
   public int $supplier_id;
   public string $type;
   public float $kg_per_piece;

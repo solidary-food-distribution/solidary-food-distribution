@@ -12,6 +12,7 @@ $topics = array(
   'ac'=>'Buchhaltung',
   'co'=>'Kommunikation',
   'ma'=>'Marketing',
+  'va'=>'Veranstaltung',
   'ws'=>'Webseite',
   'pp'=>'Produkte&Preise',
   'is'=>'Infrastruktur',

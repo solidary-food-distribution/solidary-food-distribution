@@ -449,6 +449,10 @@ div.mr1{
   font-size: 0.8em;
 }
 
+.linethrough{
+  text-decoration: line-through;
+}
+
 .title{
   margin: 0.2em;
   font-weight: bold;

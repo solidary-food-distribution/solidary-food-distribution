@@ -20,7 +20,7 @@ function execute_poll(){
     exit;
   }
   require_once('poll_answers.class.php');
-  $poll_answers = new PollAnswers(array('poll_id' => $poll_id), array('answer' => 'ASC'));
+  $poll_answers = new PollAnswers(array('poll_id' => $poll_id), array('ordering' => 'ASC', 'answer' => 'ASC'));
   if(($poll->type == 'm' || $poll->type == 'r') && $poll->has_votes && count($poll_answers)){
     $answers = array();
     $user_answers = array();
@@ -38,15 +38,12 @@ function execute_poll(){
     $user_votes = array();
     require_once('poll_votes.class.php');
     $poll_votes = new PollVotes(array('poll_answer_id' => array_keys($poll_answers), 'value' => '1'));
-    logger(print_r($poll_votes,1));
     foreach($poll_votes as $poll_vote){
       $votes[$poll_vote->poll_answer_id] = $votes[$poll_vote->poll_answer_id] + intval($poll_vote->value);
       if($poll_vote->user_id == $user['user_id'] && $poll_vote->value){
         $user_votes[$poll_vote->poll_answer_id] = $poll_vote->value;
       }
     }
-    logger(print_r($votes,1));
-    logger(print_r($user_votes,1));
   }
   return array('poll' => $poll, 'poll_answers' => $poll_answers, 'votes' => $votes, 'user_votes' => $user_votes);
 }

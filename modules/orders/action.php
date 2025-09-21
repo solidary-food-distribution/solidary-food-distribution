@@ -29,11 +29,21 @@ function execute_index(){
       Order::create($user['member_id'], $pickup_date);
     }
   }
-  $from = date('Y-m-d', strtotime('-7 days', time()));
+  $from = date('Y-m-d', strtotime('-2 days', time()));
   $os = new Orders(array('member_id' => $user['member_id'], 'pickup_date>=' => $from),array('pickup_date'=>'DESC'),0,6);
   $orders = array();
   foreach($os as $o){
     $orders = array($o->id => $o) + $orders;
+  }
+
+  foreach($orders as $order){
+    if(isset($purchase_dates[$order->pickup_date])){
+      foreach($purchase_dates[$order->pickup_date] as $purchase){
+        if($purchase->status == 'a' && $purchase->datetime > date('Y-m-d H:i:s')){
+          $order->active = 1;
+        }
+      }
+    }
   }
 
   require_once('members.class.php');

@@ -3,6 +3,7 @@ declare(strict_types=0);
 
 class OrderItem{
   public int $id;
+  public int $replaces_id;
   public int $order_id;
   public int $product_id;
   public float $amount_pieces;

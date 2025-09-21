@@ -218,22 +218,6 @@ function execute_password_set_ajax(){
 }
 
 function create_temp_password(){
-  $ret='';
-  for($i=0;$i<16;$i++){
-    $rt=random_int(0,2);
-    if($rt==0){
-      $ret.=chr(random_int(65,90)); //A-Z
-    }elseif($rt==1){
-      $ret.=chr(random_int(97,122)); //a-z
-    }elseif($rt==2){
-      $ret.=chr(random_int(48,57)); //a-z
-    }
-  }
+  $ret = create_random(16);
   return $ret;
-}
-
-if(!function_exists('random_int')){
-  function random_int($min,$max){
-    return rand($min,$max);
-  }
 }

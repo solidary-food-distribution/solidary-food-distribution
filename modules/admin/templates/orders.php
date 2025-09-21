@@ -30,6 +30,28 @@ if($date_next){
 
 <?php foreach($members as $member_id => $member): ?>
   <div class="row">
+    <div class="inner_row" style="display:none" id="admin_orders_edit" data-product_id="">
+      <div class="col9">
+        <select name="product_id">
+          <option></option>
+          <?php foreach($products as $product_id => $product): ?>
+            <option value="<?php echo $product_id ?>"><?php echo htmlentities($product->name) ?></option>
+          <?php endforeach ?>
+        </select>
+      </div>
+      <div class="col2">
+        <?php echo html_input(array(
+          'type' => 'number',
+          'field' => 'amount',
+          'value' => '',
+        )); ?>
+      </div>
+      <div class="col1 right">
+        <span class="button small" onclick="admin_orders_update(this)">
+          <i class="fa-solid fa-check" style="font-size:75%"></i>
+        </span>
+      </div>
+    </div>
     <?php foreach($member_orders[$member_id] as $order_id => $order): ?>
       <div class="inner_row">
         <div class="col9">
@@ -37,6 +59,8 @@ if($date_next){
         </div>
         <div class="col2 right">
           Bestellt
+        </div>
+        <div class="col1 right">
         </div>
         <div class="col3 right">
           Abgeholt
@@ -48,8 +72,12 @@ if($date_next){
           $product = $products[$order_item->product_id];
           $pickup_item = $pickup_items_array[$member_id][$order_item->id];
           unset($pickup_items_array[$member_id][$order_item->id]);
+          $class = '';
+          if(isset($replaced_items[$order_item->id])){
+            $class = 'linethrough grey';
+          }
         ?>
-        <div class="inner_row">
+        <div class="inner_row <?php echo $class ?>" data-order_item_id="<?php echo $order_item->id ?>" data-product_id="<?php echo $product->id ?>">
           <div class="col9">
             <?php if($product->supplier_id == 35): ?>
               <?php echo htmlentities($product->supplier_product_id) ?>
@@ -58,10 +86,15 @@ if($date_next){
           </div>
           <div class="col2 right">
             <?php if($product->type == 'k'): ?>
-              <?php echo format_amount($order_item->amount_weight).' kg' ?>
+              <span class="amount"><?php echo format_amount($order_item->amount_weight) ?></span>&nbsp;kg
             <?php else: ?>
-              <?php echo format_amount($order_item->amount_pieces).' St.' ?>
+              <span class="amount"><?php echo format_amount($order_item->amount_pieces) ?></span>&nbsp;St.
             <?php endif ?>
+          </div>
+          <div class="col1 right">
+            <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $order_item->id ?>')">
+              <i class="fa-solid fa-pencil" style="font-size:75%"></i>
+            </span>
           </div>
           <div class="col3 right">
             <?php if($product->type == 'k'): ?>
@@ -84,6 +117,8 @@ if($date_next){
             <?php echo htmlentities($product->name) ?>
           </div>
           <div class="col2 right">
+          </div>
+          <div class="col1 right">
           </div>
           <div class="col3 right">
             <?php if($product->type == 'k'): ?>

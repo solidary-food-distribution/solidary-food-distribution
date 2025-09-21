@@ -1,7 +1,6 @@
 <?php
 $PROPERTIES['pathbar']=array('/orders'=>'Bestellungen');
-$set = 0;
-$from = date('Y-m-d', strtotime('-4 days', time()));
+$first = 1;
 ?>
 
 <?php foreach($orders as $order): ?>
@@ -16,17 +15,13 @@ $from = date('Y-m-d', strtotime('-4 days', time()));
           </div>
         </div>
       <div class="col2 right last">
-        <?php if($order->pickup_date < $from || $set): ?>
-          <span class="button large disabled">
+        <?php if(isset($order->active) || $first): ?>
+          <?php $first = 0; ?>
+          <span class="button large" onclick="location.href='/order/?order_id=<?php echo $order->id ?>';">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </span>
         <?php else: ?>
-          <?php 
-            if($order->pickup_date > date('Y-m-d')){
-              $set = 1;
-            }
-          ?>
-          <span class="button large" onclick="location.href='/order/?order_id=<?php echo $order->id ?>';">
+          <span class="button large disabled">
             <i class="fa-solid fa-arrow-up-right-from-square"></i>
           </span>
         <?php endif ?>

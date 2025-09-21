@@ -84,3 +84,57 @@ function admin_purchase_status(purchase_id){
     }
   });
 }
+
+function admin_orders_edit(el, order_item_id){
+  var div = $('#admin_orders_edit').clone();
+  div.attr('id', 'admin_orders_edit'+order_item_id);
+  div.attr('data-order_item_id', order_item_id);
+  $(el).closest('.inner_row').after(div);
+  var product_id = $(el).closest('.inner_row').data('product_id');
+  div.find('select[name="product_id"]').val(product_id);
+  var amount = $(el).parent().parent().find('.amount').html();
+  div.find('[data-field="amount"]').html(amount);
+  $(el).parent().parent().parent().parent().find('.button.edit').hide();
+  div.css('display', 'flex');
+}
+
+function admin_orders_update(el){
+  var div = $(el).closest('.inner_row');
+  var order_item_id = div.data('order_item_id');
+  var product_id = div.find('select[name="product_id"]').val();
+  var amount = div.find('[data-field="amount"]').html();
+  //console.log("admin_orders_update "+order_item_id+" "+product_id+" "+amount);
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/admin/orders_update_ajax?order_item_id='+order_item_id,
+    data: { 'product_id': product_id, 'amount': amount },
+    dataType: 'html',
+    success: function(html){
+      $('#loading').hide();
+      location.reload();
+    }
+  });
+}
+
+function admin_products_import_friedls_update(el){
+  var tr = $(el).closest('tr');
+  var row_id = tr.data('id');
+  var field = $(el).attr('name');
+  if(field == 'new'){
+    field = 'new_product_name';
+    el = tr.find('.new_product_name');
+  }
+  var value = $(el).val();
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/admin/products_import_friedls_update_ajax',
+    data: { 'row_id': row_id, 'field': field, 'value': value },
+    dataType: 'html',
+    success: function(html){
+      $('#loading').hide();
+      replace_header_main_footer(html);
+    }
+  });
+}

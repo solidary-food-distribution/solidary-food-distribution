@@ -16,6 +16,12 @@ $PROPERTIES['body_class']='header_h5';
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
 <?php foreach($members as $member): ?>
+  <?php
+    $last_pickup = '-';
+    if(isset($last_pickups[$member->id])){
+      $last_pickup = format_date($last_pickups[$member->id]);
+    }
+  ?>
   <div class="row">
     <div class="inner_row">
       <div class="col8">
@@ -38,6 +44,13 @@ $PROPERTIES['body_class']='header_h5';
       <div class="col8">
         <div>
           <div>Angelegt: <?php echo format_date($member->created) ?></div>
+        </div>
+      </div>
+      <div class="col8">
+        <div>
+          <?php if($member->consumer): ?>
+            <div>Letzte Abholung: <?php echo $last_pickup ?></div>
+          <?php endif ?>
         </div>
       </div>
     </div>
