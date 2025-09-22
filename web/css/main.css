@@ -104,6 +104,25 @@ textarea{
   height: auto;
 }
 
+.headline{
+}
+.headline div{
+  display: inline-block;
+}
+.headline .image{
+  position: relative;
+}
+.headline img{
+  font-size: 1em;
+  max-height: 1.5em;
+  position: relative;
+  top: 0.2em;
+}
+.headline .text{
+  font-size: 1.5em;
+  margin-top: 0.2em;
+}
+
 .header_h5 header{
   height: 5em;
 }

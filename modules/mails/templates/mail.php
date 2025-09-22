@@ -42,7 +42,13 @@ $PROPERTIES['body_class']='header_h5';
       Inhalt
     </div>
     <div class="col12">
-      <textarea class="input" style="width:100%;text-align:left;" rows="8" data-type="input_text" data-field="content" data-url="/mails/update_ajax?mail_id=<?php echo $mail->id ?>" onclick="input_onfocus(this)" onblur="input_text_onchange(this)" onchange="input_text_onchange(this)"><?php echo htmlentities($mail->content) ?></textarea>
+      <textarea id="mail_content" class="input" style="width:100%;text-align:left;" rows="8" data-type="input_text" data-field="content" data-url="/mails/update_ajax?mail_id=<?php echo $mail->id ?>" onclick="input_onfocus(this)" onblur="input_text_onchange(this)" onchange="input_text_onchange(this)"><?php echo htmlentities($mail->content) ?></textarea>
+    </div>
+  </div>
+  <div class="inner_row">
+    <div class="col2"></div>
+    <div class="col12">
+      <div class="button" onclick="mails_add_answer('1')">Knopf "Empfang bestätigt"</div>
     </div>
   </div>
   <div class="inner_row">

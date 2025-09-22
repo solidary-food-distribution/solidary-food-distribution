@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202509211435';
+$version='202509221247';
 $body_class='';
 $header='';
 $footer='';
@@ -46,7 +46,7 @@ if(isset($_SESSION['browser'])){
 <body class="<?php echo $body_class ?>">
   <header>
     <div class="top">
-      <?php if(isset($pathbar)): ?>
+      <?php if(!empty($pathbar)): ?>
           <div class="pathbar">
             <?php 
               foreach($pathbar as $pb_href=>$pb_label){
