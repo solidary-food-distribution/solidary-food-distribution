@@ -69,7 +69,7 @@ function execute_answer_vote_ajax(){
     $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answer_id, 'user_id' => $user['user_id']));
     logger(print_r($poll_votes,1));
     if(!count($poll_votes)){
-      PollVotes::create($poll_answer_id, $user['user_id'], $value);
+      PollVotes::create($poll_answer_id, $user['user_id'], $value, $user['user_id']);
     }else{
       $poll_votes->first()->update(array('value' => $value));
     }

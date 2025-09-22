@@ -138,3 +138,18 @@ function admin_products_import_friedls_update(el){
     }
   });
 }
+
+function admin_poll_update(el){
+  var member_id = $(el).data('member_id');
+  var poll_answer_id = $(el).val();
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/admin/poll_update_ajax',
+    data: { 'member_id': member_id, 'poll_answer_id': poll_answer_id },
+    dataType: 'html',
+    success: function(html){
+      $('#loading').hide();
+    }
+  });
+}

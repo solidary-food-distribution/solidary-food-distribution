@@ -595,3 +595,25 @@ function execute_poll(){
   $users = new Users();
   return array('poll' => $poll, 'poll_answers' => $poll_answers, 'votes' => $votes, 'users' => $users, 'missing_members' => $missing_members);
 }
+
+function execute_poll_update_ajax(){
+  if(!user_has_access('infos')){
+    forward_to_noaccess();
+  }
+  global $user;
+  $poll_id = get_request_param('poll_id');
+  $member_id = get_request_param('member_id');
+  require_once('users.class.php');
+  $users = new Users(array('member_id' => $member_id), array('id' => 'ASC'));
+  $pvuser = $users->first();
+  $user_id = $pvuser->id;
+  $poll_answer_id = get_request_param('poll_answer_id');
+  require_once('poll_votes.class.php');
+  $poll_votes = new PollVotes(array('poll_answer_id' => $poll_answer_id, 'user_id' => $user_id));
+  if(!count($poll_votes)){
+    PollVotes::create($poll_answer_id, $user_id, '1', $user['user_id']);
+  }else{
+    $poll_votes->first()->update(array('value' => '1'));
+  }
+  exit;
+}
