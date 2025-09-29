@@ -209,14 +209,14 @@ function oekoring_import_bnn($file){
   $piece_factor = 0.7;
   $bundle_factor = 0.6;
 
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=CURDATE() AND end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND end>=CURDATE()";
   SQL::update($qry);
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$piece_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$piece_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND pr.end>=CURDATE()";
   SQL::update($qry);
-  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$bundle_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$bundle_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND pr.end>=CURDATE()";
   SQL::update($qry);
 
-  $qry = "UPDATE msl_prices pr, msl_products p SET p.status='n' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=CURDATE() AND pr.end>=CURDATE()";
+  $qry = "UPDATE msl_prices pr, msl_products p SET p.status='n' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND pr.end>=CURDATE()";
   SQL::update($qry);
 
   $qry = "UPDATE msl_products SET status='n' WHERE supplier_id=35 AND category='Tiefkühlprodukte'";
