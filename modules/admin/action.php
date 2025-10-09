@@ -16,7 +16,8 @@ function execute_index(){
   $mails = user_has_access('mails');
   $infos = user_has_access('infos');
   $polls = user_has_access('polls');
-  if(!$products && !$members && !$users && !$orders && !$purchases && !$debits && !$remote && !$mails && !$infos && !$polls){
+  $thaler = user_has_access('thaler');
+  if(!$products && !$members && !$users && !$orders && !$purchases && !$debits && !$remote && !$mails && !$infos && !$polls && !$thaler){
     forward_to_noaccess();
   }
   return array(
@@ -30,6 +31,7 @@ function execute_index(){
     'mails' => $mails,
     'infos' => $infos,
     'polls' => $polls,
+    'thaler' => $thaler,
   );
 }
 
@@ -205,6 +207,10 @@ function execute_products_import_friedls_update_ajax(){
   require_once('sql.class.php');
   $row = SQL::selectOne("SELECT * FROM msl_product_imports WHERE id='".intval($row_id)."'");
   if($field == 'ok'){
+    $count=SQL::selectOne("SELECT COUNT(*) AS cnt FROM msl_product_imports WHERE status='1' AND upload_id=(SELECT upload_id FROM msl_product_imports WHERE id='".intval($row_id)."')")['cnt'];
+    if($count==0){
+      SQL::update("UPDATE msl_products SET status='n' WHERE status='o' AND supplier_id=20");
+    }
     products_import_friedls_update_field($row, 'status', 'o');
     products_import_friedls_update_field($row, 'purchase', $row['purchase']);
     SQL::update("UPDATE msl_product_imports SET status='1' WHERE id='".intval($row_id)."'");
