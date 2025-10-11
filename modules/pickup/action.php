@@ -119,6 +119,7 @@ function execute_new(){
   $pickup = Pickup::create($user['member_id'], $user['user_id']);
   update_pickup_items($pickup->id);
   $modus = 'p';
+  require_once('pickup_items.class.php');
   $pickup_items = new PickupItems(array('pickup_id' => $pickup->id));
   if($pickup_items->count() == 0){
     $modus = 'd';

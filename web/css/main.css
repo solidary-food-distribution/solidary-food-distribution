@@ -321,6 +321,9 @@ div.mr1{
   text-align: left;
   width: 95%;
 }
+.input.input_text.right{
+  text-align: right;
+}
 .button{
   padding: 0.2em;
 }

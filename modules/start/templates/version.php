@@ -1,4 +1,7 @@
 <div class="row">
+  2025-10-11 11:20 Patenschaften implementiert
+</div>
+<div class="row">
   2025-09-22 12:45 E-Mail-Empfangsbestätigung implementiert<br>
 </div>
 <div class="row">

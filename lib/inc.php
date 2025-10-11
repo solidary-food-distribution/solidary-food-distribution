@@ -181,7 +181,9 @@ function format_weight($value){
 }
 
 function format_date($date, $format='j.n.Y', $weekday=true){
-  if(gettype($date)=='object' && get_class($date)=='DateTime'){
+  if(gettype($date) == 'string' && $date == '0000-00-00'){
+    return '';
+  }elseif(gettype($date)=='object' && get_class($date)=='DateTime'){
     $time=$date->getTimestamp();
   }else{
     $time=strtotime($date);

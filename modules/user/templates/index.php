@@ -49,7 +49,11 @@ $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen',''=>'Zugangsdaten');
     </div>
     <div class="col12">
       <div>
-        <div class="button" onclick="user_show_pin(this)">Code anzeigen</div>
+        <?php if($user['pickup_pin']): ?>
+          <div class="button" onclick="user_show_pin(this)">Code anzeigen</div>
+        <?php else: ?>
+          Bitte eine E-Mail an info@mit-sinn-leben.de schreiben mit Bitte um Vergabe eines Codes.
+        <?php endif ?>
       </div>
     </div>
   </div>

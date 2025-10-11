@@ -1,7 +1,8 @@
+<?php if(!isset($PROPERTIES['no_document_ready'])): ?>
 <script>
   $(document).ready(document_ready);
 </script>
-<?php
+<?php endif ?><?php
 
 if(isset($PROPERTIES['body_class'])){
   echo '<BODY_CLASS>'.$PROPERTIES['body_class'].'</BODY_CLASS>';

@@ -58,9 +58,13 @@ class Members extends ArrayObject{
       $member->id = intval($m['id']);
       $member->created = $m['created'];
       $member->name = $m['name'];
+      $member->status = $m['status'];
+      $member->deactivate_on = strval($m['deactivate_on']);
       $member->identification = $m['identification'];
       $member->producer = intval($m['producer']);
       $member->consumer = boolval($m['consumer']);
+      $member->pate_id = intval($m['pate_id']);
+      $member->order_limit = floatval($m['order_limit']);
       $member->purchase_name = strval($m['purchase_name']);
       $members[$id] = $member;
     }

@@ -13,7 +13,7 @@ function execute_index(){
     }
   }
   require_once('infos.class.php');
-  $infos = new Infos(array('published!=' => '0000-00-00 00:00:00'));
+  $infos = new Infos(array('published!=' => '0000-00-00 00:00:00', 'published>' => date('Y-m-d', strtotime('-1 months', time()))));
   require_once('info_users.class.php');
   $info_users = new InfoUsers(array('user_id' => $user['user_id'], 'read!=' => '0000-00-00 00:00:00'));
   foreach($info_users as $info_user){

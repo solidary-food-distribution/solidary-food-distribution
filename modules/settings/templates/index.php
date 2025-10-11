@@ -18,4 +18,9 @@ $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen');
   <div class="item" onclick="location.href='/user'">
     <span class="label">Zugangsdaten</span>
   </div>
+  <?php if($membertest): ?>
+    <div class="item" onclick="location.href='/settings/membertest'">
+      <span class="label">Patenschaften</span>
+    </div>
+  <?php endif ?>
 </div>
