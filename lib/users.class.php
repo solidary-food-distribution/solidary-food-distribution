@@ -68,7 +68,7 @@ class Users extends ArrayObject{
     $keys = array_keys($users);
     require_once('sql.class.php');
     $qry =
-      "SELECT a.user_id,a.access,a.start,a.end,a.member_id, m.name ".
+      "SELECT a.user_id,a.access,a.start,a.end,a.member_id,m.name,m.status ".
       "FROM msl_access a ".
         "LEFT JOIN msl_members m ON (a.member_id = m.id) ".
       "WHERE start<=CURDATE() AND end>=CURDATE() ".
@@ -77,6 +77,9 @@ class Users extends ArrayObject{
 
     $as = SQL::select($qry);
     foreach($as as $a){
+      if($a['member_id'] > 0 && $a['status'] != 'a'){
+        break;
+      }
       $users[$a['user_id']]->access[$a['access']][$a['member_id']]['start'] = $a['start'];
       $users[$a['user_id']]->access[$a['access']][$a['member_id']]['end'] = $a['end'];
       if($a['member_id']){
@@ -93,6 +96,7 @@ class Users extends ArrayObject{
         $user->access['admin']=1;
       }
     }
+    logger(print_r($users,true));
     return $users;
   }
 }

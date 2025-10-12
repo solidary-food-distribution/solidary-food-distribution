@@ -67,7 +67,7 @@ function execute_login_ajax(){
   }
   if(empty($error)){
     unset($_SESSION['browser']);
-    $user->set_session();
+    set_session($user);
     #logger(print_r($_SESSION['user'],1));
   }
 
@@ -77,20 +77,6 @@ function execute_login_ajax(){
 
 function execute_login_pin_ajax(){
   $pickup_pin = get_request_param('pickup_pin');
-  /*
-  $pickup_pin = explode(',', $pickup_pin);
-  if(count($pickup_pin)<3 || count($pickup_pin)>6){
-    exit;
-  }
-  $pin = '';
-  foreach($pickup_pin as $id){
-    $id = intval($id);
-    if($id<=0 || $id>32){
-      exit;
-    }
-    $pin .= str_pad($id, 2, '0', STR_PAD_LEFT);
-  }
-  */
   $error = '';
   require('users.class.php');
   $users = new Users(array('pickup_pin' => $pickup_pin));
@@ -101,7 +87,7 @@ function execute_login_pin_ajax(){
   if(empty($error)){
     $_SESSION['scale'] = 1;
     $user = $users->first();
-    $user->set_session();
+    set_session($user);
     #logger(print_r($_SESSION['user'],1));
   }
   echo json_encode(array('error' => $error));
@@ -220,4 +206,13 @@ function execute_password_set_ajax(){
 function create_temp_password(){
   $ret = create_random(16);
   return $ret;
+}
+
+function set_session($user){
+  $user->set_session();
+  if($user->member_id){
+    require_once('members.class.php');
+    $member = Members::sget($user->member_id);
+    $member->set_session();
+  }
 }

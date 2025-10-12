@@ -58,6 +58,12 @@ function send_browser_func(){
   });
 }
 
+function notify(html){
+  $('#loading').show();
+  $('#notify_text').html(html);
+  $('#notify').show();
+}
+
 function main_scroll(y){
   event.stopPropagation();
   var scrollTo = $('main').scrollTop() + y;

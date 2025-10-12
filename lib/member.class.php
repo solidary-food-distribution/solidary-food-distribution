@@ -24,4 +24,10 @@ class Member{
     SQL::update($qry);
   }
 
+  public function set_session(){
+    foreach(get_object_vars($this) as $key => $value){
+      $_SESSION['member'][$key] = $value;
+    }
+  }
+
 }

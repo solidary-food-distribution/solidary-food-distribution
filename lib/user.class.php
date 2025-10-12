@@ -6,7 +6,7 @@ class User{
   public $name;
   public $email;
   public $password;
-  public $member_id; //can be switched
+  public $member_id; //can be switched in future
   public $pickup_pin;
   public $access=array();
   public $members=array();

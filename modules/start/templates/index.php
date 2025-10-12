@@ -2,6 +2,14 @@
 $PROPERTIES['body_class']='footer_h4';
 ?>
 
+<?php if(!empty($message)): ?>
+  <div class="row">
+    <?php echo htmlentities($message) ?>
+  </div>
+<?php endif ?>
+
+<?php if(!$deactivated): ?>
+
 <?php foreach($infos as $info): ?>
   <div class="row" id="info<?php echo $info->id ?>">
     <div class="inner_row">
@@ -62,6 +70,8 @@ $PROPERTIES['body_class']='footer_h4';
     </div>
   <?php endif ?>
 </div>
+
+<?php endif ?>
 
 <?php ob_start(); ?>
 <div class="row center">

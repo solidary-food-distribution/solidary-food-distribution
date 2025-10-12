@@ -233,3 +233,12 @@ function send_poll_reminder_email($poll, $user, $member){
   $content .= "Lieben Dank.\n";
   send_email($to, $subject, $content);
 }
+
+function cron_may_deactivate_members(){
+  require_once('members.class.php');
+  $members = new Members(array('deactivate_on<=' => date('Y-m-d'), 'deactivate_on!=' => '0000-00-00', 'status' => 'a'));
+  foreach($members as $member){
+    logger('Member-ID ' . $member->id . ' deaktiviert');
+    $member->update(array('status' => 'i', 'modified' => date('Y-m-d H:i:s')));
+  }
+}

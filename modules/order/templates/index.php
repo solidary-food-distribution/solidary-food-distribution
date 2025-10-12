@@ -199,6 +199,12 @@ $PROPERTIES['body_class']=$body_class;
   </script>
 <?php endif ?>
 
+<?php if(!empty($notify)): ?>
+  <script>
+    notify('<?php echo htmlentities($notify) ?>');
+  </script>
+<?php endif ?>
+
 <?php if($start == 0): ?>
   <?php ob_start(); ?>
     <?php if($modus == 'o'): ?>
@@ -207,8 +213,12 @@ $PROPERTIES['body_class']=$body_class;
           <div class="col2"></div>
           <div class="col3 right"><small>Einkauf</small></div>
           <div class="col3 right"><small>-&gt; Geno</small></div>
-          <div class="col5"></div>
-          <div class="col2 right">Summe</div>
+          <div class="col2"></div>
+          <div class="col5 right">Summe<?php 
+            if($_SESSION['member']['order_limit']){
+              echo ' (max '.intval($_SESSION['member']['order_limit']).' EUR)';
+            }
+          ?></div>
           <div class="col3 right last">
             <?php echo format_money($sum['sum']); ?> EUR
           </div>

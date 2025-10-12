@@ -5,6 +5,9 @@ user_ensure_authed();
 
 function execute_index(){
   global $user;
+  if(!isset($user['access']['order'][$user['member_id']]) || $user['access']['order'][$user['member_id']]['end']<date('Y-m-d')){
+    forward_to_noaccess();
+  }
   $order_id = get_request_param('order_id');
   $modus = get_request_param('modus');
   $search = get_request_param('search');
@@ -285,6 +288,7 @@ function execute_change_ajax(){
   $product_id=intval(get_request_param('product_id'));
   $dir=get_request_param('dir');
   $modus = get_request_param('modus');
+  $notify = '';
   #logger("$order_id $product_id $dir");
   if($order_id && $product_id && $dir){
     $supplier_unlocked = get_supplier_unlocked($order_id);
@@ -334,6 +338,15 @@ function execute_change_ajax(){
         }
         $oi->update($updates);
         update_order_item_prices($oi->id);
+        if($dir > 0 && $_SESSION['member']['order_limit'] && get_order_sum($order_id) > $_SESSION['member']['order_limit']){
+          $updates = array($amount_field => $amount);
+          if($product->type == 'w'){
+            $updates['amount_weight'] = $amount * $product->kg_per_piece;
+          }
+          $oi->update($updates);
+          update_order_item_prices($oi->id);
+          $notify = "Bestellgrenze von ".$_SESSION['member']['order_limit']." EUR erreicht.";
+        }
       }
       require_once('inventory.inc.php');
       update_inventory_product($product_id);
@@ -342,7 +355,17 @@ function execute_change_ajax(){
   $return=execute_index();
   $return['template']='index.php';
   $return['layout']='layout_null.php';
+  $return['notify'] = $notify;
   return $return;
+}
+
+function get_order_sum($order_id){
+  $ois = new OrderItems(array('order_id' => $order_id));
+  $order_sum = 0;
+  foreach($ois as $oi){
+    $order_sum += $oi->price_sum;
+  }
+  return $order_sum;
 }
 
 function update_order_item_prices($order_item_id){

@@ -99,5 +99,11 @@ if(isset($_SESSION['browser'])){
     <?php echo $footer ?>
   </footer>
   <div id="loading"></div>
+  <div id="notify">
+    <div id="notify_text"></div>
+    <div style="width:100%;text-align:right">
+      <div id="notify_ok" class="button" onclick="$('#notify').hide();$('#loading').hide();">Ok</div>
+    </div>
+  </div>
 </body>
 </html>

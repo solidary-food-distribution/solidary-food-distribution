@@ -39,7 +39,6 @@ $PROPERTIES['pathbar']=array(
         ?>
     </div>
   </div>
-  <?php /*
   <div class="inner_row">
     <div class="col3">
       <div>Bestellen bis</div>
@@ -59,8 +58,6 @@ $PROPERTIES['pathbar']=array(
       Datum als TT.MM.JJJJ
     </div>
   </div>
-  */ ?>
-  <?php /*
   <div class="inner_row">
     <div class="col3">
       <div>Bestellgrenze</div>
@@ -81,7 +78,6 @@ $PROPERTIES['pathbar']=array(
       EUR/Woche
     </div>
   </div>
-  */ ?>
   <div class="col1 right last">
     <div class="buttons">
       <div class="button large ok" onclick="active_input_post_value_goto('/settings/membertest?member_id=<?php echo $member->id ?>')">

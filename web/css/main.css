@@ -67,6 +67,19 @@ footer{
   height: 1px;
 }
 
+#notify{
+  position: fixed;
+  display: none;
+  top: calc(50% - 5em);
+  left: calc(50% - 10em);
+  min-width: 10em;
+  border: 2px solid black;
+  border-radius: 1em;
+  padding: 0.5em;
+  background-color: white;
+}
+
+
 #loading{
   display: none;
   position: absolute;

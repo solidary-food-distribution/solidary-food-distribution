@@ -5,7 +5,20 @@ user_ensure_authed();
 
 function execute_index(){
   global $user;
-  if(isset($_SESSION['scale']) && $_SESSION['scale']){
+  $message = '';
+  $deactivated = 0;
+  require_once('members.class.php');
+  $member = Members::sget($user['member_id']);
+  if(!user_has_access('order') && $member->status != 'a'){
+    $message = 'Der Bestellzugriff ist deaktiviert.';
+    if($member->pate_id){
+      $message .= ' Die Patenschaft ist am '.format_date($member->deactivate_on).' ausgelaufen.';
+    }
+    $deactivated = 1;
+  }elseif($member->pate_id){
+    $message = 'Dies ist ein Patenschaft-Zugang, er gilt bis '.format_date($member->deactivate_on);
+  }
+  if($deactivated == 0 && isset($_SESSION['scale']) && $_SESSION['scale']){
     if(user_has_access('pickups') && !user_has_access('deliveries') && !user_has_access('inventory')){
       forward_to_page('/pickups');
     }else{
@@ -21,7 +34,7 @@ function execute_index(){
       unset($infos[$info_user->info_id]);
     }
   }
-  return array('infos' => $infos);
+  return array('infos' => $infos, 'message' => $message, 'deactivated' => $deactivated);
 }
 
 function execute_info_read_ajax(){
