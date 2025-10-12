@@ -72,6 +72,7 @@ function execute_membertest_new(){
   $new = member_get($member_id);
   $new->update(array('pate_id' => $user['member_id'], 'deactivate_on' => date('Y-m-d', strtotime('+5 weeks', time())) , 'order_limit' => '200'));
   create_membertest_user($member_id);
+  send_email('info@mit-sinn-leben.de', 'Neue Patenschaft von '.$member->name.': Member-ID '.$member_id, '');
   forward_to_page('/settings/membertest_edit', 'member_id='.$member_id);
 }
 
