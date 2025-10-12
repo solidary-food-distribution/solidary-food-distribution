@@ -9,6 +9,7 @@ $PROPERTIES['body_class']='header_h5';
 <?php ob_start(); ?>
 <div class="controls">
   <div class="button" onclick="if(confirm('Neue Patenschaft anlegen?')){location.href='/settings/membertest_new';}">Neue Patenschaft anlegen</div>
+  <div class="button help"><a href="/help/Patenschaften.pdf" target="_blank"><i class="fa-solid fa-question"></i></a></div>
 </div>
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
