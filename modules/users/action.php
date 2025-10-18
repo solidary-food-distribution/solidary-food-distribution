@@ -6,7 +6,9 @@ user_needs_access('users');
 require_once('users.class.php');
 
 function execute_index(){
-  return array('users' => get_users());
+  require_once('members.class.php');
+  $members = new Members();
+  return array('users' => get_users(), 'members' => $members);
 }
 
 function get_users($user_id = 0, $order_by = 'u.name,m_name,a.access'){
@@ -29,6 +31,7 @@ function get_users($user_id = 0, $order_by = 'u.name,m_name,a.access'){
     $users[$v['id']]['name']=$v['name'];
     $users[$v['id']]['email']=$v['email'];
     $users[$v['id']]['pickup_pin']=$v['pickup_pin'];
+    $users[$v['id']]['member_id']=$v['member_id'];
     $users[$v['id']]['um_name']=$v['um_name'];
     if(!empty($v['access'])){
       $users[$v['id']]['access'][$v['member_id']]['name']=$v['m_name'];

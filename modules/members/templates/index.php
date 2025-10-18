@@ -23,6 +23,13 @@ $PROPERTIES['body_class']='header_h5';
     }
   ?>
   <div class="row">
+    <?php if($member->pate_id): ?>
+      <div class="inner_row">
+        <div class="col12">
+          Patenschaft von <?php echo $members[$member->pate_id]->name ?>
+        </div>
+      </div>  
+    <?php endif ?>
     <div class="inner_row">
       <div class="col8">
         <div>

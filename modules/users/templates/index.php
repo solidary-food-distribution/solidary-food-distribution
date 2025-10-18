@@ -12,6 +12,13 @@ $PROPERTIES['body_class']='header_h5';
 
 <?php foreach($users as $user_id=>$user): ?>
   <div class="row">
+    <?php if(isset($members[$user['member_id']]->pate_id) && $members[$user['member_id']]->pate_id): ?>
+      <div class="inner_row">
+        <div class="col12">
+          Patenschaft von <?php echo $members[$members[$user['member_id']]->pate_id]->name ?>
+        </div>
+      </div>  
+    <?php endif ?>
     <div class="inner_row">
       <div class="col12">
         <div>
