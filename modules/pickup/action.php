@@ -30,15 +30,6 @@ function execute_index(){
       $order_item_ids[] = $pui->order_item_id;
     }
   }elseif($modus == 'd'){
-    require_once('inventory.inc.php');
-    $is = get_inventory();
-    #logger(print_r($is,1));
-    foreach($is as $product_id => $i){
-      if(!$i['amount_pieces'] && !$i['amount_weight']){
-        continue;
-      }
-      $inventory[$product_id] = $i;
-    }
     require_once('products.class.php');
     $products = new Products(array('supplier_id' => '35', 'status' => 'o'), array('name' => 'ASC'));
     $product_ids = $products->keys();
@@ -52,6 +43,16 @@ function execute_index(){
     foreach($puis as $pui){
       $pickup_items[$pui->product_id] = $pui;
     }
+  }
+
+  require_once('inventory.inc.php');
+  $is = get_inventory();
+  #logger(print_r($is,1));
+  foreach($is as $product_id => $i){
+    if(!$i['amount_pieces'] && !$i['amount_weight']){
+      continue;
+    }
+    $inventory[$product_id] = $i;
   }
 
   if(empty($product_ids)){

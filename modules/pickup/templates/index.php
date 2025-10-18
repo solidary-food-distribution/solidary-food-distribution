@@ -38,6 +38,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   <?php
     $amount_ordered = 0;
     $amount_ordered_type = '';
+    $amount_inventory = 0;
+    $amount_others = 0;
     $scale_title = '';
     $scale_minmax = 0.1;
     if(isset($pickup_items[$product_id])){
@@ -72,7 +74,12 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       $amount = 0;
     }
     if(isset($inventory[$product_id])){
-      $amount_ordered = $inventory[$product_id]['amount_pieces'];
+      $amount_inventory = $inventory[$product_id]['amount_pieces'];
+      if(isset($others['product_orders'][$product_id])){
+        foreach($others['product_orders'][$product_id] as $others_amount){
+          $amount_others += $others_amount;
+        }
+      }
     }
 
     
@@ -96,8 +103,15 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       $locked_less = true;
     }
     $locked_more = false;
-    if($locked || ($modus == 'd' && $amount_ordered == 0)){
+    $locked_more_html = '';
+    if($locked){
       $locked_more = true;
+    }
+    if(isset($amount_inventory) && $amount_inventory-$amount_others <= 0){
+      $locked_more = true;
+      if($amount_others){
+        $locked_more_html = 'title="'.$amount_others.' sind von weiteren Abholern reserviert." onclick="show_title(this)"';
+      }
     }
 
     if($supplier->producer == 1){
@@ -157,6 +171,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         <?php if($amount_ordered): ?>
           <span class="amount_ordered"><?php echo format_amount($amount_ordered) ?></span>
         <?php endif ?>
+        <?php if($modus == 'd' && $amount_inventory): ?>
+          <span class="amount_ordered"><?php echo format_amount($amount_inventory) ?></span>
+        <?php endif ?>
         <?php
           $needs_todo = ($amount_ordered != $amount);
           if($product->type == 'k'){
@@ -198,7 +215,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
         </div>
       </div>
       <?php if($product->type!='k'): ?>
-        <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?'':'onclick="pickup_change(this,\'+\')"' ?>>+</div>
+        <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?$locked_more_html:'onclick="pickup_change(this,\'+\')"' ?>>+</div>
       <?php else: ?>
         <div style="width:1.7em;font-size:2em;">&nbsp;</div>
       <?php endif ?>
