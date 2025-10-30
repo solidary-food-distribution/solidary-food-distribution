@@ -207,6 +207,7 @@ function execute_products_import_friedls_update_ajax(){
   require_once('sql.class.php');
   $row = SQL::selectOne("SELECT * FROM msl_product_imports WHERE id='".intval($row_id)."'");
   if($field == 'ok'){
+    //if it is the first product to be set ok, we deactivate all products from the supplier
     $count=SQL::selectOne("SELECT COUNT(*) AS cnt FROM msl_product_imports WHERE status='1' AND upload_id=(SELECT upload_id FROM msl_product_imports WHERE id='".intval($row_id)."')")['cnt'];
     if($count==0){
       SQL::update("UPDATE msl_products SET status='n' WHERE status='o' AND supplier_id=20");
@@ -262,11 +263,53 @@ function products_import_friedls_update_field($row,$field,$value){
     if(strpos(',kg_per_piece,amount_steps', $field)){
       $value = str_replace(',', '.', $value);
     }
+    if($field!='kg_per_piece' && $product->type == 'w'){
+      $kg_per_piece = get_product_kg_per_piece_by_pickups($product->id);
+      if($kg_per_piece){
+        logger($product->id." kg_per_piece $kg_per_piece");
+        $product->update(array('kg_per_piece' => $kg_per_piece));
+      }
+    }
     logger($product->id." ".$field." ".$value);
     $product->update(array($field => $value));
   }
 }
 
+function get_product_kg_per_piece_by_pickups($product_id){
+  $kg_per_piece = 0;
+  $avgs = array();
+  $cnts = 0;
+  $min_date = '';
+  require_once('sql.class.php');
+  $qry = "SELECT pickup_date,AVG(avg) AS avg,COUNT(*) AS cnt FROM (SELECT o.pickup_date, pui.amount_weight / pui.amount_pieces AS avg FROM msl_pickup_items pui, msl_order_items oi, msl_orders o WHERE o.id=oi.order_id AND oi.id=pui.order_item_id AND pui.product_id='".intval($product_id)."' AND pui.amount_pieces>0 AND pui.amount_weight>0) t1 GROUP BY pickup_date HAVING cnt>1 ORDER BY pickup_date DESC LIMIT 10";
+  $res = SQL::select($qry);
+  foreach($res as $v){
+    if(empty($min_date)){
+      $min_date = date('Y-m-d', strtotime('-4 WEEKS', strtotime($v['pickup_date'])));
+    }
+    if($v['pickup_date'] < $min_date){
+      break;
+    }
+    $avgs[] = $v['avg'];
+    $cnts += $v['cnt'];
+    if($cnts > 5){
+      break;
+    }
+  }
+  if(count($avgs)){
+    $kg_per_piece = array_sum($avgs) / count($avgs);
+    if($kg_per_piece < 0.25 ){
+      $kg_per_piece = 10 * round($kg_per_piece/10, 3);
+    }elseif($kg_per_piece < 0.5 ){
+      $kg_per_piece = 25 * round($kg_per_piece/25, 3);
+    }elseif($kg_per_piece < 1 ){
+      $kg_per_piece = 50 * round($kg_per_piece/50, 3);
+    }else{
+      $kg_per_piece = 100 * round($kg_per_piece/100, 3);
+    }
+  }
+  return $kg_per_piece;
+}
 
 
 function execute_purchases(){
