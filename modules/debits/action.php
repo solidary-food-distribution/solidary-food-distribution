@@ -71,6 +71,24 @@ function get_debits_data($month){
   require_once('members.class.php');
   $members = new Members(array('id' => array_keys($member_ids)));
 
+  $missing_members = array();
+  foreach($members as $member){
+    if($member->pate_id){
+      if(isset($debits[$member->pate_id])){
+        $debits[$member->pate_id]+=$debits[$member->id];
+      }else{
+        $debits[$member->pate_id]=$debits[$member->id];
+        $missing_members[] = $member->pate_id;
+      }
+      unset($debits[$member->id]);
+    }
+  }
+
+  if(!empty($missing_members)){
+    $ms = new Members(array('id' => $missing_members));
+    $members += $ms; //TODO this is not working I guess
+  }
+
   return array('members' => $members, 'debits' => $debits, 'pickups' => $pickups);
 }
 

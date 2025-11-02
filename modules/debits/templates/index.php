@@ -21,6 +21,7 @@ $totalsum=0;
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 
 <?php foreach($members as $member_id => $member): ?>
+  <?php if(!isset($debits[$member_id])){ continue; } ?>
   <div class="row">
   <?php
     $sum=0;
@@ -30,7 +31,16 @@ $totalsum=0;
         <div><b><?php echo htmlentities($member->name) ?></b></div>
       </div>
     </div>
+  <?php $actual_member_id = $member_id; ?>
   <?php foreach($debits[$member_id] as $debit_id => $debit): ?>
+    <?php if($actual_member_id != $debit->member_id): ?>
+      <?php $actual_member_id = $debit->member_id; ?>
+      <div class="inner_row">
+        <div class="col8">
+          <div><b><?php echo htmlentities($members[$debit->member_id]->name) ?></b></div>
+        </div>
+      </div>
+    <?php endif ?>
     <div class="inner_row">
       <div class="col13">
         <div>Abholung am <?php echo date('d.m.Y', strtotime($pickups[$debit->pickup_id]->created)) ?></div>
