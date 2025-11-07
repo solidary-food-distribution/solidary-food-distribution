@@ -45,6 +45,8 @@ function execute_index(){
     $scategories = array();
   }
 
+  $do_inventories = false;
+
   require_once('products.class.php');
   require_once('members.class.php');
   if($modus == 'o'){
@@ -54,6 +56,7 @@ function execute_index(){
     }
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
     $suppliers = new Members(array('producer>=' => 1));
+    $do_inventories = true;
   }elseif($modus == 'f'){
     require_once('sql.class.php');
     $product_ids=SQL::selectKey2Val("SELECT f.product_id,p.name FROM msl_favorites f,msl_products p WHERE f.product_id=p.id AND member_id='".intval($user['member_id'])."' AND p.status IN ('o','s') ORDER BY p.name",'product_id','product_id');
@@ -66,6 +69,9 @@ function execute_index(){
     $suppliers = new Members(array('producer' => $modus));
     $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => array('o','e'), 'type' => array('k', 'p', 'w')));
     $product_ids = $products->keys();
+    if($modus == '2'){
+      $do_inventories = true;
+    }
   }elseif($modus == 's' && (trim($search) != '' || !empty($scategories))){
     $suppliers = new Members(array('producer>=' => 1));
     $product_ids = search_products($search, $scategories, $suppliers);
@@ -88,6 +94,17 @@ function execute_index(){
     }
     if(trim($search) == '' && empty($scategories)){
       $products = array();
+    }
+  }
+
+  if($do_inventories){
+    require_once('inventory.inc.php');
+    $is = get_inventory($product_ids);
+    foreach($is as $product_id => $i){
+      if(!$i['amount_pieces'] && !$i['amount_weight']){
+        continue;
+      }
+      $inventory[$product_id] = $i;
     }
   }
 
@@ -130,7 +147,7 @@ function execute_index(){
   if(isset($supplier_unlocked[35])){
     $order_sum_oekoring = get_oekoring_order_sum($order->pickup_date);
   }
-  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'supplier_unlocked' => $supplier_unlocked, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => $order_sum_oekoring);
+  return array('modus' => $modus, 'order' => $order, 'products' => $products, 'inventory' => $inventory, 'favorites' => $favorites, 'order_items' => $ois, 'order_items_count' => $order_items_count, 'suppliers' => $suppliers, 'supplier_unlocked' => $supplier_unlocked, 'prices' => $prices, 'brands' => $brands, 'search' => $search, 'limit' => $limit, 'categories' => $categories, 'scategories' => $scategories, 'order_sum_oekoring' => $order_sum_oekoring);
 }
 
 function get_supplier_unlocked($order_id){
@@ -294,24 +311,32 @@ function execute_change_ajax(){
     $supplier_unlocked = get_supplier_unlocked($order_id);
     require_once('products.class.php');
     $product = Products::sget($product_id);
-    if(isset($supplier_unlocked[$product->supplier_id])){
-      require_once('order_items.class.php');
-      $ois = new OrderItems(array('order_id' => $order_id, 'product_id' => $product_id));
-      if(!$ois->count()){
-        $oi = OrderItem::create($order_id, $product_id);
-      }else{
-        $oi = $ois->first();
+    require_once('order_items.class.php');
+    $ois = new OrderItems(array('order_id' => $order_id, 'product_id' => $product_id));
+    if(!$ois->count()){
+      $oi = OrderItem::create($order_id, $product_id);
+    }else{
+      $oi = $ois->first();
+    }
+    if($product->type == 'p' || $product->type == 'w'){
+      $amount = $oi->amount_pieces;
+      $amount_field = 'amount_pieces';
+    }elseif($product->type == 'k'){
+      $amount = $oi->amount_weight;
+      $amount_field = 'amount_weight';
+    }else{
+      throw new Exception("unknown product-type ".print_r($product,1), 1);
+      exit;
+    }
+    $product_in_inventory = false;
+    if($product->supplier_id == 35){
+      require_once('inventory.inc.php');
+      $is = get_inventory(array($product_id));
+      if(isset($is[$product_id]) && $is[$product_id]['amount_pieces'] > $amount){
+        $product_in_inventory = true;
       }
-      if($product->type == 'p' || $product->type == 'w'){
-        $amount = $oi->amount_pieces;
-        $amount_field = 'amount_pieces';
-      }elseif($product->type == 'k'){
-        $amount = $oi->amount_weight;
-        $amount_field = 'amount_weight';
-      }else{
-        throw new Exception("unknown product-type ".print_r($product,1), 1);
-        exit;
-      }
+    }
+    if($product_in_inventory || $dir < 0 || isset($supplier_unlocked[$product->supplier_id])){
       $change = ($dir>0)?1:-1;
       if($product->status == 'o'){
         $change *= $product->amount_steps;

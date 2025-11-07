@@ -10,6 +10,7 @@ class Inventory{
   public int $product_id;
   public int $delivery_item_id;
   public int $pickup_item_id;
+  public int $order_item_id;
   public int $user_id;
   public float $amount_pieces;
   public float $amount_weight;
@@ -18,9 +19,9 @@ class Inventory{
   public float $weight_max;
   public float $weight_avg;
 
-  public static function create($product_id, $delivery_item_id, $pickup_item_id, $user_id){
+  public static function create($product_id, $delivery_item_id, $pickup_item_id, $order_item_id, $user_id){
     require_once('sql.class.php');
-    $qry = "INSERT INTO msl_inventory (product_id, delivery_item_id, pickup_item_id, user_id) VALUES (".intval($product_id).",".intval($delivery_item_id).",".intval($pickup_item_id).",".intval($user_id).")";
+    $qry = "INSERT INTO msl_inventory (product_id, delivery_item_id, pickup_item_id, order_item_id, user_id) VALUES (".intval($product_id).",".intval($delivery_item_id).",".intval($pickup_item_id).",".intval($order_item_id).",".intval($user_id).")";
     $id = SQL::insert($qry);
     if(!$id){
       return false;

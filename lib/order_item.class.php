@@ -3,6 +3,7 @@ declare(strict_types=0);
 
 class OrderItem{
   public int $id;
+  public string $updated;
   public int $replaces_id;
   public int $order_id;
   public int $product_id;

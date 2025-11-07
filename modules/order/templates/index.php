@@ -102,9 +102,26 @@ $PROPERTIES['body_class']=$body_class;
     $purchase_incl_tax = round($amount_price * round($prices[$product_id]->purchase + $prices[$product_id]->purchase * ($prices[$product_id]->tax/100), 2), 2);
     #logger($prices[$product_id]->purchase." purchase_incl_tax $purchase_incl_tax");
     $supplier = $suppliers[$product->supplier_id];
-    $locked = true;
+    $locked_less = true;
+    $locked_more = true;
+    logger("product_id $product_id");
     if(isset($supplier_unlocked[$supplier->id])){
-      $locked = false;
+      logger("supplier_unlocked");
+      $locked_less = false;
+      $locked_more = false;
+    }elseif(isset($inventory[$product_id]['amount_pieces'])){
+      logger("inventory ".$inventory[$product_id]['amount_pieces']);
+      if($inventory[$product_id]['amount_pieces'] > $amount){
+        $locked_more = false;
+      }
+      if($amount > 0){
+        $locked_less = false;
+      }
+    }
+    if($locked_less && $amount > 0 && $supplier->producer == 2 && $product->status == 'o' ){
+      $locked_less = false;
+    }elseif($locked_less && $amount == 0 && $modus == 'o'){
+      $locked_less = false;
     }
     if($supplier->producer == 1){
       $sum['supplier_paid'] = $sum['supplier_paid'] + $purchase_incl_tax;
@@ -159,7 +176,7 @@ $PROPERTIES['body_class']=$body_class;
       </div>
     </div>
     <div class="col7">
-      <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="order_change(this,-1)"' ?>>-</div>
+      <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="order_change(this,-1)"' ?>>-</div>
       <div class="" style="width:7em;text-align:right;margin-right:0.2em;">
         <div class="input">
           <?php echo format_amount($amount); ?>
@@ -178,7 +195,7 @@ $PROPERTIES['body_class']=$body_class;
           <?php endif ?>
         </div>
       </div>
-      <div class="button large <?php echo $locked?'disabled':'' ?>" <?php echo $locked?'':'onclick="order_change(this,1)"' ?>>+</div>
+      <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?'':'onclick="order_change(this,1)"' ?>>+</div>
     </div>
     <div class="col3 right last">
       <span><?php echo format_money($price * $amount_price) ?> EUR</span>
