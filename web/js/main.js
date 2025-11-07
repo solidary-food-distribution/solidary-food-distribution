@@ -414,7 +414,7 @@ function keyboard_key(key){
     keyboard_input_change(key);
   }else if('|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|ä|ö|ü|ß|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
-  }else if('|-|.|@|_|(|)|'.indexOf('|'+key+'|') >= 0 ){
+  }else if('|-|.|@|_|(|)|"|'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change(key);
   }else if('| |'.indexOf('|'+key+'|') >= 0 ){
     keyboard_input_change('Space');
