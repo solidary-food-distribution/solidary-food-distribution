@@ -6,7 +6,6 @@ if(!isset($_SERVER['HTTP_HOST']) || strpos($_SERVER['HTTP_HOST'],'.local')){
   $env_file = '../config/database.env';
 }
 $env = parse_ini_file($env_file);
-logger("env ".print_r($env,1));
 $mysqli=mysqli_connect($env['DB_HOST'], $env['DB_USER'], $env['DB_PWD'], $env['DB_DATABASE']);
 if(mysqli_connect_errno()){
     die('Fehler: '.mysqli_connect_errno());
