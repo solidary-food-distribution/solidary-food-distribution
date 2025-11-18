@@ -9,6 +9,7 @@ class Purchase{
   public $datetime;
   public $status;
   public $sent;
+  public $order_notification_last;
 
   public static function create( $supplier_id, $datetime){
     require_once('sql.class.php');

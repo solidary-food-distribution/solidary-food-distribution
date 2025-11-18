@@ -234,6 +234,47 @@ function send_poll_reminder_email($poll, $user, $member){
   send_email($to, $subject, $content);
 }
 
+function cron_send_order_notifications(){
+  #$now = date('Y-m-d H:i:s');
+  $now = date('Y-m-d H:i:s',strtotime('2025-11-19 19:00:00'));
+  require_once('sql.class.php');
+  $last = SQL::selectOne("SELECT value FROM msl_var WHERE var='NOTIFICATION_ORDER_REMINDER_LAST'")['value'];
+  logger("now $now last $last");
+
+  $qry = "SELECT setting, GROUP_CONCAT(user_id) user_ids FROM msl_settings WHERE setting LIKE 'NOTIFICATION_ORDER_REMINDER%' AND value='1' GROUP BY setting";
+  $settings = SQL::selectId($qry, 'setting');
+  $notifications = array();
+  foreach($settings as $setting => $notification){
+    $delta = substr($setting, strlen('NOTIFICATION_ORDER_REMINDER'));
+    $delta = str_replace('_', ' ',$delta);
+    $hours = preg_replace('/[^0-9]/','', $delta);
+    $notification['delta'] = $delta;
+    $notification['hours'] = $hours;
+    $notifications[$hours] = $notification;
+  }
+  ksort($notifications);
+  #logger(print_r($notifications,1));
+
+  require_once('purchases.class.php');
+  $purchases = new Purchases(array('datetime>' => $now, 'status' => 'a', 'sent' => '0000-00-00 00:00:00'));
+  #logger(print_r($purchases,1));
+  foreach($purchases as $purchase){
+    foreach($notifications as $hours => $notification){
+      $delta = $notification['delta'];
+      $datetime = date('Y-m-d H:i:s', strtotime($delta, strtotime($purchase->datetime)));
+      #logger("now $now hours $hours purchase.datetime ".$purchase->datetime." purchase.order_notification_last ".$purchase->order_notification_last." $delta $datetime");
+      if($datetime <= $now && $datetime > $last){
+        $notifications[$hours]['purchases'][] = $purchase;
+      }
+    }
+  }
+  logger(print_r($notifications,1));
+  $user_notifications = array();
+  foreach($notifications as $hour => $notification){
+    
+  }
+}
+
 function cron_may_deactivate_members(){
   require_once('members.class.php');
   $members = new Members(array('deactivate_on<=' => date('Y-m-d'), 'deactivate_on!=' => '0000-00-00', 'status' => 'a'));

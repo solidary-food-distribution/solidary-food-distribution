@@ -132,3 +132,21 @@ function execute_membertest_update_ajax(){
   echo json_encode(array('value' => $value));
   exit;
 }
+
+
+function execute_notifications(){
+  global $user;
+  require_once('sql.class.php');
+  $notifications = SQL::selectKey2Val("SELECT * FROM msl_settings WHERE user_id='".intval($user['user_id'])."' AND setting LIKE 'NOTIFICATION_%'", 'setting', 'value');
+  return array('notifications' => $notifications);
+}
+
+function execute_notifications_update_ajax(){
+  global $user;
+  $notification = get_request_param('notification');
+  $value = get_request_param('value');
+  require_once('sql.class.php');
+  $qry = "INSERT INTO msl_settings (user_id, setting, value) VALUES ('".intval($user['user_id'])."', '".SQL::escapeString($notification)."', '".SQL::escapeString($value)."') ON DUPLICATE KEY UPDATE value=VALUES(value),modified=NOW()";
+  SQL::update($qry);
+  exit;
+}
