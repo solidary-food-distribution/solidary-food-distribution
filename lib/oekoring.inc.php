@@ -1,11 +1,12 @@
 <?php
 
 function oekoring_download_bnns(){
-  $ftp = ftp_connect('www.biooffice.de',21);
+  $env = parse_ini_file('../config/oekoring.env');
+  $ftp = ftp_connect($env['FTP_HOST'], 21);
   if(!$ftp){
     return array('error' => 'connect to FTP failed');
   }
-  $login = @ftp_login($ftp, '***OEKORING_FTP_USER***', '***OEKORING_FTP_PWD***');
+  $login = @ftp_login($ftp, $env['FTP_USER'], $env['FTP_PWD']);
   if(!$login){
     return array('error' => 'login to FTP failed');
   }

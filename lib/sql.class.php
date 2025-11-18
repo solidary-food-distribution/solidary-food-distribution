@@ -1,10 +1,13 @@
 <?php
 global $mysqli;
 if(!isset($_SERVER['HTTP_HOST']) || strpos($_SERVER['HTTP_HOST'],'.local')){
-  $mysqli=mysqli_connect('mysqlsrv','root','***LOCAL_DB_PWD***','msl_buchen');
+  $env_file = '../config/database.local.env';
 }else{
-  $mysqli=mysqli_connect('***PROD_DB_HOST***','***PROD_DB_USER***','***PROD_DB_PWD***','***PROD_DB_DATABASE***');
+  $env_file = '../config/database.env';
 }
+$env = parse_ini_file($env_file);
+logger("env ".print_r($env,1));
+$mysqli=mysqli_connect($env['DB_HOST'], $env['DB_USER'], $env['DB_PWD'], $env['DB_DATABASE']);
 if(mysqli_connect_errno()){
     die('Fehler: '.mysqli_connect_errno());
 }else{
