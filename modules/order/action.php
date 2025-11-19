@@ -100,8 +100,12 @@ function execute_index(){
   if($do_inventories){
     require_once('inventory.inc.php');
     $is = get_inventory($product_ids);
+    #logger("products ".print_r($products,1));
     foreach($is as $product_id => $i){
       if(!$i['amount_pieces'] && !$i['amount_weight']){
+        continue;
+      }
+      if($products[$product_id]->supplier_id != 35){
         continue;
       }
       $inventory[$product_id] = $i;

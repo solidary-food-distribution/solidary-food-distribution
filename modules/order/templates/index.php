@@ -104,13 +104,13 @@ $PROPERTIES['body_class']=$body_class;
     $supplier = $suppliers[$product->supplier_id];
     $locked_less = true;
     $locked_more = true;
-    logger("product_id $product_id");
+    #logger("product_id $product_id");
     if(isset($supplier_unlocked[$supplier->id])){
-      logger("supplier_unlocked");
+      #logger("supplier_unlocked");
       $locked_less = false;
       $locked_more = false;
     }elseif(isset($inventory[$product_id]['amount_pieces'])){
-      logger("inventory ".$inventory[$product_id]['amount_pieces']);
+      #logger("inventory ".$inventory[$product_id]['amount_pieces']);
       if($inventory[$product_id]['amount_pieces'] > $amount){
         $locked_more = false;
       }
