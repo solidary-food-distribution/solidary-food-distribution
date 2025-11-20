@@ -9,6 +9,7 @@ services:
     container_name: php83_app
     volumes:
       - ./web:/var/www/public
+      - ./web:/var/www/web
       - ./modules:/var/www/modules
       - ./lib:/var/www/lib
       - ./templates:/var/www/templates
