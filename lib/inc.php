@@ -26,8 +26,9 @@ function user_ensure_authed(){
     if(!empty($forward)){
       $forward='_forward='.$forward;
     }
-    if(!empty($_REQUEST)){
-      $request=$_REQUEST;
+
+    if(!empty(/*$_REQUEST*/ array_merge($_POST,$_GET))){
+      $request=array_merge($_POST,$_GET)/*$_REQUEST*/;
       unset($request['password']); //never expose password
       unset($request['index_path']); //not needed
       $forward.='&_query='.urlencode(http_build_query($request));
