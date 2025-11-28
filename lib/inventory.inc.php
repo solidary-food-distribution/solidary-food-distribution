@@ -58,7 +58,7 @@ function update_inventory_product($product_id){
   }
   foreach($delivery_items as $delivery_item){
     if(!isset($idis[$delivery_item->id])){
-      $idis[$delivery_item->id] = Inventory::create($delivery_item->product_id, $delivery_item->id, 0, 0, 0);
+      $idis[$delivery_item->id] = Inventory::create($delivery_item->product_id, $delivery_item->id, 0, 0);
     }
     $idis[$delivery_item->id]->update(array(
       'modified' => $delivery_item->modified,
@@ -83,72 +83,21 @@ function update_inventory_product($product_id){
   foreach($inventories as $inventory){
     $ipis[$inventory->pickup_item_id] = $inventory;
   }
-  $puis_order_item_ids = array();
   foreach($pickup_items as $pickup_item){
     if(!isset($ipis[$pickup_item->id])){
-      $ipis[$pickup_item->id] = Inventory::create($pickup_item->product_id, 0, $pickup_item->id, 0, 0);
+      $ipis[$pickup_item->id] = Inventory::create($pickup_item->product_id, 0, $pickup_item->id, 0);
     }
     $ipis[$pickup_item->id]->update(array(
       'modified' => $pickup_item->modified,
       'amount_pieces' => -$pickup_item->amount_pieces,
       'amount_weight' => -$pickup_item->amount_weight,
     ));
-    $puis_order_item_ids[$pickup_item->order_item_id] = 1;
-  }
-
-  require_once('sql.class.php');
-  SQL::update("DELETE FROM msl_inventory WHERE order_item_id>0 AND order_item_id NOT IN (SELECT id FROM msl_order_items)");
-  $order_item_modified = '0000-00-00 00:00:00';
-  $inventories = new Inventories(array('order_item_id>' => 0, 'product_id' => $product_id, 'modified>' => $user_modified), array('modified' => 'DESC'), 0, 1);
-  if($inventories->count()){
-    $order_item_modified = $inventories->first()->modified;
-  }
-  require_once('order_items.class.php');
-  require_once('inventory_log.class.php');
-  $order_items = new OrderItems(array('updated>=' => $order_item_modified, 'product_id' => $product_id, 'updated>' => $user_modified));
-  $inventories = new Inventories(array('order_item_id' => $order_items->keys()));
-  $iois = array();
-  #logger("inventories ".print_r($inventories,1));
-  foreach($inventories as $inventory){
-    $iois[$inventory->order_item_id] = $inventory;
-  }
-  foreach($order_items as $order_item){
-    $delete = false;
-    if(isset($puis_order_item_ids[$order_item->id])){
-      $delete = true;
-    }elseif(!$order_item->amount_pieces && !$order_item->amount_weight){
-      $delete = true;
-    }
-    if(!isset($iois[$order_item->id]) && !$delete){
-      $iois[$order_item->id] = Inventory::create($pickup_item->product_id, 0, 0, $order_item->id, 0);
-    }elseif(isset($iois[$order_item->id]) && $delete){
-      $inventory = $iois[$order_item->id];
-      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id,$inventory->order_item_id, $inventory->user_id);
-      $inventory_log->update(array(
-        'modified' => $inventory->modified,
-        'amount_pieces' => $inventory->amount_pieces,
-        'amount_weight' => $inventory->amount_weight,
-        'dividable' => $inventory->dividable,
-        'weight_min' => $inventory->weight_min,
-        'weight_max' => $inventory->weight_max,
-        'weight_avg' => $inventory->weight_avg,
-      ));
-      $inventory->delete();
-    }
-    if($delete){
-      continue;
-    }
-    $iois[$order_item->id]->update(array(
-      'modified' => $order_item->updated,
-      'amount_pieces' => -$order_item->amount_pieces,
-      'amount_weight' => -$order_item->amount_weight,
-    ));
   }
 
   if($user_modified != '0000-00-00 00:00:00'){
     $inventories = new Inventories(array('product_id' => $product_id, 'modified<' => $user_modified));
     foreach($inventories as $inventory){
-      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id,$inventory->order_item_id, $inventory->user_id);
+      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id, $inventory->user_id);
       $inventory_log->update(array(
         'modified' => $inventory->modified,
         'amount_pieces' => $inventory->amount_pieces,

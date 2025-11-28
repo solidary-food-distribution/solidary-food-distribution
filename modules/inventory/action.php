@@ -121,7 +121,7 @@ function execute_update_ajax(){
   if(($user_id != $user['user_id']) || (substr($modified, 0, 10) != date('Y-m-d'))){
     require_once('inventory_log.class.php');
     foreach($inventories as $inventory){
-      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id, $inventory->order_item_id, $inventory->user_id);
+      $inventory_log = InventoryLog::create($inventory->id, $inventory->product_id, $inventory->delivery_item_id, $inventory->pickup_item_id, $inventory->user_id);
       $inventory_log->update(array(
         'modified' => $inventory->modified,
         'amount_pieces' => $inventory->amount_pieces,
@@ -133,7 +133,7 @@ function execute_update_ajax(){
       ));
       $inventory->delete();
     }
-    $inventory = Inventory::create($product_id, 0, 0, 0, $user['user_id']);
+    $inventory = Inventory::create($product_id, 0, 0, $user['user_id']);
   }
   if($change == '0'){
     $update = array('amount_pieces' => 0, 'amount_weight' => '0');

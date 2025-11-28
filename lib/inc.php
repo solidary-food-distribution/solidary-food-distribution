@@ -1,5 +1,5 @@
 <?php
-global $user;
+global $user,$_request_cache;
 
 function logger($str){
   global $MODULE,$ACTION;
@@ -7,17 +7,27 @@ function logger($str){
 }
 
 function get_request_param($param){
-  if(isset($_REQUEST[$param])){
-    return $_REQUEST[$param];
+  global $_request_cache;
+  init_request_cache();
+  if(isset($_request_cache[$param])){
+    return $_request_cache[$param];
   }
   return '';
 }
 function set_request_param($param,$value){
-  $_REQUEST[$param]=$value;
+  global $_request_cache;
+  init_request_cache();
+  $_request_cache[$param]=$value;
+}
+function init_request_cache(){
+  global $_request_cache;
+  if(empty($_request_cache)){
+    $_request_cache=array_merge($_GET, $_POST); //POST overwrites GET
+  }
 }
 
 function user_ensure_authed(){
-  global $user,$MODULE,$ACTION;
+  global $user,$MODULE,$ACTION,$_request_cache;
   if(!isset($_SESSION['user'])){
     $forward='/'.$MODULE.'/'.$ACTION;
     if($forward=='/auth/login' || $forward=='/start/index'){
@@ -26,9 +36,9 @@ function user_ensure_authed(){
     if(!empty($forward)){
       $forward='_forward='.$forward;
     }
-
-    if(!empty(/*$_REQUEST*/ array_merge($_POST,$_GET))){
-      $request=array_merge($_POST,$_GET)/*$_REQUEST*/;
+    init_request_cache();
+    if(!empty($_request_cache)){
+      $request=$_request_cache;
       unset($request['password']); //never expose password
       unset($request['index_path']); //not needed
       $forward.='&_query='.urlencode(http_build_query($request));
