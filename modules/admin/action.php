@@ -524,9 +524,21 @@ function execute_orders_update_ajax(){
   $order_item_id = get_request_param('order_item_id');
   $pickup_item_id = get_request_param('pickup_item_id');
   $product_id = get_request_param('product_id');
+  $order_item_comment = get_request_param('order_item_comment');
   $amount_order = get_request_param('amount_order');
   $amount_pickup = get_request_param('amount_pickup');
-  logger("$order_item_id $pickup_item_id $product_id $amount_order $amount_pickup");
+  logger("$order_item_id $pickup_item_id $product_id $order_item_comment $amount_order $amount_pickup");
+  if($order_item_id){
+    require_once('order_items.class.php');
+    $oi = OrderItems::sget($order_item_id);
+    $updates = array();
+    if($oi->comment !== $order_item_comment){
+      $updates['comment'] = trim($order_item_comment);
+    }
+    if(!empty($updates)){
+      $oi->update($updates);
+    }
+  }
   if($pickup_item_id){
     require_once('pickup_items.class.php');
     $pui = PickupItems::sget($pickup_item_id);

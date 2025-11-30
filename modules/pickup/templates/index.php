@@ -42,9 +42,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $amount_others = 0;
     $scale_title = '';
     $scale_minmax = 0.1;
+    $order_item_comment = '';
     if(isset($pickup_items[$product_id])){
       $pickup_item = $pickup_items[$product_id];
       $order_item = $order_items[$pickup_item->order_item_id];
+      $order_item_comment = $order_item->comment;
       if($product->type == 'k'){
         $amount_ordered = $order_item->amount_weight;
         $amount_ordered_type = 'k';
@@ -133,115 +135,125 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $sum['sum'] = $sum['sum'] + $price_row;
   ?>
   <div class="row product" data-id="<?php echo $product_id ?>" data-pickup_id="<?php echo $pickup->id ?>" data-item_id="<?php echo $pickup_item->id ?>">
-    <div class="col2">
-      <div class="image" style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;">
-        <?php
-          $infos = array();
-          if(!empty($product->infos)){
-            $infos = json_decode($product->infos, true);
-            if(strpos($infos['link'], 'duckduckgo')){
-              $infos = array();
-            }
-          }
-          if(isset($infos['link'])){
-            echo '<a href="'.$infos['link'].'" target="_blank">';
-          }
-          if(isset($infos['image'])){
-            echo '<img src="'.$infos['image'].'" />';
-          }
-          if(isset($infos['link'])){
-            echo '</a>';
-          }
-        ?>
-      </div>
-    </div>
-    <div class="col5">
-      <div>
-        <?php echo htmlentities($product->name) ?><br>
-        <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
-      </div>
-    </div>
-    <div class="col8">
-      <?php if($product->type!='k'): ?>
-        <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="pickup_change(this,\'-\')"' ?>>-</div>
-      <?php else: ?>
-        <div style="width:1.7em;font-size:2em;">&nbsp;</div>
-      <?php endif ?>
-      <div class="" style="width:6em;text-align:right;margin-right:0.2em;">
-        <?php if($amount_ordered): ?>
-          <span class="amount_ordered"><?php echo format_amount($amount_ordered) ?></span>
-        <?php endif ?>
-        <?php if($modus == 'd' && $amount_inventory): ?>
-          <span class="amount_ordered"><?php echo format_amount($amount_inventory) ?></span>
-        <?php endif ?>
-        <?php
-          $needs_todo = ($amount_ordered != $amount);
-          if($product->type == 'k'){
-            $needs_todo = 0;
-            if($amount_weight > $amount_ordered_weight*1.2){
-              $needs_todo = 1;
-            }elseif($amount_weight < $amount_ordered_weight*0.8){
-              $needs_todo = 1;
-            }
-          }
-          if($modus == 'd'){
-            $needs_todo = 0;
-          }
-          if(!isset($pickup_item->order_item_id) || $pickup_item->order_item_id == 0){
-            $needs_todo = 0;
-          }
-        ?>
-        <div class="input <?php echo $needs_todo?'needs_todo':'' ?>">
-          <?php echo format_amount($amount); ?>
+    <?php if(!empty($order_item_comment)): ?>
+      <div class="inner_row">
+        <div class="col2"></div>
+        <div class="col12">
+          <span style="font-weight:bold; position:relative; top:-0.2em"><i><?php echo htmlentities($order_item_comment) ?></i></span>
         </div>
-        <span><?php echo translate_product_type_amount($product->type); ?></span><br>
-        <?php if($product->type == 'w'): ?>
-          <div class="input <?php echo $amount_weight?'':'needs_todo' ?>">
-            <?php echo format_amount($amount_weight); ?>
+      </div>
+    <?php endif ?>
+    <div class="inner_row">
+      <div class="col2">
+        <div class="image" style="display:block;width:3.5em;height:3.5em;background-color:rgba(255,255,255,0.5);border:1px solid black;border-radius:0.5em;">
+          <?php
+            $infos = array();
+            if(!empty($product->infos)){
+              $infos = json_decode($product->infos, true);
+              if(strpos($infos['link'], 'duckduckgo')){
+                $infos = array();
+              }
+            }
+            if(isset($infos['link'])){
+              echo '<a href="'.$infos['link'].'" target="_blank">';
+            }
+            if(isset($infos['image'])){
+              echo '<img src="'.$infos['image'].'" />';
+            }
+            if(isset($infos['link'])){
+              echo '</a>';
+            }
+          ?>
+        </div>
+      </div>
+      <div class="col5">
+        <div>
+          <?php echo htmlentities($product->name) ?><br>
+          <i style="font-size:80%"><?php echo htmlentities(trim($brand.' '.$supplier->name)) ?></i>
+        </div>
+      </div>
+      <div class="col8">
+        <?php if($product->type!='k'): ?>
+          <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="pickup_change(this,\'-\')"' ?>>-</div>
+        <?php else: ?>
+          <div style="width:1.7em;font-size:2em;">&nbsp;</div>
+        <?php endif ?>
+        <div class="" style="width:6em;text-align:right;margin-right:0.2em;">
+          <?php if($amount_ordered): ?>
+            <span class="amount_ordered"><?php echo format_amount($amount_ordered) ?></span>
+          <?php endif ?>
+          <?php if($modus == 'd' && $amount_inventory): ?>
+            <span class="amount_ordered"><?php echo format_amount($amount_inventory) ?></span>
+          <?php endif ?>
+          <?php
+            $needs_todo = ($amount_ordered != $amount);
+            if($product->type == 'k'){
+              $needs_todo = 0;
+              if($amount_weight > $amount_ordered_weight*1.2){
+                $needs_todo = 1;
+              }elseif($amount_weight < $amount_ordered_weight*0.8){
+                $needs_todo = 1;
+              }
+            }
+            if($modus == 'd'){
+              $needs_todo = 0;
+            }
+            if(!isset($pickup_item->order_item_id) || $pickup_item->order_item_id == 0){
+              $needs_todo = 0;
+            }
+          ?>
+          <div class="input <?php echo $needs_todo?'needs_todo':'' ?>">
+            <?php echo format_amount($amount); ?>
           </div>
-          <span><?php echo translate_product_type_amount('k'); ?></span><br>
-        <?php endif ?>
-        <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
+          <span><?php echo translate_product_type_amount($product->type); ?></span><br>
           <?php if($product->type == 'w'): ?>
-            <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
+            <div class="input <?php echo $amount_weight?'':'needs_todo' ?>">
+              <?php echo format_amount($amount_weight); ?>
+            </div>
+            <span><?php echo translate_product_type_amount('k'); ?></span><br>
           <?php endif ?>
-          <?php if($product->status == 'o'): ?>
-            <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
-          <?php endif ?>
-          <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>
-            <br>
-            <span><?php echo $prices[$product_id]->amount_per_bundle ?>: <?php echo format_money($prices[$product_id]->price_bundle) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
-          <?php endif ?>
+          <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
+            <?php if($product->type == 'w'): ?>
+              <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
+            <?php endif ?>
+            <?php if($product->status == 'o'): ?>
+              <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
+            <?php endif ?>
+            <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>
+              <br>
+              <span><?php echo $prices[$product_id]->amount_per_bundle ?>: <?php echo format_money($prices[$product_id]->price_bundle) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
+            <?php endif ?>
+          </div>
         </div>
-      </div>
-      <?php if($product->type!='k'): ?>
-        <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?$locked_more_html:'onclick="pickup_change(this,\'+\')"' ?>>+</div>
-      <?php else: ?>
-        <div style="width:1.7em;font-size:2em;">&nbsp;</div>
-      <?php endif ?>
-      <?php if($product->type != 'p'): ?>
-        <?php 
-          $scale_bottom = '';
-          if($product->type == 'k' || $product->type == 'w'){
-            if($others['product_amounts'][$product_id]){
-              $others_count = count($others['product_orders'][$product_id]);
-              $scale_bottom = 'Weitere Abholende: <b>'.$others_count.' mit gesamt '.format_amount($others['product_amounts'][$product_id]).' '.($product->type=='k'?'kg':'St.').'</b>';
-            }else{
-              $scale_bottom = 'Keine weiteren Abholende für dieses Produkt.';
+        <?php if($product->type!='k'): ?>
+          <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?$locked_more_html:'onclick="pickup_change(this,\'+\')"' ?>>+</div>
+        <?php else: ?>
+          <div style="width:1.7em;font-size:2em;">&nbsp;</div>
+        <?php endif ?>
+        <?php if($product->type != 'p'): ?>
+          <?php 
+            $scale_bottom = '';
+            if($product->type == 'k' || $product->type == 'w'){
+              if($others['product_amounts'][$product_id]){
+                $others_count = count($others['product_orders'][$product_id]);
+                $scale_bottom = 'Weitere Abholende: <b>'.$others_count.' mit gesamt '.format_amount($others['product_amounts'][$product_id]).' '.($product->type=='k'?'kg':'St.').'</b>';
+              }else{
+                $scale_bottom = 'Keine weiteren Abholende für dieses Produkt.';
+              }
             }
-          }
-        ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>" data-bottom="<?php echo htmlentities($scale_bottom) ?>">
-          <i class="fa-solid fa-weight-scale"></i>
-        </div>
-      <?php elseif($modus != 'd' && $amount_ordered > 0): ?>
-        <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount!=$amount_ordered?'needs_todo':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'=\')"' ?> style="margin-left:0.2em">
-          <i class="fa-solid fa-check"></i>
-        </div>
-      <?php endif ?>
-    </div>
-    <div class="col3 right last">
-      <span><?php echo format_money($price * $amount_price) ?> EUR</span>
+          ?>
+          <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>" data-bottom="<?php echo htmlentities($scale_bottom) ?>">
+            <i class="fa-solid fa-weight-scale"></i>
+          </div>
+        <?php elseif($modus != 'd' && $amount_ordered > 0): ?>
+          <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount!=$amount_ordered?'needs_todo':'' ?>" <?php echo $locked?'':'onclick="pickup_change(this,\'=\')"' ?> style="margin-left:0.2em">
+            <i class="fa-solid fa-check"></i>
+          </div>
+        <?php endif ?>
+      </div>
+      <div class="col3 right last">
+        <span><?php echo format_money($price * $amount_price) ?> EUR</span>
+      </div>
     </div>
   </div>
 <?php endforeach ?>

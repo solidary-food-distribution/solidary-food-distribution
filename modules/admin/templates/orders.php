@@ -32,12 +32,21 @@ if($date_next){
   <div class="row">
     <div class="inner_row" style="display:none" id="admin_orders_edit" data-product_id="">
       <div class="col9">
-        <select name="product_id" style="width:100%">
-          <option></option>
-          <?php foreach($products as $product_id => $product): ?>
-            <option value="<?php echo $product_id ?>"><?php echo htmlentities($product->name) ?></option>
-          <?php endforeach ?>
-        </select>
+        <div>
+          <select name="product_id" style="width:100%">
+            <option></option>
+            <?php foreach($products as $product_id => $product): ?>
+              <option value="<?php echo $product_id ?>"><?php echo htmlentities($product->name) ?></option>
+            <?php endforeach ?>
+          </select>
+          <br>
+          <?php echo html_input(array(
+            'type' => 'input_text',
+            'class' => 'admin_orders_input',
+            'field' => 'order_item_comment',
+            'value' => '',
+          )); ?>
+        </div>
       </div>
       <div class="col2">
         <?php echo html_input(array(
@@ -100,10 +109,13 @@ if($date_next){
             }
           ?>
           <div class="col9">
-            <?php if($product->supplier_id == 35): ?>
-              <?php echo htmlentities($product->supplier_product_id) ?>
-            <?php endif ?>
-            <?php echo htmlentities($product->name) ?>
+            <div>
+              <?php if($product->supplier_id == 35): ?>
+                <?php echo htmlentities($product->supplier_product_id) ?>
+              <?php endif ?>
+              <?php echo htmlentities($product->name) ?><br>
+              <span class="order_item_comment" style="font-size:75%;position:relative;top:-0.2em;"><?php echo htmlentities($order_item->comment) ?></span>
+            </div>
           </div>
           <div class="col2 right">
             <span class="amount_order"><?php echo format_amount($amount_order) ?></span>&nbsp;<?php echo $unit ?>

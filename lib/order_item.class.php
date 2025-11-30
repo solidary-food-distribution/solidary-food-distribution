@@ -14,6 +14,7 @@ class OrderItem{
   public float $amount_per_bundle;
   public float $price_bundle;
   public float $price_sum;
+  public string $comment;
 
   public static function create($order_id, $product_id){
     require_once('sql.class.php');
