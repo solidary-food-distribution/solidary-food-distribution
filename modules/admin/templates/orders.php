@@ -43,7 +43,7 @@ if($date_next){
         <?php echo html_input(array(
           'type' => 'number',
           'class' => 'admin_orders_input',
-          'field' => 'amount',
+          'field' => 'amount_order',
           'value' => '',
         )); ?>
       </div>
@@ -52,7 +52,7 @@ if($date_next){
         <?php echo html_input(array(
           'type' => 'number',
           'class' => 'admin_orders_input',
-          'field' => 'amount',
+          'field' => 'amount_pickup',
           'value' => '',
         )); ?>
       </div>
@@ -87,7 +87,18 @@ if($date_next){
             $class = 'linethrough grey';
           }
         ?>
-        <div class="inner_row <?php echo $class ?>" data-order_item_id="<?php echo $order_item->id ?>" data-product_id="<?php echo $product->id ?>">
+        <div class="inner_row <?php echo $class ?>" data-order_item_id="<?php echo $order_item->id ?>" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $pickup_item->id ?>">
+          <?php
+            if($product->type == 'k'){
+              $amount_order = $order_item->amount_weight;
+              $amount_pickup = $pickup_item->amount_weight;
+              $unit = 'kg';
+            }else{
+              $amount_order = $order_item->amount_pieces;
+              $amount_pickup = $pickup_item->amount_pieces;
+              $unit = 'St.';
+            }
+          ?>
           <div class="col9">
             <?php if($product->supplier_id == 35): ?>
               <?php echo htmlentities($product->supplier_product_id) ?>
@@ -95,20 +106,12 @@ if($date_next){
             <?php echo htmlentities($product->name) ?>
           </div>
           <div class="col2 right">
-            <?php if($product->type == 'k'): ?>
-              <span class="amount"><?php echo format_amount($order_item->amount_weight) ?></span>&nbsp;kg
-            <?php else: ?>
-              <span class="amount"><?php echo format_amount($order_item->amount_pieces) ?></span>&nbsp;St.
-            <?php endif ?>
+            <span class="amount_order"><?php echo format_amount($amount_order) ?></span>&nbsp;<?php echo $unit ?>
           </div>
           <div class="col1 right">
           </div>
-          <div class="col3 right">
-            <?php if($product->type == 'k'): ?>
-              <?php echo format_amount($pickup_item->amount_weight).' kg' ?>
-            <?php else: ?>
-              <?php echo format_amount($pickup_item->amount_pieces).' St.' ?>
-            <?php endif ?>
+          <div class="col3 right <?php echo $amount_pickup?'':'warn' ?>">
+            <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
           </div>
           <div class="col1 right">
             <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $order_item->id ?>')">

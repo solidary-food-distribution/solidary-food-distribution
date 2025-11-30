@@ -522,9 +522,36 @@ function execute_orders_update_ajax(){
     forward_to_noaccess();
   }
   $order_item_id = get_request_param('order_item_id');
+  $pickup_item_id = get_request_param('pickup_item_id');
   $product_id = get_request_param('product_id');
-  $amount = get_request_param('amount');
-  logger("$order_item_id $product_id $amount");
+  $amount_order = get_request_param('amount_order');
+  $amount_pickup = get_request_param('amount_pickup');
+  logger("$order_item_id $pickup_item_id $product_id $amount_order $amount_pickup");
+  if($pickup_item_id){
+    require_once('pickup_items.class.php');
+    $pui = PickupItems::sget($pickup_item_id);
+    require_once('products.class.php');
+    $product = Products::sget($product_id);
+    if($product->type == 'k'){
+      $amount_field = 'amount_weight';
+      $amount = $pui->amount_weight;
+    }elseif($product->type == 'p'){
+      $amount_field = 'amount_pieces';
+      $amount = $pui->amount_pieces;
+    }else{
+      logger("product->type not implemented ".$product->type);
+      exit;
+    }
+    if($pui->product_id != $product_id){
+      logger("product->id update not implemented");
+      exit;
+    }
+    if(round($amount,3) != round(floatval(str_replace(',', '.', $amount_pickup)),3)){
+      $pui->update(array($amount_field => $amount_pickup));
+      require_once('pickups.inc.php');
+      update_pickup_item_price_sum($pui->id);
+    }
+  }
   exit;
 }
 

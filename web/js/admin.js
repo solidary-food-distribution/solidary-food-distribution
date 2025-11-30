@@ -89,11 +89,14 @@ function admin_orders_edit(el, order_item_id){
   var div = $('#admin_orders_edit').clone();
   div.attr('id', 'admin_orders_edit'+order_item_id);
   div.attr('data-order_item_id', order_item_id);
+  div.attr('data-pickup_item_id', $(el).closest('.inner_row').data('pickup_item_id'));
   $(el).closest('.inner_row').after(div);
   var product_id = $(el).closest('.inner_row').data('product_id');
   div.find('select[name="product_id"]').val(product_id);
-  var amount = $(el).parent().parent().find('.amount').html();
-  div.find('[data-field="amount"]').html(amount);
+  var amount_order = $(el).parent().parent().find('.amount_order').html();
+  div.find('[data-field="amount_order"]').html(amount_order);
+  var amount_pickup = $(el).parent().parent().find('.amount_pickup').html();
+  div.find('[data-field="amount_pickup"]').html(amount_pickup);
   $(el).parent().parent().parent().parent().find('.button.edit').hide();
   div.css('display', 'flex');
 }
@@ -101,14 +104,16 @@ function admin_orders_edit(el, order_item_id){
 function admin_orders_update(el){
   var div = $(el).closest('.inner_row');
   var order_item_id = div.data('order_item_id');
+  var pickup_item_id = div.data('pickup_item_id');
   var product_id = div.find('select[name="product_id"]').val();
-  var amount = div.find('[data-field="amount"]').html();
-  //console.log("admin_orders_update "+order_item_id+" "+product_id+" "+amount);
+  var amount_order = div.find('[data-field="amount_order"]').html();
+  var amount_pickup = div.find('[data-field="amount_pickup"]').html();
+  console.log("admin_orders_update "+order_item_id+" "+product_id+" "+amount_order+" "+amount_pickup);
   $('#loading').show();
   $.ajax({
     type: 'POST',
-    url: '/admin/orders_update_ajax?order_item_id='+order_item_id,
-    data: { 'product_id': product_id, 'amount': amount },
+    url: '/admin/orders_update_ajax?order_item_id='+order_item_id+'&pickup_item_id='+pickup_item_id,
+    data: { 'product_id': product_id, 'amount_order': amount_order, 'amount_pickup': amount_pickup},
     dataType: 'html',
     success: function(html){
       $('#loading').hide();
