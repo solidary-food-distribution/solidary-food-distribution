@@ -137,8 +137,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
   <div class="row product" data-id="<?php echo $product_id ?>" data-pickup_id="<?php echo $pickup->id ?>" data-item_id="<?php echo $pickup_item->id ?>">
     <?php if(!empty($order_item_comment)): ?>
       <div class="inner_row">
-        <div class="col2"></div>
-        <div class="col12">
+        <div class="col7"></div>
+        <div class="col10">
           <span style="font-weight:bold; position:relative; top:-0.2em"><i><?php echo htmlentities($order_item_comment) ?></i></span>
         </div>
       </div>

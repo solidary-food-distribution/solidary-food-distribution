@@ -542,14 +542,22 @@ function execute_orders_update_ajax(){
   if($pickup_item_id){
     require_once('pickup_items.class.php');
     $pui = PickupItems::sget($pickup_item_id);
+    $updates = array();
     require_once('products.class.php');
     $product = Products::sget($product_id);
     if($product->type == 'k'){
-      $amount_field = 'amount_weight';
-      $amount = $pui->amount_weight;
+      if(round($pui->amount_weight,3) != round(floatval(str_replace(',', '.', $amount_pickup)),3)){
+        $updates['amount_weight'] = round(floatval(str_replace(',', '.', $amount_pickup)),3);
+      }
     }elseif($product->type == 'p'){
-      $amount_field = 'amount_pieces';
-      $amount = $pui->amount_pieces;
+      if(round($pui->amount_pieces,3) != round(floatval(str_replace(',', '.', $amount_pickup)),3)){
+        $updates['amount_pieces'] = round(floatval(str_replace(',', '.', $amount_pickup)),3);
+      }
+    }elseif($product->type == 'w'){
+      if(round($pui->amount_pieces,3) != round(floatval(str_replace(',', '.', $amount_pickup)),3)){
+        $updates['amount_pieces'] = round(floatval(str_replace(',', '.', $amount_pickup)),3);
+        $updates['amount_weight'] = round($updates['amount_pieces'] * $product->kg_per_piece, 3);
+      }
     }else{
       logger("product->type not implemented ".$product->type);
       exit;
@@ -558,8 +566,8 @@ function execute_orders_update_ajax(){
       logger("product->id update not implemented");
       exit;
     }
-    if(round($amount,3) != round(floatval(str_replace(',', '.', $amount_pickup)),3)){
-      $pui->update(array($amount_field => $amount_pickup));
+    if(!empty($updates)){
+      $pui->update($updates);
       require_once('pickups.inc.php');
       update_pickup_item_price_sum($pui->id);
     }
