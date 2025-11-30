@@ -114,7 +114,7 @@ if($date_next){
             <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
           </div>
           <div class="col1 right">
-            <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $order_item->id ?>')">
+            <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $order_item->id ?>','<?php echo $pickup_item->id ?>')">
               <i class="fa-solid fa-pencil" style="font-size:75%"></i>
             </span>
           </div>
@@ -123,8 +123,15 @@ if($date_next){
       <?php foreach($pickup_items_array[$member_id] as $pickup_item): ?>
         <?php 
           $product = $products[$pickup_item->product_id];
+          if($product->type == 'k'){
+            $amount_pickup = $pickup_item->amount_weight;
+            $unit = 'kg';
+          }else{
+            $amount_pickup = $pickup_item->amount_pieces;
+            $unit = 'St.';
+          }
         ?>
-        <div class="inner_row" data-pickup_item_id="<?php echo $order_item->id ?>" >
+        <div class="inner_row" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $order_item->id ?>" >
           <div class="col9">
             <?php if($product->supplier_id == 35): ?>
               <?php echo htmlentities($product->supplier_product_id) ?>
@@ -136,19 +143,13 @@ if($date_next){
           <div class="col1 right">
           </div>
           <div class="col3 right">
-            <?php if($product->type == 'k'): ?>
-              <?php echo format_amount($pickup_item->amount_weight).' kg' ?>
-            <?php else: ?>
-              <?php echo format_amount($pickup_item->amount_pieces).' St.' ?>
-            <?php endif ?>
+            <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
           </div>
-          <!--
           <div class="col1 right">
-            <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $pickup_item->id ?>')">
+            <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $pickup_item->id ?>','<?php echo $pickup_item->id ?>')">
               <i class="fa-solid fa-pencil" style="font-size:75%"></i>
             </span>
           </div>
-          -->
         </div>
       <?php endforeach ?>
     <?php endforeach ?>

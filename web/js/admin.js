@@ -85,11 +85,11 @@ function admin_purchase_status(purchase_id){
   });
 }
 
-function admin_orders_edit(el, order_item_id){
+function admin_orders_edit(el, order_item_id, pickup_item_id){
   var div = $('#admin_orders_edit').clone();
   div.attr('id', 'admin_orders_edit'+order_item_id);
   div.attr('data-order_item_id', order_item_id);
-  div.attr('data-pickup_item_id', $(el).closest('.inner_row').data('pickup_item_id'));
+  div.attr('data-pickup_item_id', pickup_item_id);
   $(el).closest('.inner_row').after(div);
   var product_id = $(el).closest('.inner_row').data('product_id');
   div.find('select[name="product_id"]').val(product_id);
