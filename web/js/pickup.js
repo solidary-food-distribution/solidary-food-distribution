@@ -295,7 +295,7 @@ function scale_scale(){
 
 function pickup_check_logout(products){
   if(products != ''){
-    $('#notify_cancel').show();
+    $('#notify_cancel').css('display', 'inline-block');
     $('#notify_cancel').html('Bearbeiten');
     $('#notify_ok').html('Logout');
     $('#notify_ok').attr('onclick', "location.href = '/auth/logout'");

@@ -78,7 +78,9 @@ footer{
   padding: 0.5em;
   background-color: white;
 }
-
+#notify_cancel{
+  display: none;
+}
 
 #loading{
   display: none;
