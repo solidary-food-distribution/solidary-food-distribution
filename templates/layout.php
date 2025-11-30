@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202510120240';
+$version='202511301908';
 $body_class='';
 $header='';
 $footer='';
@@ -102,6 +102,7 @@ if(isset($_SESSION['browser'])){
   <div id="notify">
     <div id="notify_text"></div>
     <div style="width:100%;text-align:right">
+      <div id="notify_cancel" class="button" onclick="$('#notify').hide();$('#loading').hide();">Abbrechen</div>
       <div id="notify_ok" class="button" onclick="$('#notify').hide();$('#loading').hide();">Ok</div>
     </div>
   </div>

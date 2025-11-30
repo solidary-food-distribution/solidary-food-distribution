@@ -291,3 +291,16 @@ function scale_scale(){
   $('#scale_ok').hide();
   scale_show_values();
 }
+
+
+function pickup_check_logout(products){
+  if(products != ''){
+    $('#notify_cancel').show();
+    $('#notify_cancel').html('Bearbeiten');
+    $('#notify_ok').html('Logout');
+    $('#notify_ok').attr('onclick', "location.href = '/auth/logout'");
+    notify("Es gibt noch Positionen, die nicht befüllt sind:<br>"+products.replaceAll("[BR]","<br>"));
+    return;
+  }
+  location.href = '/auth/logout';
+}

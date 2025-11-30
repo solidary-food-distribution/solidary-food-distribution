@@ -32,6 +32,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
 
 <?php
   $sum = array();
+  $open_pickup_items = array();
 ?>
 
 <?php foreach($products as $product_id => $product): ?>
@@ -82,6 +83,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           $amount_others += $others_amount;
         }
       }
+    }
+    if($amount_ordered && !$amount){
+      $open_pickup_items[] = $product->name;
     }
 
     
@@ -278,6 +282,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
           <div class="col2"><small>Erzeuger</small></div>
           <div class="col3 right"><small><?php echo format_money($sum['supplier_paid']) ?> EUR</small></div>
           <div class="col3 right"><small><?php echo format_money($sum['supplier_sum'] - $sum['supplier_paid']) ?> EUR</small></div>
+          <div class="col8 right last">
+            <?php if(!empty($open_pickup_items)): ?>
+              <b>Noch <?php echo count($open_pickup_items) ?> Position<?php echo count($open_pickup_items)>1?'en':'' ?> offen</b>
+            <?php endif ?>
+          </div>
         </div>
         <div class="inner_row">
           <div class="col2"><small>Großhandel</small></div>
@@ -309,3 +318,11 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $PROPERTIES['footer']=ob_get_clean();
   ?>
 <?php endif ?>
+
+<script>
+  <?php
+    $products = implode('[BR]', $open_pickup_items);
+    $products = preg_replace("/[^0-9a-zA-Z ,.äöüÄÖÜß()[]-]/", "", $products);
+  ?>
+  $('.logout').attr('onclick', "pickup_check_logout('<?php echo htmlentities($products) ?>')");
+</script>
