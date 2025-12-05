@@ -32,18 +32,15 @@ function execute_index(){
     require_once('products.class.php');
     $products = new Products(array('id' => $product_ids),array('FIELD(id,'.implode(',',$product_ids).')' => 'ASC'));
   }elseif($modus=='2'){
-    require_once('members.class.php');
-    $suppliers = new Members(array('producer' => $modus));
     $product_ids = array();
     require_once('products.class.php');
-    $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => 'o'), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
-    /*foreach($data as $product_id => $pdata){
-      if($pdata['user_id'] == 0 || $pdata['amount_pieces'] != 0 || $pdata['amount_pieces'] != 0){
-        $product_ids[] = $product_id;
-      }
+    $products = new Products(array('stock' => array('o', 'i'), 'status' => 'o'), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
+    $supplier_ids = array();
+    foreach($products as $product){
+      $supplier_ids[$product->supplier_id] = $product->supplier_id;
     }
-    $products = new Products(array('id' => $product_ids, 'supplier_id' => $suppliers->keys()), array('FIELD(type,\'k\',\'w\',\'p\')' => '', 'name' => 'ASC'));
-    */
+    require_once('members.class.php');
+    $suppliers = new Members(array('id' => $supplier_ids));
   }
 
   if(!isset($suppliers)){

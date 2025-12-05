@@ -69,9 +69,7 @@ function execute_index(){
     $suppliers = new Members(array('producer' => $modus));
     $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => array('o','e'), 'type' => array('k', 'p', 'w')));
     $product_ids = $products->keys();
-    if($modus == '2'){
-      $do_inventories = true;
-    }
+    $do_inventories = true;
   }elseif($modus == 's' && (trim($search) != '' || !empty($scategories))){
     $suppliers = new Members(array('producer>=' => 1));
     $product_ids = search_products($search, $scategories, $suppliers);
@@ -100,16 +98,17 @@ function execute_index(){
   if($do_inventories){
     require_once('inventory.inc.php');
     $is = get_inventory($product_ids);
-    #logger("products ".print_r($products,1));
+    #logger("is ".print_r($is,1));
     foreach($is as $product_id => $i){
       if(!$i['amount_pieces'] && !$i['amount_weight']){
         continue;
       }
-      if($products[$product_id]->supplier_id != 35){
+      if($products[$product_id]->stock != 'o' && $products[$product_id]->stock != 'i'){
         continue;
       }
       $inventory[$product_id] = $i;
     }
+    #logger("inventory ".print_r($inventory,1));
   }
 
   require_once('sql.class.php');
@@ -333,7 +332,7 @@ function execute_change_ajax(){
       exit;
     }
     $product_in_inventory = false;
-    if($product->supplier_id == 35){
+    if($product->stock == 'o' || $product->stock == 'i'){
       require_once('inventory.inc.php');
       $is = get_inventory(array($product_id));
       if(isset($is[$product_id]) && $is[$product_id]['amount_pieces'] > $amount){

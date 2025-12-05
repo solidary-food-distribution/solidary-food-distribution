@@ -1,4 +1,10 @@
 <div class="row">
+  2025-12-05 22:05 Lager-Artikel implementiert
+</div>
+<div class="row">
+  2025-11-30 19:08 Abhol-Logout-Überprüfung implementiert
+</div>
+<div class="row">
   2025-10-11 11:20 Patenschaften implementiert
 </div>
 <div class="row">

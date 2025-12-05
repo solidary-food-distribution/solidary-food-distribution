@@ -11,7 +11,7 @@ $PROPERTIES['body_class']='header_h5';
       <?php
         $options = array(
           /*'1' => '<i class="fa-solid fa-tractor" title="Erzeuger"></i> Erzeuger',*/
-          '2' => '<i class="fa-solid fa-warehouse" title="Großhandel"></i> Großhandel',
+          '2' => '<i class="fa-solid fa-warehouse" title="Lager"></i> Lager',
           's' => '<i class="fa-solid fa-magnifying-glass" title="Suche"></i> Suche'
         );
         echo html_input(array(

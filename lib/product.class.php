@@ -12,6 +12,7 @@ class Product{
   public float $amount_min;
   public float $amount_max;
   public string $status;
+  public string $stock;
   public int $amount_per_bundle;
   public string $supplier_product_id;
   public int $brand_id;

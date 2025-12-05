@@ -4,7 +4,7 @@ require_once('inventories.class.php');
 
 function update_inventory(){
   require_once('products.class.php');
-  $products = new Products(array('status' => array('o', 'e'), 'supplier_id' => array(35)));
+  $products = new Products(array('status' => array('o', 'e'), 'stock' => array('o' ,'i')));
   $products_ids = $products->keys();
 
   $product_ids = array();

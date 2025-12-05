@@ -15,11 +15,12 @@ $PROPERTIES['body_class']=$body_class;
       <div class="control filter">
         <?php
           $options = array(
-            'o' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' Warenkorb',
-            'f' => '<i class="fa-solid fa-heart" title="Lieblinge"></i> Lieblinge',
-            '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> Erzeuger', 
-            '2' => '<i class="fa-solid fa-warehouse" title="Vom Großhandel"></i> Handel',
-            's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> Suche'
+            'o' => '<i class="fa-solid fa-basket-shopping" title="Warenkorb"></i>'.($order_items_count?'<span class="count cart">'.$order_items_count.'</span>':'').' <span class="label">Warenkorb</span>',
+            'f' => '<i class="fa-solid fa-heart" title="Lieblinge"></i> <span class="label">Lieblinge</span>',
+            '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> <span class="label">Erzeuger</span>',
+            '2' => '<i class="fa-solid fa-warehouse" title="Vom Handel"></i> <span class="label">Handel</span>',
+            /*'g' => '<i class="fa-solid fa-box-open"></i> <span class="label">Aufteilen</span>',*/
+            's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> <span class="label">Suche</span>'
           );
           echo html_input(array(
             'class' => 'filter',
@@ -178,6 +179,11 @@ $PROPERTIES['body_class']=$body_class;
     <div class="col7">
       <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="order_change(this,-1)"' ?>>-</div>
       <div class="" style="width:7em;text-align:right;margin-right:0.2em;">
+        <?php if(0 && $amount && $prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle && $product->status == 's'): ?>
+          <div class="input">
+            <i class="fa-solid fa-box-open" style="color:#999"></i>
+          </div>
+        <?php endif ?>
         <div class="input">
           <?php echo format_amount($amount); ?>
         </div>

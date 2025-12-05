@@ -31,14 +31,8 @@ function execute_index(){
     }
   }elseif($modus == 'd'){
     require_once('products.class.php');
-    $products = new Products(array('supplier_id' => array(35,61), 'status' => 'o'), array('name' => 'ASC'));
+    $products = new Products(array('stock' => array('o', 'i'), 'status' => 'o'), array('name' => 'ASC'));
     $product_ids = $products->keys();
-    /*
-    $product_ids = array_keys($inventory);
-    if(empty($product_ids)){
-      $product_ids[0] = 0;
-    }
-    */
     $puis = new PickupItems(array('pickup_id' => $pickup_id, 'product_id' => $product_ids));
     foreach($puis as $pui){
       $pickup_items[$pui->product_id] = $pui;
@@ -64,7 +58,7 @@ function execute_index(){
 
   $ps = array();
   foreach($products as $product){
-    if($modus == 'd' && $product->supplier_id != 35 && $product->supplier_id != 61){
+    if($modus == 'd' && $product->stock != 'o' && $product->stock != 'i'){
       continue;
     }
     if($product->type == 'p'){

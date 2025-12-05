@@ -88,6 +88,7 @@ function oekoring_import_bnn($file){
       iconv('CP850', 'UTF-8', $name),
       $type,      //type
       's', //status "searchable"
+      'n', //no stock
       $status, //import_status
       str_replace(',', '.', $line[23]), //amount_per_bundle
       $brand_id,
@@ -229,11 +230,14 @@ function oekoring_import_bnn($file){
   $qry = "UPDATE msl_products SET status='n' WHERE supplier_id=35 AND category=''";
   SQL::update($qry);
 
+  $qry = "UPDATE msl_products SET stock='o' WHERE supplier_id=35 AND status='o'";
+  SQL::update($qry);
+
   return 'ok '.print_r($header,1);
 }
 
 function oekoring_insert_products_prices($products, $prices){
-  $qry = "INSERT INTO msl_products (supplier_id, supplier_product_id, name, type, status, import_status, amount_per_bundle, brand_id, gtin_piece, gtin_bundle, category) VALUES (".implode('),(', $products).") ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), import_status=VALUES(import_status), amount_per_bundle=VALUES(amount_per_bundle), brand_id=VALUES(brand_id), gtin_piece=VALUES(gtin_piece), gtin_bundle=VALUES(gtin_bundle), category=VALUES(category), updated=NOW()";
+  $qry = "INSERT INTO msl_products (supplier_id, supplier_product_id, name, type, status, stock, import_status, amount_per_bundle, brand_id, gtin_piece, gtin_bundle, category) VALUES (".implode('),(', $products).") ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), import_status=VALUES(import_status), amount_per_bundle=VALUES(amount_per_bundle), brand_id=VALUES(brand_id), gtin_piece=VALUES(gtin_piece), gtin_bundle=VALUES(gtin_bundle), category=VALUES(category), stock=VALUES(stock), updated=NOW()";
   SQL::update($qry);
   $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='35' AND supplier_product_id IN (".SQL::escapeArray(array_keys($prices)).")";
   $pids = SQL::selectKey2Val($qry, 'supplier_product_id', 'id');

@@ -332,6 +332,9 @@ div.mr1{
   margin: 0;
   display: inline-block;
 }
+.controls .control span.label{
+  font-size: 80%;
+}
 .input.input_text{
   text-align: left;
   width: 95%;

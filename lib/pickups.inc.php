@@ -142,6 +142,9 @@ function update_pickup_item_price_sum($pickup_item_id){
     $pickup_date = substr($pu->created, 0, 10);
     require_once('prices.class.php');
     $prices = new Prices(array('product_id' => $pui->product_id, 'start<=' => $pickup_date, 'end>=' => $pickup_date));
+    if(!$prices->count()){
+      $prices = new Prices(array('product_id' => $pui->product_id, 'end>=' => $pickup_date), array('start' => 'DESC'));
+    }
     require_once('products.class.php');
     $product = Products::sget($pui->product_id);
     $updates = array(
