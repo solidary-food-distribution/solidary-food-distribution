@@ -9,7 +9,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 # Each one serves specific purpose:
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl zip opcache
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl zip opcache mysqli
 
 # Redis for caching/sessions
 RUN pecl install redis && docker-php-ext-enable redis
