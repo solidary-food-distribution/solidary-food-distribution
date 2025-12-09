@@ -2,7 +2,7 @@ services:
   database:
     build:
       dockerfile: docker/mariadb/Dockerfile
-    container_name: database
+    container_name: solidary-food-distribution-database
     networks:
       - app-network
     environment:
@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    container_name: php
+    container_name: solidary-food-distribution-php
     volumes:
       - ./web:/var/www/public
       - ./web:/var/www/web
@@ -35,7 +35,7 @@ services:
   nginx:
     build:
       dockerfile: docker/nginx/Dockerfile
-    container_name: nginx
+    container_name: solidary-food-distribution-nginx
     ports:
       - "8080:80"
     volumes:
