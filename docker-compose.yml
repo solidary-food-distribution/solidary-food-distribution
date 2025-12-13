@@ -1,18 +1,31 @@
-version: '3.8'
-
 services:
+  database:
+    build:
+      dockerfile: docker/mariadb/Dockerfile
+    container_name: solidary-food-distribution-database
+    networks:
+      - app-network
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      #MARIADB_USER: root
+      #MARIADB_PASSWORD: root
+      MARIADB_DATABASE: sofodi
+    ports:
+      - "3306:3306"
+
   # PHP Service
   php:
     build:
       context: .
       dockerfile: docker/php/Dockerfile
-    container_name: php83_app
+    container_name: solidary-food-distribution-php
     volumes:
       - ./web:/var/www/public
       - ./web:/var/www/web
       - ./modules:/var/www/modules
       - ./lib:/var/www/lib
       - ./templates:/var/www/templates
+      - ./config:/var/www/config
     networks:
       - app-network
     environment:
@@ -20,15 +33,17 @@ services:
 
   # Nginx Service
   nginx:
-    image: nginx:latest      # Use official Nginx image
-    container_name: nginx_app
+    build:
+      dockerfile: docker/nginx/Dockerfile
+    container_name: solidary-food-distribution-nginx
     ports:
-      - "8080:80"           # Map port 8080 on our PC to 80 in container
+      - "8080:80"
     volumes:
-      - ./web:/var/www/public  # Mount same source code
+      - ./web:/var/www/public
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - php                 # Wait for PHP container
+      - php
+      - database
     networks:
       - app-network
 
