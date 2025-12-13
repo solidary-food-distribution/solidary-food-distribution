@@ -47,6 +47,13 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     if(isset($pickup_items[$product_id])){
       $pickup_item = $pickup_items[$product_id];
       $order_item = $order_items[$pickup_item->order_item_id];
+      if($order_item->split_status == 's'){
+        $order_item->amount_pieces = 0;
+        $order_item->amount_weight = 0;
+      }elseif($order_item->split_status == 'o'){
+        $split_data = json_decode($order_item->split_data, 1);
+        $order_item->amount_pieces = $split_data['ordered'];
+      }
       $order_item_comment = $order_item->comment;
       if($product->type == 'k'){
         $amount_ordered = $order_item->amount_weight;
@@ -104,6 +111,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     if($pickup->status != 'o'){
       $locked = true;
     }
+    if(isset($order_item) && $order_item->split_status == 's'){
+      $locked = true;
+    }
     $locked_less = false;
     if($locked || $amount <= 0){
       $locked_less = true;
@@ -113,7 +123,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     if($locked){
       $locked_more = true;
     }
-    if(isset($amount_inventory) && $amount_inventory-$amount_others <= 0){
+    if(isset($amount_inventory) && $amount_inventory>0 && $amount_inventory-$amount_others <= 0){
       $locked_more = true;
       if($amount_others){
         $locked_more_html = 'title="'.$amount_others.' sind von weiteren Abholern reserviert." onclick="show_title(this)"';
@@ -143,7 +153,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
       <div class="inner_row">
         <div class="col7"></div>
         <div class="col10">
-          <span style="font-weight:bold; position:relative; top:-0.2em"><i><?php echo htmlentities($order_item_comment) ?></i></span>
+          <span style="font-weight:bold; font-size: 80%; position:relative; top:-0.2em"><i><?php echo htmlentities($order_item_comment) ?></i></span>
         </div>
       </div>
     <?php endif ?>
@@ -220,7 +230,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
             <?php if($product->type == 'w'): ?>
               <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
             <?php endif ?>
-            <?php if($product->status == 'o'): ?>
+            <?php if($product->status == 'o' || $order_item->split_status != 'n'): ?>
               <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
             <?php endif ?>
             <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>

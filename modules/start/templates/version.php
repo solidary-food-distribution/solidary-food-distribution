@@ -1,4 +1,7 @@
 <div class="row">
+  2025-12-13 01:10 Aufteilung implementiert
+</div>
+<div class="row">
   2025-12-05 22:05 Lager-Artikel implementiert
 </div>
 <div class="row">

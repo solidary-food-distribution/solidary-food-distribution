@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202511301908';
+$version='202512130110';
 $body_class='';
 $header='';
 $footer='';

@@ -489,6 +489,9 @@ function execute_orders(){
     if($order_item->amount_pieces == 0 && $order_item->amount_weight == 0){
       continue;
     }
+    if($order_item->split_status == 's'){
+      continue;
+    }
     $order = $orders[$order_item->order_id];
     $member_orders[$order->member_id][$order->id] = $order;
     $product_id = $order_item->product_id;

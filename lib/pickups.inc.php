@@ -57,6 +57,19 @@ function update_pickup_items($pickup_id){
     }
     if(!isset($pickup_items[$oi->product_id])){
       $pui = PickupItem::create($pickup_id, $oi->product_id);
+      logger("update_pickup_items oi ".print_r($oi,1));
+      if($oi->split_status == 's'){
+        $oi->comment = $oi->amount_pieces." bis ".$oi->amount_max ." bestellt, leider nicht genug Mitbestellende.";
+        $oi->update(array('comment' => $oi->comment));
+        $oi->amount_pieces = 0;
+        $oi->amount_weight = 0;
+      }elseif($oi->split_status == 'o'){
+        $oi->comment = $oi->amount_pieces." bis ".$oi->amount_max ." bestellt.";
+        $oi->update(array('comment' => $oi->comment));
+        $split_data = json_decode($oi->split_data, 1);
+        $oi->amount_pieces = $split_data['ordered'];
+      }
+      logger("update_pickup_items oi ".print_r($oi,1));
       $updates = array(
         'order_item_id' => $oi->id,
         'amount_pieces_min' => $oi->amount_pieces,

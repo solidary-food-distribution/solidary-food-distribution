@@ -154,6 +154,13 @@ function execute_change_ajax(){
     }else{
       $pui = $puis->first();
     }
+    $split_status = 'n';
+    if($pui->order_item_id){
+      require_once('order_items.class.php');
+      $oi = OrderItems::sget($pui->order_item_id);
+      $split_status = $oi->split_status;
+    }
+
     require_once('products.class.php');
     $product = Products::sget($product_id);
     if($product->type == 'p' || $product->type == 'w'){
@@ -167,18 +174,19 @@ function execute_change_ajax(){
       exit;
     }
 
-    if($change == '+' && $product->status == 'o'){
+    if($change == '+' && ($product->status == 'o' || $split_status == 'o')){
       $amount_new = round($amount + $product->amount_steps, 3);
     }elseif($change == '+' && $product->status == 's'){
       $amount_new = round($amount + $product->amount_per_bundle, 3);
-    }elseif($change == '-' && $product->status == 'o'){
+    }elseif($change == '-' && ($product->status == 'o' || $split_status == 'o')){
       $amount_new = round($amount - $product->amount_steps, 3);
     }elseif($change == '-' && $product->status == 's'){
       $amount_new = round($amount - $product->amount_per_bundle, 3);
     }elseif($change == '='){
-      require_once('order_items.class.php');
-      $ois = new OrderItems(array('id' => $pui->order_item_id));
-      $oi = $ois->first();
+      if($split_status == 'o'){
+        $split_data = json_decode($oi->split_data, 1);
+        $oi->amount_pieces = $split_data['ordered'];
+      }
       $amount_new = $oi->amount_pieces;
     }
 

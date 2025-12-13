@@ -489,6 +489,13 @@ div.mr1{
   font-size: 0.8em;
 }
 
+.italic{
+  font-style: italic;
+}
+.bold{
+  font-weight: bold;
+}
+
 .linethrough{
   text-decoration: line-through;
 }

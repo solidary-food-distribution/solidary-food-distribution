@@ -70,6 +70,12 @@ function execute_index(){
     $products = new Products(array('supplier_id' => $suppliers->keys(), 'status' => array('o','e'), 'type' => array('k', 'p', 'w')));
     $product_ids = $products->keys();
     $do_inventories = true;
+  }elseif($modus == 'p'){
+    $split_orders = new Orders(array('pickup_date' => $order->pickup_date));
+    $split_order_items = new OrderItems(array('order_id' => $split_orders->keys(), 'split_status' => array('s', 'o')));
+    $products = new Products(array('id' => $split_order_items->get_product_ids(), 'status' => array('o', 'e', 's'), 'type' => array('k', 'p', 'w')));
+    $product_ids = $products->keys();
+    $suppliers = new Members(array('producer>=' => 1));
   }elseif($modus == 's' && (trim($search) != '' || !empty($scategories))){
     $suppliers = new Members(array('producer>=' => 1));
     $product_ids = search_products($search, $scategories, $suppliers);
@@ -144,6 +150,15 @@ function execute_index(){
       $products[$p_id] = $p;
     }
   }
+
+  $split_orders = new Orders(array('pickup_date' => $order->pickup_date));
+  $split_order_items = new OrderItems(array('order_id' => $split_orders->keys(), 'product_id' => array_keys($products), 'split_status' => array('s', 'o')));
+  foreach($split_order_items as $split_order_item){
+    $products[$split_order_item->product_id]->split_data = $split_order_item->split_data;
+    $products[$split_order_item->product_id]->split_status = $split_order_item->split_status;
+  }
+
+  #logger("products ".print_r($products,1));
 
   $supplier_unlocked = get_supplier_unlocked($order->id);
   $order_sum_oekoring = -1;
@@ -305,11 +320,12 @@ function execute_filter_ajax(){
 function execute_change_ajax(){
   global $user;
   $order_id = get_request_param('order_id');
-  $product_id=intval(get_request_param('product_id'));
-  $dir=get_request_param('dir');
+  $product_id = intval(get_request_param('product_id'));
+  $dir = get_request_param('dir');
   $modus = get_request_param('modus');
+  $max = get_request_param('max');
   $notify = '';
-  #logger("$order_id $product_id $dir");
+  logger("$order_id $product_id $dir $max");
   if($order_id && $product_id && $dir){
     $supplier_unlocked = get_supplier_unlocked($order_id);
     require_once('products.class.php');
@@ -318,10 +334,16 @@ function execute_change_ajax(){
     $ois = new OrderItems(array('order_id' => $order_id, 'product_id' => $product_id));
     if(!$ois->count()){
       $oi = OrderItem::create($order_id, $product_id);
+      update_order_item_prices($oi->id);
+      order_splits_update($oi->id);
+      $oi = OrderItems::sget($oi->id);
     }else{
       $oi = $ois->first();
     }
-    if($product->type == 'p' || $product->type == 'w'){
+    if($max == 'max'){
+      $amount = $oi->amount_max;
+      $amount_field = 'amount_max';
+    }elseif($product->type == 'p' || $product->type == 'w'){
       $amount = $oi->amount_pieces;
       $amount_field = 'amount_pieces';
     }elseif($product->type == 'k'){
@@ -341,7 +363,7 @@ function execute_change_ajax(){
     }
     if($product_in_inventory || $dir < 0 || isset($supplier_unlocked[$product->supplier_id])){
       $change = ($dir>0)?1:-1;
-      if($product->status == 'o'){
+      if($product->status == 'o' || $oi->split_status != 'n'){
         $change *= $product->amount_steps;
       }elseif($product->status == 's'){
         $change *= $product->amount_per_bundle;
@@ -357,15 +379,49 @@ function execute_change_ajax(){
       }
       if($modus == 'o' && $amount == 0 && $dir < 0){
         $oi->delete();
-      }elseif($modus !='o' && $amount_new == 0){
+      }elseif($modus != 'o' && $amount_new == 0){
+        $oi->update(array('amount_pieces' => 0, 'amount_weight' => 0, 'amount_max' => 0));
+        update_order_item_prices($oi->id);
+        order_splits_update($oi->id);
         $oi->delete();
       }else{
         $updates = array($amount_field => $amount_new);
-        if($product->type == 'w'){
+        if($product->type == 'w' && $max == ''){
           $updates['amount_weight'] = $amount_new * $product->kg_per_piece;
+        }
+        if($oi->split_status != 'n'){
+          $amount_max = ($amount_field == 'amount_max')?$updates['amount_max']:$oi->amount_max;
+          if($product->type == 'p' || $product->type == 'w'){
+            $amount_min = ($amount_field == 'amount_pieces')?$updates['amount_pieces']:$oi->amount_pieces;
+            if($max == '' && $amount_min > $amount_max){
+              $updates['amount_max'] = $amount_min;
+            }elseif($amount_min > $amount_max){
+              $updates['amount_pieces'] = $amount_max;
+              if($product->type == 'w'){
+                $updates['amount_weight'] = $updates['amount_pieces'] * $product->kg_per_piece;
+              }
+            }
+            if($amount_min == 0 && $amount_max > 0){
+              $updates['amount_pieces'] = 1;
+              if($product->type == 'w'){
+                $updates['amount_weight'] = $product->kg_per_piece;
+              }
+            }
+          }elseif($product->type == 'k'){
+            $amount_min = ($amount_field == 'amount_weight')?$updates['amount_weight']:$oi->amount_weight;
+            if($max == '' && $amount_min > $amount_max){
+              $updates['amount_max'] = $amount_min;
+            }elseif($amount_min > $amount_max){
+              $updates['amount_weight'] = $amount_max;
+            }
+            if($amount_min == 0 && $amount_max > 0){
+              $updates['amount_weight'] = $product->amount_min;
+            }
+          }
         }
         $oi->update($updates);
         update_order_item_prices($oi->id);
+        order_splits_update($oi->id);
         if($dir > 0 && $_SESSION['member']['order_limit'] && get_order_sum($order_id) > $_SESSION['member']['order_limit']){
           $updates = array($amount_field => $amount);
           if($product->type == 'w'){
@@ -373,6 +429,7 @@ function execute_change_ajax(){
           }
           $oi->update($updates);
           update_order_item_prices($oi->id);
+          order_splits_update($oi->id);
           $notify = "Bestellgrenze von ".$_SESSION['member']['order_limit']." EUR erreicht.";
         }
       }
@@ -457,4 +514,173 @@ function execute_favorite(){
   }
   echo json_encode(array('set' => $set));
   exit;
+}
+
+function execute_update_ajax(){
+  global $user;
+  $order_id = get_request_param('order_id');
+  $product_id = intval(get_request_param('product_id'));
+  $field = get_request_param('field');
+  $value = get_request_param('value');
+  $notify = '';
+  if($order_id && $product_id && $field == 'split_status'){
+    require_once('products.class.php');
+    $product = Products::sget($product_id);
+    require_once('order_items.class.php');
+    $ois = new OrderItems(array('order_id' => $order_id, 'product_id' => $product_id));
+    if(!$ois->count()){
+      $oi = OrderItem::create($order_id, $product_id);
+    }else{
+      $oi = $ois->first();
+    }
+    $updates = array($field => $value);
+    if($field == 'split_status' && $value != 'n'){
+      if($product->type == 'p' || $product->type == 'w'){
+        $updates['amount_max'] = $oi->amount_pieces;
+      }elseif($product->type == 'k'){
+        $updates['amount_max'] = $oi->amount_weight;
+      }
+    }
+    $oi->update($updates);
+    order_splits_update($oi->id);
+  }
+  $return=execute_index();
+  $return['template']='index.php';
+  $return['layout']='layout_null.php';
+  $return['notify'] = $notify;
+  return $return;
+}
+
+
+function order_splits_update($order_item_id){
+  require_once('order_items.class.php');
+  $order_item = OrderItems::sget($order_item_id);
+  #logger("order_splits_update order_item_id $order_item_id order_item ".print_r($order_item,1));
+  require_once('products.class.php');
+  $product = Products::sget($order_item->product_id);
+  #logger("order_splits_update product ".print_r($product,1));
+  if($product->status == 'o' || $product->status == 'e'){
+    return;
+  }
+  require_once('orders.class.php');
+  $order = Orders::sget($order_item->order_id);
+  $orders = new Orders(array('pickup_date' => $order->pickup_date));
+  $order_items = new OrderItems(array('order_id' => $orders->keys(), 'product_id' => $order_item->product_id), array('id' => 'ASC'));
+  #logger("order_splits_update order_items ".print_r($order_items,1));
+  $is_splitted = false;
+  $amount_min_sum = 0;
+  $amount_max_sum = 0;
+  foreach($order_items as $oi){
+    if($oi->split_status != 'n'){
+      $is_splitted = true;
+    }
+    $amount_min_sum += ($product->type=='k')?$oi->amount_weight:$oi->amount_pieces;
+    $amount_max_sum += $oi->amount_max;
+  }
+  if($is_splitted == false && $order_item->split_status == 'n' && $order_item->amount_max == 0){
+    return;
+  }
+  foreach($order_items as $oi){
+    if($is_splitted && $oi->split_status == 'n'){
+      $oi->update(array('split_status' => 's'));
+    }
+  }
+  $amount_per_bundle = $order_item->amount_per_bundle;
+  if(!$amount_per_bundle){
+    $amount_per_bundle = $product->amount_per_bundle;
+  }
+  $min_bundles = ceil($amount_min_sum / $amount_per_bundle);
+  $max_bundles = floor($amount_max_sum / $amount_per_bundle);
+  $split_data = array();
+  $split_status = 's';
+  $ordered_amount = 0;
+  #logger("order_splits_update amount_min_sum $amount_min_sum amount_max_sum $amount_max_sum min_bundles $min_bundles max_bundles $max_bundles");
+  if($min_bundles > $max_bundles){
+    //minimum nicht erreicht
+    $needed = $min_bundles * $amount_per_bundle - $amount_max_sum;
+    #logger("order_splits_update needed $needed");
+    $split_data['needed'] = $needed;
+    $split_status = 's';
+  }else{
+    //minimum erreicht
+    #logger("order_splits_update erreicht");
+    $split_data['needed'] = 0;
+    $split_status = 'o';
+    $ordered_amount = $min_bundles * $amount_per_bundle;
+  }
+  $rest_amount = $ordered_amount;
+  $order_items_min_max_ratio = array();
+  #logger("order_splits_update 1 order_items ".print_r($order_items,1));
+  foreach($order_items as $oi_id => $oi){
+    #logger("rest_amount $rest_amount");
+    $data = $split_data;
+    $updates = array('split_status' => $split_status);
+    if($split_status == 'o'){
+      $amount = ($product->type=='k')?$oi->amount_weight:$oi->amount_pieces;
+      $order_items_min_max_ratio[$oi_id] = ($oi->amount_max - $amount);
+      if($amount < $rest_amount){
+        $rest_amount -= $amount;
+        $data['ordered'] = $amount;
+      }elseif($amount >= $rest_amount){
+        $amount = $rest_amount;
+        $rest_amount = 0;
+        $data['ordered'] = $amount;
+      }else{
+        $updates['split_status'] = 's';
+      }
+    }
+    $updates['split_data'] = json_encode($data);
+    $order_items[$oi_id]->split_data = json_encode($data);
+    $oi->update($updates);
+  }
+  #logger("order_splits_update 2 order_items ".print_r($order_items,1));
+  if($rest_amount > 0 && !empty($order_items_min_max_ratio)){
+    #logger("order_splits_update order_items_min_max_ratio ".print_r($order_items_min_max_ratio,1));
+    $order_items_min_max_ratio_sum = array_sum($order_items_min_max_ratio);
+    foreach($order_items_min_max_ratio as $oi_id => $ratio){
+      $order_items_min_max_ratio[$oi_id] = ($ratio / $order_items_min_max_ratio_sum) * $rest_amount;
+    }
+    #logger("order_splits_update order_items_min_max_ratio ".print_r($order_items_min_max_ratio,1));
+    $order_items_min_max_ratio = distribute_splits($order_items_min_max_ratio);
+    #logger("order_splits_update order_items_min_max_ratio ".print_r($order_items_min_max_ratio,1));
+    $rest = $rest_amount - array_sum($order_items_min_max_ratio);
+    #logger("rest $rest");
+    while($rest > 0){
+      foreach($order_items_min_max_ratio as $oi_id => $amount){
+        if($order_items[$oi_id]->amount_max >= $amount + 1){
+          $order_items_min_max_ratio[$oi_id] += 1;
+          $rest -= 1;
+        }
+      }
+    }
+    #logger("order_splits_update order_items_min_max_ratio ".print_r($order_items_min_max_ratio,1));
+    #logger("rest $rest");
+    foreach($order_items_min_max_ratio as $oi_id => $amount){
+      if($amount){
+        $split_data = json_decode($order_items[$oi_id]->split_data, 1);
+        #logger("oi_id $oi_id split_data ".print_r($split_data,1));
+        $split_data['ordered'] += $amount;
+        $order_items[$oi_id]->update(array('split_data' => json_encode($split_data)));
+        $order_items[$oi_id]->split_data = json_encode($split_data);
+      }
+    }
+  }
+  #logger("order_splits_update 3 order_items ".print_r($order_items,1));
+}
+
+function distribute_splits($order_items_min_max_ratio){
+  $sum = array_sum($order_items_min_max_ratio);
+  arsort($order_items_min_max_ratio);
+  #logger("distribute_splits sum $sum order_items_min_max_ratio ".print_r($order_items_min_max_ratio,1));
+  $return = array();
+  $rest = $sum;
+  foreach($order_items_min_max_ratio as $oi_id => $ratio){
+    $amount = round($ratio);
+    if($amount > $rest){
+      $amount = $rest;
+    }
+    $return[$oi_id] = $amount;
+    $rest -= $amount;
+  }
+  return $return;
 }

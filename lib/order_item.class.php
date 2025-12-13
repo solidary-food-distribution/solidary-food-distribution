@@ -8,7 +8,10 @@ class OrderItem{
   public int $order_id;
   public int $product_id;
   public float $amount_pieces;
+  public float $amount_max;
   public float $amount_weight;
+  public string $split_status;
+  public string $split_data;
   public string $price_type;
   public float $price;
   public float $amount_per_bundle;

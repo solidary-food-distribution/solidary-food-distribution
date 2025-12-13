@@ -98,6 +98,10 @@ if($date_next){
         ?>
         <div class="inner_row <?php echo $class ?>" data-order_item_id="<?php echo $order_item->id ?>" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $pickup_item->id ?>">
           <?php
+            if($order_item->split_status == 'o'){
+              $split_data = json_decode($order_item->split_data, 1);
+              $order_item->amount_pieces = $split_data['ordered'];
+            }
             if($product->type == 'k'){
               $amount_order = $order_item->amount_weight;
               $amount_pickup = $pickup_item->amount_weight;

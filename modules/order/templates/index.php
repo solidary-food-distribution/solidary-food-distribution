@@ -19,7 +19,7 @@ $PROPERTIES['body_class']=$body_class;
             'f' => '<i class="fa-solid fa-heart" title="Lieblinge"></i> <span class="label">Lieblinge</span>',
             '1' => '<i class="fa-solid fa-tractor" title="Direkt vom Erzeuger"></i> <span class="label">Erzeuger</span>',
             '2' => '<i class="fa-solid fa-warehouse" title="Vom Handel"></i> <span class="label">Handel</span>',
-            /*'g' => '<i class="fa-solid fa-box-open"></i> <span class="label">Aufteilen</span>',*/
+            'p' => '<i class="fa-solid fa-box-open"></i> <span class="label">Aufteilen</span>',
             's' => '<i class="fa-solid fa-magnifying-glass" title="Produktsuche"></i> <span class="label">Suche</span>'
           );
           echo html_input(array(
@@ -71,6 +71,7 @@ $PROPERTIES['body_class']=$body_class;
     if($modus == 's' && $product_count >= $limit){
       break;
     }
+    unset($order_item);
     if(isset($order_items[$product_id])){
       $order_item = $order_items[$product_id];
       if($product->type == 'k'){
@@ -83,17 +84,41 @@ $PROPERTIES['body_class']=$body_class;
         $amount_price =  $order_item->amount_pieces;
         $amount = $order_item->amount_pieces;
       }
+      #logger("order_item ".print_r($order_item,1));
     }else{
       $amount_price = 0;
       $amount = 0;
     }
 
+    $split_status = 'n';
+    $split_label = '';
+    $split_label_class = '';
+    if(isset($order_item->split_status)){
+      $split_status = $order_item->split_status;
+      $split_data = json_decode($order_item->split_data, 1);
+    }elseif(isset($product->split_status)){
+      $split_status = $product->split_status;
+      $split_data = json_decode($product->split_data ,1);
+    }
+    if($split_status != 'n'){
+      #logger("split_status $split_status split_data ".print_r($split_data,1));
+      if(intval($split_data['needed'])){
+        $split_label = 'Offen: '.$split_data['needed'];
+        $amount_price = 0;
+        $split_label_class = 'italic bold';
+      }elseif(trim($split_data['needed']) === '0'){
+        $split_label = 'Bestellt: ';
+        if($amount != $order_item->amount_max){
+          $split_label .= 'vsl. ';
+        }
+        $split_label .= $split_data['ordered'];
+        $amount_price = $split_data['ordered'];
+        $split_label_class = 'bold';
+      }
+    }
+
     $price = $prices[$product_id]->price;
     if($amount && $prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle){
-      /*$abf = $amount / $prices[$product_id]->amount_per_bundle;
-      if($abf == intval($abf)){
-        $price = $prices[$product_id]->price_bundle;
-      }*/
       if($amount >= $prices[$product_id]->amount_per_bundle){
         $price = $prices[$product_id]->price_bundle;
       }
@@ -177,31 +202,62 @@ $PROPERTIES['body_class']=$body_class;
       </div>
     </div>
     <div class="col7">
-      <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="order_change(this,-1)"' ?>>-</div>
-      <div class="" style="width:7em;text-align:right;margin-right:0.2em;">
-        <?php if(0 && $amount && $prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle && $product->status == 's'): ?>
-          <div class="input">
-            <i class="fa-solid fa-box-open" style="color:#999"></i>
+      <div style="">
+        <?php if($split_status != 'n'): ?>
+          <div style="display: flex;justify-content: flex-start;align-items: flex-start; margin-bottom: 0.5em;">
+            <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="order_change(this,-1,\'\')"' ?>>-</div>
+            <div class="" style="width:7em;text-align:right;margin-right:0.2em;">
+              <div>
+                Min
+                <div class="input">
+                  <?php echo format_amount($amount); ?>
+                </div>
+                <span><?php echo translate_product_type_amount($product->type); ?></span>
+              </div>
+              <div style="text-align: center;">
+                <span class="split_label smaller <?php echo $split_label_class ?>"><?php echo $split_label ?></span>
+              </div>
+            </div>
+            <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?'':'onclick="order_change(this,1,\'\')"' ?>>+</div>
           </div>
+          <br style="display: none;" />
         <?php endif ?>
-        <div class="input">
-          <?php echo format_amount($amount); ?>
-        </div>
-        <span><?php echo translate_product_type_amount($product->type); ?></span>
-        <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
-          <?php if($product->type == 'w'): ?>
-            <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
-          <?php endif ?>
-          <?php if($product->status == 'o' || $product->status == 'e' || (!$prices[$product_id]->price_bundle)): ?>
-            <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
-          <?php endif ?>
-          <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>
-            <br>
-            <span><?php echo $prices[$product_id]->amount_per_bundle ?>: <?php echo format_money($prices[$product_id]->price_bundle) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
-          <?php endif ?>
+        <div style="display: flex;justify-content: flex-start;align-items: flex-start;">
+          <div class="button large <?php echo $locked_less?'disabled':'' ?>" <?php echo $locked_less?'':'onclick="order_change(this,-1,\''.(($split_status != 'n')?'max':'').'\')"' ?>>-</div>
+          <div class="" style="width:7em;text-align:right;margin-right:0.2em;">
+            <?php if($split_status != 'n'): ?>
+              Max
+            <?php elseif($amount && $prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle && $product->status == 's'): ?>
+              <div class="input" onclick="order_update(this,'split_status','s')">
+                <i class="fa-solid fa-box-open" style="color:#999"></i>
+              </div>
+            <?php endif ?>
+            <div class="input">
+              <?php
+                if($split_status != 'n'){
+                  echo format_amount($order_item->amount_max);
+                }else{
+                  echo format_amount($amount);
+                }
+              ?>
+            </div>
+            <span><?php echo translate_product_type_amount($product->type); ?></span>
+            <div style="font-size:70%;cursor:help;" title="<?php echo htmlentities($price_title) ?>" onclick="show_title(this)">
+              <?php if($product->type == 'w'): ?>
+                <span>ca.(!) <?php echo format_weight($product->kg_per_piece) ?> kg / St.</span><br>
+              <?php endif ?>
+              <?php if($product->status == 'o' || $product->status == 'e' || ($split_status != 'n') || (!$prices[$product_id]->price_bundle)): ?>
+                <span><?php echo format_money($prices[$product_id]->price) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
+              <?php endif ?>
+              <?php if($prices[$product_id]->price_bundle && $prices[$product_id]->amount_per_bundle): ?>
+                <br>
+                <span><?php echo $prices[$product_id]->amount_per_bundle ?>: <?php echo format_money($prices[$product_id]->price_bundle) ?> EUR / <?php echo translate_product_type($product->type); ?></span>
+              <?php endif ?>
+            </div>
+          </div>
+          <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?'':'onclick="order_change(this,1,\''.(($split_status != 'n')?'max':'').'\')"' ?>>+</div>
         </div>
       </div>
-      <div class="button large <?php echo $locked_more?'disabled':'' ?>" <?php echo $locked_more?'':'onclick="order_change(this,1)"' ?>>+</div>
     </div>
     <div class="col3 right last">
       <span><?php echo format_money($price * $amount_price) ?> EUR</span>

@@ -62,16 +62,36 @@ function order_search_keyup(event){
   }
 }
 
-function order_change(el,dir){
+function order_change(el, dir, max){
   var product_id = $(el).closest('.product').data('id');
   var data = get_url_params();
   data['product_id'] = product_id;
   data['dir'] = dir;
+  data['max'] = max;
   $('#loading').show();
   $.ajax({
     type: 'POST',
     data: data,
     url: '/order/change_ajax',
+    dataType: "html",
+    success: function(html){
+      $('#loading').hide();
+      replace_header_main_footer(html);
+    }
+  });
+}
+
+function order_update(el, field, value){
+  var product_id = $(el).closest('.product').data('id');
+  var data = get_url_params();
+  data['product_id'] = product_id;
+  data['field'] = field;
+  data['value']= value;
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    data: data,
+    url: '/order/update_ajax',
     dataType: "html",
     success: function(html){
       $('#loading').hide();
