@@ -31,6 +31,7 @@ $PROPERTIES['body_class']=$body_class;
             'options' => $options,
         )); ?>
       </div>
+      <div class="button help"><a href="/help/Bestellen.pdf" target="_blank"><i class="fa-solid fa-question"></i></a></div>
     </div>
   <?php $PROPERTIES['header']=ob_get_clean(); ?>
 <?php endif ?>
