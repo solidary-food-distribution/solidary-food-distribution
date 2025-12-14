@@ -213,6 +213,7 @@ function execute_scale_ajax(){
   global $user;
   $pickup_id = intval(get_request_param('pickup_id'));
   $pickup_item_id = intval(get_request_param('item_id'));
+  $product_id = intval(get_request_param('product_id'));
   $value = get_request_param('value');
   $pu = Pickups::sget($pickup_id);
   if(!$pu || $pu->member_id!=$user['member_id']){
@@ -220,7 +221,11 @@ function execute_scale_ajax(){
     exit;
   }
   require_once('pickup_items.class.php');
-  $pui = PickupItems::sget($pickup_item_id);
+  if($pickup_item_id){
+    $pui = PickupItems::sget($pickup_item_id);
+  }elseif($product_id){
+    $pui = PickupItem::create($pickup_id, $product_id);
+  }
   if(!$pui || $pui->pickup_id!=$pickup_id){
     logger("ERROR wrong pickup item $pickup_item_id");
     exit;

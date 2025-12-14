@@ -44,6 +44,8 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     $scale_title = '';
     $scale_minmax = 0.1;
     $order_item_comment = '';
+    unset($pickup_item);
+    unset($order_item);
     if(isset($pickup_items[$product_id])){
       $pickup_item = $pickup_items[$product_id];
       $order_item = $order_items[$pickup_item->order_item_id];
@@ -209,6 +211,9 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
                 $needs_todo = 1;
               }
             }
+            if(($product->type == 'k' || $product->type == 'w') && $amount_weight == 0){
+              $needs_todo = 1;
+            }
             if($modus == 'd'){
               $needs_todo = 0;
             }
@@ -256,7 +261,7 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
               }
             }
           ?>
-          <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $amount_weight?'':'needs_todo' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>" data-bottom="<?php echo htmlentities($scale_bottom) ?>">
+          <div class="button large <?php echo $locked?'disabled':'' ?> <?php echo $needs_todo?'needs_todo':'' ?>" <?php echo $locked?'':'onclick="scale_show(this)"' ?> style="margin-left:0.2em" data-title="<?php echo htmlentities($scale_title) ?>" data-value_exact="<?php echo $amount_ordered_weight ?>" data-value_min="<?php echo $amount_ordered_weight*(1-$scale_minmax) ?>" data-value_max="<?php echo $amount_ordered_weight*(1+$scale_minmax) ?>" data-bottom="<?php echo htmlentities($scale_bottom) ?>">
             <i class="fa-solid fa-weight-scale"></i>
           </div>
         <?php elseif($modus != 'd' && $amount_ordered > 0): ?>

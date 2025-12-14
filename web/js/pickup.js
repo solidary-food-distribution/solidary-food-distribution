@@ -98,6 +98,7 @@ var scale_price_sum = 0;
 var scale_price_sum_pickup = 0;
 var scale_pickup_id = 0;
 var scale_item_id = 0;
+var scale_product_id = 0;
 var scale_product_type = '';
 var scale_edit_mode = 0;
 var scale_row = 0;
@@ -121,6 +122,7 @@ function scale_show(el){
   scale_price_sum_pickup = $(el).data('price_sum_pickup');
   scale_pickup_id = scale_row.data('pickup_id');
   scale_item_id = scale_row.data('item_id');
+  scale_product_id = scale_row.data('id');
   scale_product_type = scale_row.data('product_type');
   $('#scale').show();
   scale_show_values();
@@ -157,6 +159,7 @@ function scale_ok(){
       pickup_id: scale_pickup_id,
       product_type: scale_product_type,
       item_id: scale_item_id,
+      product_id: scale_product_id,
       value: value,
     },
     url: '/pickup/scale_ajax',
