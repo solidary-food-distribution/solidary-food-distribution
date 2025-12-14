@@ -34,7 +34,7 @@ CREATE TABLE `msl_brands` (
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `bnn` (`supplier_id`,`bnn`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=284 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_crons`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -47,7 +47,7 @@ CREATE TABLE `msl_crons` (
   `task` varchar(255) NOT NULL,
   PRIMARY KEY (`cron_id`),
   KEY `next_run` (`next_run`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_debits`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -67,7 +67,7 @@ CREATE TABLE `msl_debits` (
   KEY `pickup_id` (`pickup_id`),
   KEY `status` (`status`),
   KEY `due_date` (`due_date`)
-) ENGINE=InnoDB AUTO_INCREMENT=386 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_deliveries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -84,7 +84,7 @@ CREATE TABLE `msl_deliveries` (
   PRIMARY KEY (`id`),
   KEY `purchase_id` (`purchase_id`),
   KEY `supplier_id` (`supplier_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=150 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_delivery_dates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -95,7 +95,7 @@ CREATE TABLE `msl_delivery_dates` (
   `date` date NOT NULL DEFAULT '0000-00-00',
   PRIMARY KEY (`id`),
   KEY `datetime` (`date`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_delivery_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -122,7 +122,7 @@ CREATE TABLE `msl_delivery_items` (
   KEY `delivery_id` (`delivery_id`),
   KEY `product_id` (`product_id`),
   KEY `modified` (`modified`)
-) ENGINE=InnoDB AUTO_INCREMENT=1480 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_favorites`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -155,7 +155,7 @@ CREATE TABLE `msl_infos` (
   `content` text NOT NULL DEFAULT '',
   `published` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_inventory`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -182,7 +182,7 @@ CREATE TABLE `msl_inventory` (
   KEY `pickup_item_id` (`pickup_item_id`),
   KEY `user_id` (`user_id`),
   KEY `order_item_id` (`order_item_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7567 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_inventory_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -221,7 +221,7 @@ CREATE TABLE `msl_mail_answers` (
   `user_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `mail_id` (`mail_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_mails`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -234,7 +234,7 @@ CREATE TABLE `msl_mails` (
   `content` text NOT NULL DEFAULT '',
   `sent` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_members`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -254,7 +254,7 @@ CREATE TABLE `msl_members` (
   `purchase_time` varchar(50) NOT NULL DEFAULT '' COMMENT 'relative to pickup date',
   `purchase_name` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_order_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -267,7 +267,10 @@ CREATE TABLE `msl_order_items` (
   `order_id` int(10) unsigned NOT NULL,
   `product_id` int(10) unsigned NOT NULL,
   `amount_pieces` decimal(6,2) unsigned NOT NULL DEFAULT 0.00,
-  `amount_weight` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `amount_max` decimal(6,2) unsigned NOT NULL DEFAULT 0.00,
+  `amount_weight` decimal(6,2) unsigned NOT NULL DEFAULT 0.00,
+  `split_status` char(1) NOT NULL DEFAULT 'n' COMMENT 'n: no split\r\ns: started, but needs more\r\no: order ready',
+  `split_data` varchar(50) NOT NULL DEFAULT '' COMMENT 'JSON with split data',
   `price_type` char(1) NOT NULL DEFAULT '' COMMENT 'p(iece), k(g)',
   `price` decimal(6,2) NOT NULL DEFAULT 0.00,
   `amount_per_bundle` decimal(5,2) NOT NULL DEFAULT 0.00,
@@ -277,7 +280,7 @@ CREATE TABLE `msl_order_items` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   KEY `pickup_id` (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4856 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_orders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -289,7 +292,7 @@ CREATE TABLE `msl_orders` (
   `member_id` int(10) unsigned NOT NULL,
   `pickup_date` date NOT NULL DEFAULT '0000-00-00',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=599 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_pickup_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -320,7 +323,7 @@ CREATE TABLE `msl_pickup_items` (
   KEY `delivery_id` (`delivery_item_id`),
   KEY `product_id` (`product_id`),
   KEY `pickup_id` (`pickup_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3987 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_pickups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -335,7 +338,7 @@ CREATE TABLE `msl_pickups` (
   PRIMARY KEY (`id`),
   KEY `member_id` (`member_id`),
   KEY `status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=389 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_poll_answers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -350,7 +353,7 @@ CREATE TABLE `msl_poll_answers` (
   `ordering` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`poll_answer_id`),
   KEY `poll_id` (`poll_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_poll_votes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -380,7 +383,7 @@ CREATE TABLE `msl_polls` (
   `reminded` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `close_datetime` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`poll_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_preferences`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -437,7 +440,7 @@ CREATE TABLE `msl_product_imports` (
   `status` char(1) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `upload_id` (`upload_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=414 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_products`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -468,7 +471,7 @@ CREATE TABLE `msl_products` (
   UNIQUE KEY `supplier_id` (`supplier_id`,`supplier_product_id`),
   KEY `brand_id` (`brand_id`),
   KEY `supplier_name` (`supplier_name`)
-) ENGINE=MyISAM AUTO_INCREMENT=56739 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_purchase_items`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -490,7 +493,7 @@ CREATE TABLE `msl_purchase_items` (
   KEY `purchase_id` (`purchase_id`),
   KEY `product_id` (`product_id`),
   KEY `modified` (`modified`)
-) ENGINE=InnoDB AUTO_INCREMENT=1342 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_purchases`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -510,7 +513,7 @@ CREATE TABLE `msl_purchases` (
   KEY `sent` (`sent`),
   KEY `datetime` (`datetime`),
   KEY `delivery_date_id` (`delivery_date_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=19230 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -524,7 +527,7 @@ CREATE TABLE `msl_settings` (
   `updated` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique` (`setting`,`user_id`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_task_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -554,7 +557,7 @@ CREATE TABLE `msl_tasks` (
   `sort` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`task_id`),
   KEY `starts` (`starts`)
-) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_timesheet`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -581,7 +584,7 @@ CREATE TABLE `msl_uploads` (
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   `user_id` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -599,7 +602,7 @@ CREATE TABLE `msl_users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`) USING BTREE,
   KEY `pickup_pin` (`pickup_pin`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_var`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -629,7 +632,7 @@ CREATE TABLE `msl_wg_oeko` (
   KEY `wg_filter` (`wg_filter`),
   KEY `wg_ersatz` (`wg_ersatz`),
   KEY `wg_faktor` (`wg_faktor`)
-) ENGINE=MyISAM AUTO_INCREMENT=97 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
