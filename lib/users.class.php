@@ -6,12 +6,12 @@ require_once('user.class.php');
 class Users extends ArrayObject{
 
   public static function create($email, $name, $member_id=0){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_users ".
         "(email, name, member_id, passwd, passwd_tmp, pickup_pin) VALUES ".
-        "('".SQL::escapeString($email)."', '".SQL::escapeString($name)."', ".intval($member_id).", '', '', '')";
-    $user_id = SQL::insert($qry);
+        "('".sql_escape_string($email)."', '".sql_escape_string($name)."', ".intval($member_id).", '', '', '')";
+    $user_id = sql_insert($qry);
     return $user_id;
   }
 
@@ -30,18 +30,18 @@ class Users extends ArrayObject{
   }
 
   private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "SELECT * ".
       "FROM msl_users u ";
     if(!empty($filters)){
-      $qry .= "WHERE ".SQL::buildFilterQuery($filters);
+      $qry .= "WHERE ".sql_build_filter_query($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY ".sql_build_orderby_query($orderby);
     }
     #logger($qry);
-    $us = SQL::selectID($qry, 'id');
+    $us = sql_select_id($qry, 'id');
     #logger(print_r($us,1));
 
     $users = array();
@@ -66,16 +66,16 @@ class Users extends ArrayObject{
       return array();
     }
     $keys = array_keys($users);
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "SELECT a.user_id,a.access,a.start,a.end,a.member_id,m.name,m.status ".
       "FROM msl_access a ".
         "LEFT JOIN msl_members m ON (a.member_id = m.id) ".
       "WHERE start<=CURDATE() AND end>=CURDATE() ".
-        "AND user_id IN (".SQL::escapeArray($keys).") ".
+        "AND user_id IN (".sql_escape_array($keys).") ".
       "ORDER BY (CASE WHEN a.member_id=0 THEN 0 ELSE 1 END),m.name,a.access";
 
-    $as = SQL::select($qry);
+    $as = sql_select($qry);
     foreach($as as $a){
       if($a['member_id'] > 0 && $a['status'] != 'a'){
         break;

@@ -9,13 +9,13 @@ class Info{
   public $published;
 
   public static function create(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "INSERT INTO msl_infos (created) VALUES (NOW())";
-    $id = SQL::insert($qry);
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_infos WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_infos WHERE id=".intval($id));
     $info = new Info();
     $info->_init_values($values); 
     return $info;
@@ -30,10 +30,10 @@ class Info{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "UPDATE msl_infos SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

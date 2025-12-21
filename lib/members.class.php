@@ -6,12 +6,12 @@ require_once('member.class.php');
 class Members extends ArrayObject{
 
   public static function create($name){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_members ".
         "(name) VALUES ".
-        "('".SQL::escapeString($name)."')";
-    $member_id = SQL::insert($qry);
+        "('".sql_escape_string($name)."')";
+    $member_id = sql_insert($qry);
     return $member_id;
   }
 
@@ -38,19 +38,19 @@ class Members extends ArrayObject{
   }
 
   private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "SELECT * ".
       "FROM msl_members m ";
     if(!empty($filters)){
-      $qry .= "WHERE ".SQL::buildFilterQuery($filters);
+      $qry .= "WHERE ".sql_build_filter_query($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY ".sql_build_orderby_query($orderby);
     }else{
       $qry .= "ORDER BY m.producer,m.consumer DESC,m.name";
     }
-    $ms = SQL::selectID($qry, 'id');
+    $ms = sql_select_id($qry, 'id');
 
     $members = array();
     foreach($ms as $id=>$m){

@@ -10,9 +10,9 @@ function product_import_csv($file, $supplier_id, $prices_start, $prices_end){
 
   $full = true;
 
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   if($full){
-    SQL::update("UPDATE msl_products SET import_status='n' WHERE supplier_id='".intval($supplier_id)."'");
+    sql_update("UPDATE msl_products SET import_status='n' WHERE supplier_id='".intval($supplier_id)."'");
   }
 
 
@@ -39,7 +39,7 @@ function product_import_csv($file, $supplier_id, $prices_start, $prices_end){
       $product['kg_per_piece'] = floatval(str_replace(',', '.', $data['Größe']));
     }
     $fields = array_keys($product);
-    $products[$linenr] = SQL::escapeArray($product);
+    $products[$linenr] = sql_escape_array($product);
 
     $tax = 7;
 
@@ -60,10 +60,10 @@ function product_import_csv($file, $supplier_id, $prices_start, $prices_end){
     $qry .= $field."=VALUES(".$field."),";
   }
   $qry .= "updated=NOW()";
-  SQL::update($qry);
+  sql_update($qry);
 
-  $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='".intval($supplier_id)."' AND supplier_product_id IN (".SQL::escapeArray(array_keys($prices)).")";
-  $pids = SQL::selectKey2Val($qry, 'supplier_product_id', 'id');
+  $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='".intval($supplier_id)."' AND supplier_product_id IN (".sql_escape_array(array_keys($prices)).")";
+  $pids = sql_select_key2value($qry, 'supplier_product_id', 'id');
   print_r($pids);
   
   $fields = array_keys($prices[key($prices)]);
@@ -72,7 +72,7 @@ function product_import_csv($file, $supplier_id, $prices_start, $prices_end){
   foreach($prices as $supplier_product_id => $pp){
     $product_id = $pids[$supplier_product_id];
     array_unshift($pp, $product_id);
-    $qry .= "(".SQL::escapeArray($pp)."),";
+    $qry .= "(".sql_escape_array($pp)."),";
     #logger($product_id." ".$supplier_product_id." ".print_r($pp,1));
   }
   $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE ";
@@ -80,9 +80,9 @@ function product_import_csv($file, $supplier_id, $prices_start, $prices_end){
     $qry .= $field."=VALUES(".$field."),";
   }
   $qry .= "updated=NOW()";
-  SQL::update($qry);
+  sql_update($qry);
 
-  SQL::update("UPDATE msl_products SET status='o' WHERE supplier_id='".intval($supplier_id)."' AND supplier_product_id IN (".SQL::escapeArray(array_keys($prices)).")");
+  sql_update("UPDATE msl_products SET status='o' WHERE supplier_id='".intval($supplier_id)."' AND supplier_product_id IN (".sql_escape_array(array_keys($prices)).")");
 
   return 'ok';
 }

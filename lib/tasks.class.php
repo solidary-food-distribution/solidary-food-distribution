@@ -6,12 +6,12 @@ require_once('task.class.php');
 class Tasks extends ArrayObject{
 
   public static function create($starts, $title){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_tasks ".
         "(starts, title) VALUES ".
-        "('" . SQL::escapeString($starts) . "', '" . SQL::escapeString($title) . "')";
-    $task_id = SQL::insert($qry);
+        "('" . sql_escape_string($starts) . "', '" . sql_escape_string($title) . "')";
+    $task_id = sql_insert($qry);
     return $task_id;
   }
 
@@ -34,7 +34,7 @@ class Tasks extends ArrayObject{
       $filters['t.task_id'] = $filters['task_id'];
       unset($filters['task_id']);
     }
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry=
       "SELECT t.task_id, t.title, t.description, t.starts, t.interval, t.effort, ".
         "tu.user_id, tu.assign, tu.start tu_start, tu.end tu_end, tu.comment tu_comment ".
@@ -42,10 +42,10 @@ class Tasks extends ArrayObject{
         "LEFT JOIN msl_task_users tu ON (t.task_id = tu.task_id) ".
        "WHERE 1=1 ";
     if(!empty($filters)){
-      $qry .= "AND ".SQL::buildFilterQuery($filters);
+      $qry .= "AND ".sql_build_filter_query($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY ".sql_build_orderby_query($orderby);
     }else{
       $qry .= "ORDER BY t.starts, t.task_id";
     }
@@ -56,7 +56,7 @@ class Tasks extends ArrayObject{
       $qry .=
         " LIMIT ".intval($limit_start).", ".intval($limit_count);
     }
-    $ts = SQL::selectID2($qry,'task_id','user_id');
+    $ts = sql_select_id2($qry,'task_id','user_id');
     $tasks = array();
     #logger(print_r($ts,1));
     foreach($ts as $task_id=>$tus){

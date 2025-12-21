@@ -11,11 +11,11 @@ class PollVotes extends Objects{
   protected $_id_key = 'CONCAT(poll_answer_id,\'_\',user_id)';
 
   public static function create($poll_answer_id, $user_id, $value, $created_by){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_poll_votes ".
         "(poll_answer_id, user_id, value, created, updated, created_by) VALUES ".
-        "('".intval($poll_answer_id)."', '".intval($user_id)."', '".SQL::escapeString($value)."', NOW(), NOW(), '".intval($created_by)."')";
-    SQL::insert($qry);
+        "('".intval($poll_answer_id)."', '".intval($user_id)."', '".sql_escape_string($value)."', NOW(), NOW(), '".intval($created_by)."')";
+    sql_insert($qry);
   }
 }

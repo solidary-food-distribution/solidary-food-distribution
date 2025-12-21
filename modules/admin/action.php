@@ -67,8 +67,8 @@ function execute_products(){
   }
   $products = new Products($filter);
 
-  require_once('sql.class.php');
-  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands WHERE supplier_id='".intval($supplier_id)."' ORDER BY name", 'id', 'name');
+  require_once('sql.inc.php');
+  $brands = sql_select_key2value("SELECT id, name FROM msl_brands WHERE supplier_id='".intval($supplier_id)."' ORDER BY name", 'id', 'name');
 
   require_once('prices.class.php');
   $prices = new Prices(array('product_id' => $products->keys()));
@@ -137,10 +137,10 @@ function execute_products_import_friedls(){
   $rows = array();
   
   #logger(print_r($_FILES,1));
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   if(!empty($_FILES['file']['name']) && $_FILES['file']['size']>0 && $_FILES['file']['error']==0){
     
-    $upload_id = SQL::insert("INSERT INTO msl_uploads (filename, user_id) VALUES ('".SQL::escapeString(basename($_FILES['file']['name']))."','".$user['user_id']."')");
+    $upload_id = sql_insert("INSERT INTO msl_uploads (filename, user_id) VALUES ('".sql_escape_string(basename($_FILES['file']['name']))."','".$user['user_id']."')");
     $target =  $_SERVER['DOCUMENT_ROOT'].'/../data/uploads/'.$upload_id;
     move_uploaded_file($_FILES['file']['tmp_name'], $target);
     require_once('SimpleXLSX.php');
@@ -153,11 +153,11 @@ function execute_products_import_friedls(){
         if($row[0] == 'Pause' || $row[0] == 'aus' || $row[1] == '' || $row[3] == '' || $row[1] == 'zzgl. Pfand/Kiste inkl. Flaschen'){
           continue;
         }
-        SQL::insert("INSERT INTO msl_product_imports (upload_id, row_nr, info, name, type, purchase, brand) VALUES ('$upload_id', '$row_nr', '".SQL::escapeString(trim($row[0]))."', '".SQL::escapeString(trim($row[1]))."', '".SQL::escapeString(trim($row[2]))."', '".SQL::escapeString(trim($row[3]))."', '".SQL::escapeString(trim($row[4]))."')");
+        sql_insert("INSERT INTO msl_product_imports (upload_id, row_nr, info, name, type, purchase, brand) VALUES ('$upload_id', '$row_nr', '".sql_escape_string(trim($row[0]))."', '".sql_escape_string(trim($row[1]))."', '".sql_escape_string(trim($row[2]))."', '".sql_escape_string(trim($row[3]))."', '".sql_escape_string(trim($row[4]))."')");
       }
     }
   }
-  $uploads = SQL::selectId("SELECT *,(SELECT COUNT(*) FROM msl_product_imports WHERE upload_id=u.id AND status='') open, (SELECT COUNT(*) FROM msl_product_imports WHERE upload_id=u.id AND status='1') ok FROM msl_uploads u ORDER BY 1 DESC LIMIT 3", 'id');
+  $uploads = sql_select_id("SELECT *,(SELECT COUNT(*) FROM msl_product_imports WHERE upload_id=u.id AND status='') open, (SELECT COUNT(*) FROM msl_product_imports WHERE upload_id=u.id AND status='1') ok FROM msl_uploads u ORDER BY 1 DESC LIMIT 3", 'id');
 
   if(!isset($upload_id)){
     $upload_id = intval(get_request_param('upload_id'));
@@ -166,7 +166,7 @@ function execute_products_import_friedls(){
     $upload_id = key($uploads);
   }
 
-  $rows = SQL::selectId("SELECT * FROM msl_product_imports WHERE upload_id='".intval($upload_id)."' AND status='".SQL::escapeString($status)."' ORDER BY 1", 'id');
+  $rows = sql_select_id("SELECT * FROM msl_product_imports WHERE upload_id='".intval($upload_id)."' AND status='".sql_escape_string($status)."' ORDER BY 1", 'id');
   
   require_once('products.class.php');
   $products = new Products(array('supplier_id' => 20, 'status!=' => 'd'));
@@ -186,12 +186,12 @@ function execute_products_import_friedls(){
       $search = trim(trim($row['name']).' '.trim($row['brand']));
       if(isset($products_search[$search])){
         $row['product_id'] = $products_search[$search];
-        SQL::update("UPDATE msl_product_imports SET product_id='".intval($row['product_id'])."' WHERE id='".intval($row['id'])."'");
+        sql_update("UPDATE msl_product_imports SET product_id='".intval($row['product_id'])."' WHERE id='".intval($row['id'])."'");
       }
     }
   }
 
-  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands WHERE supplier_id=20 ORDER BY name", 'id', 'name');
+  $brands = sql_select_key2value("SELECT id, name FROM msl_brands WHERE supplier_id=20 ORDER BY name", 'id', 'name');
 
   require_once('members.class.php');
   $supplier = Members::sget(20);
@@ -204,17 +204,17 @@ function execute_products_import_friedls_update_ajax(){
   $field = get_request_param('field');
   $value = get_request_param('value');
   require_once('products.class.php');
-  require_once('sql.class.php');
-  $row = SQL::selectOne("SELECT * FROM msl_product_imports WHERE id='".intval($row_id)."'");
+  require_once('sql.inc.php');
+  $row = sql_select_one("SELECT * FROM msl_product_imports WHERE id='".intval($row_id)."'");
   if($field == 'ok'){
     //if it is the first product to be set ok, we deactivate all products from the supplier
-    $count=SQL::selectOne("SELECT COUNT(*) AS cnt FROM msl_product_imports WHERE status='1' AND upload_id=(SELECT upload_id FROM msl_product_imports WHERE id='".intval($row_id)."')")['cnt'];
+    $count=sql_select_one("SELECT COUNT(*) AS cnt FROM msl_product_imports WHERE status='1' AND upload_id=(SELECT upload_id FROM msl_product_imports WHERE id='".intval($row_id)."')")['cnt'];
     if($count==0){
-      SQL::update("UPDATE msl_products SET status='n' WHERE status='o' AND supplier_id=20");
+      sql_update("UPDATE msl_products SET status='n' WHERE status='o' AND supplier_id=20");
     }
     products_import_friedls_update_field($row, 'status', 'o');
     products_import_friedls_update_field($row, 'purchase', $row['purchase']);
-    SQL::update("UPDATE msl_product_imports SET status='1' WHERE id='".intval($row_id)."'");
+    sql_update("UPDATE msl_product_imports SET status='1' WHERE id='".intval($row_id)."'");
   }else{
     products_import_friedls_update_field($row, $field, $value);
   }
@@ -235,9 +235,9 @@ function products_import_friedls_update_field($row,$field,$value){
       }
       $product = Products::sget(intval($value));
       $product->update(array('supplier_name' => $search));
-      SQL::update("UPDATE msl_product_imports SET product_id='".intval($product->id)."' WHERE id='".intval($row['id'])."'");
+      sql_update("UPDATE msl_product_imports SET product_id='".intval($product->id)."' WHERE id='".intval($row['id'])."'");
     }else{
-      SQL::update("UPDATE msl_product_imports SET product_id=-1 WHERE id='".intval($row['id'])."'");
+      sql_update("UPDATE msl_product_imports SET product_id=-1 WHERE id='".intval($row['id'])."'");
     }
   }elseif($field == 'new_product_name'){
     $supplier_name = trim(trim($row['name']).' '.trim($row['brand']));
@@ -245,7 +245,7 @@ function products_import_friedls_update_field($row,$field,$value){
     require_once('prices.class.php');
     $price = Price::create($product->id);
     $price->update(array('purchase' => $row['purchase'], 'tax' => 7));
-    SQL::update("UPDATE msl_product_imports SET product_id='".intval($product->id)."' WHERE id='".intval($row['id'])."'");
+    sql_update("UPDATE msl_product_imports SET product_id='".intval($product->id)."' WHERE id='".intval($row['id'])."'");
   }elseif($row['product_id']>0 && strpos(',purchase,tax,price', $field)){
     require_once('prices.class.php');
     $prices = new Prices(array('product_id' => intval($row['product_id'])));
@@ -280,9 +280,9 @@ function get_product_kg_per_piece_by_pickups($product_id){
   $avgs = array();
   $cnts = 0;
   $min_date = '';
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry = "SELECT pickup_date,AVG(avg) AS avg,COUNT(*) AS cnt FROM (SELECT o.pickup_date, pui.amount_weight / pui.amount_pieces AS avg FROM msl_pickup_items pui, msl_order_items oi, msl_orders o WHERE o.id=oi.order_id AND oi.id=pui.order_item_id AND pui.product_id='".intval($product_id)."' AND pui.amount_pieces>0 AND pui.amount_weight>0) t1 GROUP BY pickup_date HAVING cnt>1 ORDER BY pickup_date DESC LIMIT 10";
-  $res = SQL::select($qry);
+  $res = sql_select($qry);
   foreach($res as $v){
     if(empty($min_date)){
       $min_date = date('Y-m-d', strtotime('-4 WEEKS', strtotime($v['pickup_date'])));
@@ -684,9 +684,9 @@ function execute_poll(){
       $user_ids[] = $poll_vote->user_id;
     }
   }
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry = "SELECT GROUP_CONCAT(m.id) member_ids FROM msl_members m WHERE m.id NOT IN (SELECT u.member_id FROM msl_users u, msl_poll_answers pa, msl_poll_votes pv WHERE pa.poll_answer_id=pv.poll_answer_id AND pv.value=1 AND pv.user_id=u.id AND pa.poll_id=".$poll->poll_id.") AND m.id NOT IN (1) AND m.consumer=1";
-  $member_ids = SQL::selectOne($qry)['member_ids'];
+  $member_ids = sql_select_one($qry)['member_ids'];
   $member_ids = explode(',', $member_ids);
   require_once('members.class.php');
   $missing_members = new Members(array('id' => $member_ids));

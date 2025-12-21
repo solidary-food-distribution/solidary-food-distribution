@@ -10,13 +10,13 @@ class Mail{
   public string $sent;
 
   public static function create($to, $subject, $content){
-    require_once('sql.class.php');
-    $qry = "INSERT INTO msl_mails (`to`, subject, content) VALUES ('".SQL::escapeString($to)."', '".SQL::escapeString($subject)."', '".SQL::escapeString($content)."')";
-    $id = SQL::insert($qry);
+    require_once('sql.inc.php');
+    $qry = "INSERT INTO msl_mails (`to`, subject, content) VALUES ('".sql_escape_string($to)."', '".sql_escape_string($subject)."', '".sql_escape_string($content)."')";
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_mails WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_mails WHERE id=".intval($id));
     $object = new Mail();
     $object->_init_values($values); 
     return $object;
@@ -31,19 +31,19 @@ class Mail{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "UPDATE msl_mails SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete() {
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "DELETE FROM msl_mails " .
         "WHERE id='" . intval($this->id) . "'";
-    SQL::update($qry);
+    sql_update($qry);
     return true;
   }
 }

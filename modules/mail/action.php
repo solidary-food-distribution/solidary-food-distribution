@@ -13,9 +13,9 @@ function execute_answer(){
   $check = dechex(crc32(hash('sha256',$mail_id.'#{zU'.$value.'#g&T$c}'.$user_id)));
   #logger("crc|$crc|check|$check");
   if($crc == $check){
-    require('sql.class.php');
+    require('sql.inc.php');
     $qry="INSERT INTO msl_mail_answers (mail_id, answer_id, user_id) VALUES ('".intval($mail_id)."','".intval($value)."','".intval($user_id)."')";
-    SQL::insert($qry);
+    sql_insert($qry);
     $message = "Danke fürs Bestätigen der E-Mail.";
     if($user_id != $user['user_id']){
       logger("USER_ID WEICHT AB angemeldet:".$user['user_id']." link:".$user_id." answer: ".$a);

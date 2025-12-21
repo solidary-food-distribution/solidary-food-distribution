@@ -10,14 +10,14 @@ function execute_index(){
   if($month==''){
     $month=date('Y-m');
   }
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry=
     "SELECT * ".
     "FROM msl_timesheet ".
     "WHERE user_id='".intval($user['user_id'])."' ".
-      "AND `date` LIKE '".SQL::escapeString($month)."%'".
+      "AND `date` LIKE '".sql_escape_string($month)."%'".
     "ORDER BY `date`,modified";
-  $timesheet=SQL::selectID($qry,'id');
+  $timesheet=sql_select_id($qry,'id');
 
   $months=array();
   $yn=date('Y');
@@ -78,9 +78,9 @@ function execute_new(){
 function execute_edit_ajax(){
   global $user;
   $id=intval(get_request_param('id'));
-  require_once('sql.class.php');
-  $qry="SELECT `date` FROM msl_timesheet WHERE user_id='".intval($user['user_id'])."' AND id='".SQL::escapeString($id)."'";
-  $date=SQL::selectOne($qry)['date'];
+  require_once('sql.inc.php');
+  $qry="SELECT `date` FROM msl_timesheet WHERE user_id='".intval($user['user_id'])."' AND id='".sql_escape_string($id)."'";
+  $date=sql_select_one($qry)['date'];
   $month=substr($date,0,7);
   set_request_param('month',$month);
   set_request_param('edit_id',$id);
@@ -99,7 +99,7 @@ function execute_save_ajax(){
   $topic=get_request_param('topic');
   $what=trim(get_request_param('what'));
 
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   if(intval($mins) || intval($km) || !empty($what)){
     if(!intval($id)){
       $id=get_unix_ms();
@@ -109,11 +109,11 @@ function execute_save_ajax(){
     }
     $qry=
       "INSERT INTO msl_timesheet (user_id,id,`date`,mins,km,topic,what,modified) ".
-      "VALUES ('".intval($user['user_id'])."','".intval($id)."','".SQL::escapeString($date)."','".intval($mins)."','".intval($km)."','".SQL::escapeString($topic)."','".SQL::escapeString($what)."','".intval($modified)."') ".
+      "VALUES ('".intval($user['user_id'])."','".intval($id)."','".sql_escape_string($date)."','".intval($mins)."','".intval($km)."','".sql_escape_string($topic)."','".sql_escape_string($what)."','".intval($modified)."') ".
       "ON DUPLICATE KEY UPDATE `date`=VALUES(`date`),mins=VALUES(mins),km=VALUES(km),topic=VALUES(topic),what=VALUES(what),modified=VALUES(modified)";
-    SQL::update($qry);
+    sql_update($qry);
   }elseif(intval($id)){
-    SQL::update("DELETE FROM msl_timesheet WHERE user_id='".intval($user['user_id'])."' AND id='".intval($id)."'");
+    sql_update("DELETE FROM msl_timesheet WHERE user_id='".intval($user['user_id'])."' AND id='".intval($id)."'");
   }
 
   $month=substr($date,0,7);

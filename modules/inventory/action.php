@@ -48,8 +48,8 @@ function execute_index(){
     $suppliers = new Members(array('producer>=' => 1));
   }
 
-  require_once('sql.class.php');
-  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
+  require_once('sql.inc.php');
+  $brands = sql_select_key2value("SELECT id, name FROM msl_brands", 'id', 'name');
 
   return array(
     'data' => $data,
@@ -73,10 +73,10 @@ function execute_filter_ajax(){
 }
 
 function search_products($search, $suppliers, $limit){
-  require_once('sql.class.php');
-  $qry = "SELECT p.id FROM msl_members m,msl_products p LEFT JOIN msl_brands b ON (brand_id=b.id) WHERE m.id = p.supplier_id AND p.supplier_id IN (".SQL::escapeArray($suppliers->keys()).") AND p.status IN ('o', 's') AND p.type IN ('k', 'p') AND (";
+  require_once('sql.inc.php');
+  $qry = "SELECT p.id FROM msl_members m,msl_products p LEFT JOIN msl_brands b ON (brand_id=b.id) WHERE m.id = p.supplier_id AND p.supplier_id IN (".sql_escape_array($suppliers->keys()).") AND p.status IN ('o', 's') AND p.type IN ('k', 'p') AND (";
   if(is_numeric($search)){
-    $esc_search = SQL::escapeString($search);
+    $esc_search = sql_escape_string($search);
     $qry .= "p.supplier_product_id='$esc_search' OR p.gtin_piece='$esc_search' OR p.gtin_bundle='$esc_search'";
   }else{
     $wheres = array();
@@ -86,14 +86,14 @@ function search_products($search, $suppliers, $limit){
       if($term == ''){
         continue;
       }
-      $esc_term = SQL::escapeString('%'.$term.'%');
+      $esc_term = sql_escape_string('%'.$term.'%');
       $wheres[] = "(p.name LIKE '$esc_term' OR b.name LIKE '$esc_term')";
     }
     $qry .= implode(' AND ', $wheres);
   }
   $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC LIMIT ".intval($limit);
   #logger($qry);
-  $res = SQL::selectKey2Val($qry, 'id', 'id');
+  $res = sql_select_key2value($qry, 'id', 'id');
   return $res;
 }
 
@@ -216,11 +216,11 @@ function execute_product_select(){
 
 function execute_remove_product_ajax(){
   $product_id=get_request_param('product_id');
-  require_once('sql.class.php');
-  $qry = "INSERT INTO msl_inventory_log (ts, inventory_id, delivery_item_id, pickup_item_id, product_id, amount_pieces, amount_weight, dividable, weight_min, weight_max, weight_avg, modified) SELECT NOW(), id, delivery_item_id, pickup_item_id, product_id, amount_pieces, amount_weight, dividable, weight_min, weight_max, weight_avg, modified FROM msl_inventory WHERE product_id='".SQL::escapeString($product_id)."'";
-  SQL::update($qry);
-  $qry = "DELETE FROM msl_inventory WHERE product_id='".SQL::escapeString($product_id)."'";
-  SQL::update($qry);
+  require_once('sql.inc.php');
+  $qry = "INSERT INTO msl_inventory_log (ts, inventory_id, delivery_item_id, pickup_item_id, product_id, amount_pieces, amount_weight, dividable, weight_min, weight_max, weight_avg, modified) SELECT NOW(), id, delivery_item_id, pickup_item_id, product_id, amount_pieces, amount_weight, dividable, weight_min, weight_max, weight_avg, modified FROM msl_inventory WHERE product_id='".sql_escape_string($product_id)."'";
+  sql_update($qry);
+  $qry = "DELETE FROM msl_inventory WHERE product_id='".sql_escape_string($product_id)."'";
+  sql_update($qry);
   exit;
 }
 

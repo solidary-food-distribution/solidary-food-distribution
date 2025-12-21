@@ -79,11 +79,11 @@ function execute_membertest_new(){
 function create_membertest_user($member_id){
   require_once('users.class.php');
   $user_id = Users::create('Email setzen '.date('ymdHis'), '.Neue Patenschaft von '.$member->name, $member_id);
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry = "INSERT INTO msl_access (user_id, access, member_id, start, end) VALUES ".
     "($user_id, 'order', $member_id, '0000-00-00', '9999-12-31'),".
     "($user_id, 'pickups', $member_id, '0000-00-00', '9999-12-31')";
-  SQL::insert($qry);
+  sql_insert($qry);
 }
 
 function execute_membertest_edit(){
@@ -136,8 +136,8 @@ function execute_membertest_update_ajax(){
 
 function execute_notifications(){
   global $user;
-  require_once('sql.class.php');
-  $notifications = SQL::selectKey2Val("SELECT * FROM msl_settings WHERE user_id='".intval($user['user_id'])."' AND setting LIKE 'NOTIFICATION_%'", 'setting', 'value');
+  require_once('sql.inc.php');
+  $notifications = sql_select_key2value("SELECT * FROM msl_settings WHERE user_id='".intval($user['user_id'])."' AND setting LIKE 'NOTIFICATION_%'", 'setting', 'value');
   return array('notifications' => $notifications);
 }
 
@@ -145,8 +145,8 @@ function execute_notifications_update_ajax(){
   global $user;
   $notification = get_request_param('notification');
   $value = get_request_param('value');
-  require_once('sql.class.php');
-  $qry = "INSERT INTO msl_settings (user_id, setting, value) VALUES ('".intval($user['user_id'])."', '".SQL::escapeString($notification)."', '".SQL::escapeString($value)."') ON DUPLICATE KEY UPDATE value=VALUES(value),modified=NOW()";
-  SQL::update($qry);
+  require_once('sql.inc.php');
+  $qry = "INSERT INTO msl_settings (user_id, setting, value) VALUES ('".intval($user['user_id'])."', '".sql_escape_string($notification)."', '".sql_escape_string($value)."') ON DUPLICATE KEY UPDATE value=VALUES(value),modified=NOW()";
+  sql_update($qry);
   exit;
 }

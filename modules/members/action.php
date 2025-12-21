@@ -10,9 +10,9 @@ require_once('users.class.php');
 function execute_index(){
   $sort = get_request_param('sort');
 
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry = "SELECT member_id,MAX(created) created FROM msl_pickups GROUP BY member_id ORDER BY created DESC";
-  $last_pickups = SQL::selectKey2Val($qry, 'member_id', 'created');
+  $last_pickups = sql_select_key2value($qry, 'member_id', 'created');
 
   if($sort == 'name'){
     $sort_array = array($sort => 'ASC');
@@ -76,13 +76,13 @@ function execute_create_user(){
 
 function create_user($member_id){
   $user_id = Users::create('Email setzen '.date('ymdHis'), '.Neuer Benutzer', $member_id);
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry = "INSERT INTO msl_access (user_id, access, member_id, start, end) VALUES ".
     "($user_id, 'access', $member_id, '0000-00-00', '9999-12-31'),".
     "($user_id, 'order', $member_id, '0000-00-00', '9999-12-31'),".
     "($user_id, 'pickups', $member_id, '0000-00-00', '9999-12-31'),".
     "($user_id, 'preferences', $member_id, '0000-00-00', '9999-12-31')";
-  SQL::insert($qry);
+  sql_insert($qry);
 }
 
 function execute_update_ajax(){

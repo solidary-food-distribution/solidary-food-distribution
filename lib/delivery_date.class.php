@@ -7,13 +7,13 @@ class DeliveryDate{
   public $date;
 
   public static function create($date){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_delivery_dates ".
         "(`date`) VALUES ".
-        "('" . SQL::escapeString($date) . "')";
-    $id = SQL::insert($qry);
-    $values = SQL::selectOne("SELECT * FROM msl_delivery_dates WHERE id=".intval($id));
+        "('" . sql_escape_string($date) . "')";
+    $id = sql_insert($qry);
+    $values = sql_select_one("SELECT * FROM msl_delivery_dates WHERE id=".intval($id));
     $object = new DeliveryDate();
     $object->_init_values($values); 
     return $object;
@@ -28,19 +28,19 @@ class DeliveryDate{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_delivery_dates SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "DELETE FROM msl_delivery_dates ";
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

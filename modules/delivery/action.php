@@ -23,8 +23,8 @@ function execute_index(){
   require_once('products.class.php');
   $products = new Products(array('id' => $product_ids));
 
-  require_once('sql.class.php');
-  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
+  require_once('sql.inc.php');
+  $brands = sql_select_key2value("SELECT id, name FROM msl_brands", 'id', 'name');
 
   return array('delivery' => $delivery, 'delivery_items' => $delivery_items, 'supplier' => $supplier, 'brands' => $brands, 'products' => $products, 'item_id' => $item_id);
 }

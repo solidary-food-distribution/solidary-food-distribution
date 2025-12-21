@@ -11,12 +11,12 @@ class Poll{
   public $close_datetime;
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_polls SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE poll_id='".intval($this->poll_id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
 }

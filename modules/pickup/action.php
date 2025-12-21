@@ -90,8 +90,8 @@ function execute_index(){
   require_once('prices.class.php');
   $prices = new Prices(array('product_id' => $product_ids));
 
-  require_once('sql.class.php');
-  $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
+  require_once('sql.inc.php');
+  $brands = sql_select_key2value("SELECT id, name FROM msl_brands", 'id', 'name');
 
   $others = pickups_get_info_others();
 

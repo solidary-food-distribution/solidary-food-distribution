@@ -6,12 +6,12 @@ require_once('poll_answer.class.php');
 class PollAnswers extends ArrayObject{
 
   public static function create($poll_id, $user_id, $answer){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_poll_answers ".
         "(poll_id, user_id, answer) VALUES ".
-        "('" . intval($poll_id) . "', '" . intval($user_id) . "', '".SQL::escapeString($answer)."')";
-    $poll_answer_id = SQL::insert($qry);
+        "('" . intval($poll_id) . "', '" . intval($user_id) . "', '".sql_escape_string($answer)."')";
+    $poll_answer_id = sql_insert($qry);
     return $poll_answer_id;
   }
 
@@ -30,16 +30,16 @@ class PollAnswers extends ArrayObject{
   }
 
   private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry=
       "SELECT * ".
       "FROM msl_poll_answers ".
       "WHERE 1=1 ";
     if(!empty($filters)){
-      $qry .= "AND ".SQL::buildFilterQuery($filters);
+      $qry .= "AND ".sql_build_filter_query($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY ".sql_build_orderby_query($orderby);
     }else{
       $qry .= "ORDER BY poll_answer_id";
     }
@@ -50,7 +50,7 @@ class PollAnswers extends ArrayObject{
       $qry .=
         " LIMIT ".intval($limit_start).", ".intval($limit_count);
     }
-    $rec = SQL::selectID($qry,'poll_answer_id');
+    $rec = sql_select_id($qry,'poll_answer_id');
     $poll_answers = array();
     #logger(print_r($rec,1));
     foreach($rec as $poll_answer_id=>$pa){

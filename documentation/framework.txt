@@ -34,7 +34,7 @@ Documentation / Framework
 7.2 .htaccess rewrites to web/index.php?index_path=product/detail?pid=15
 7.3 action modules/product/action.php execute_detail() is called
 7.3.1 $pid=intval($_GET['pid']);
-7.3.2 $product=SQL::selectOne("SELECT * FROM products WHERE pid=".$pid);
+7.3.2 $product=sql_selectOne("SELECT * FROM products WHERE pid=".$pid);
 7.3.3 return array('product'=>$product)
 7.4 template modules/product/templates/detail.php
 7.4.1 in detail.php: <div class="product_name"><?php echo htmlentities($product['name']) ?></div>

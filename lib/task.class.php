@@ -13,12 +13,12 @@ class Task{
   public array $users = array(); //class TaskUser
 
   public function add_user( $user_id ) {
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "INSERT INTO msl_task_users ".
         "(task_id, user_id) VALUES ".
         "('" . intval($this->task_id) . "', '" . intval($user_id) . "')";
-    SQL::insert($qry);
+    sql_insert($qry);
     $task_user = new TaskUser();
     $task_user->task_id = intval($this->task_id);
     $task_user->user_id = intval($user_id);
@@ -27,28 +27,28 @@ class Task{
   }
 
   public function remove_user( $user_id ) {
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "DELETE FROM msl_task_users " .
         "WHERE task_id='" . intval($this->task_id) . "' AND user_id='" . intval($user_id) . "'";
-    SQL::update($qry);
+    sql_update($qry);
     return true;
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_tasks SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE task_id='".intval($this->task_id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "DELETE FROM msl_tasks ";
     $qry .= "WHERE task_id='".intval($this->task_id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

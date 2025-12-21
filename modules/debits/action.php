@@ -113,7 +113,7 @@ function update_debits(){
   foreach($missing as $pickup_id){
     $pickup = $pickups[$pickup_id];
     $qry = "SELECT tax, SUM(price_sum) amount FROM msl_pickup_items WHERE pickup_id='".intval($pickup_id)."' GROUP BY tax";
-    $amounts = SQL::selectKey2Val($qry, 'tax', 'amount');
+    $amounts = sql_select_key2value($qry, 'tax', 'amount');
     foreach($amounts as $tax => $amount){
       if(!round($amount,2)){
         continue;

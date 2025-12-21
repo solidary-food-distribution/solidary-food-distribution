@@ -14,13 +14,13 @@ class PurchaseItem{
   public float $purchase_sum;
 
   public static function create($purchase_id, $product_id){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "INSERT INTO msl_purchase_items ".
         "(purchase_id, product_id, created, modified) VALUES ".
         "('" . intval($purchase_id) . "', '" . intval($product_id) . "', NOW(), NOW())";
-    $id = SQL::insert($qry);
-    $values = SQL::selectOne("SELECT * FROM msl_purchase_items WHERE id='".intval($id)."'");
+    $id = sql_insert($qry);
+    $values = sql_select_one("SELECT * FROM msl_purchase_items WHERE id='".intval($id)."'");
     $object = new PurchaseItem();
     $object->_init_values($values); 
     return $object;
@@ -35,20 +35,20 @@ class PurchaseItem{
   }
 
   public function delete(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "DELETE FROM msl_purchase_items WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function update( array $updates = array() ){
     global $user;
     $updates['modified'] = date('Y-m-d H:i:s');
     $updates['modifier_id'] = $user['user_id'];
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_purchase_items SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

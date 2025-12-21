@@ -13,13 +13,13 @@ class Debit{
   public $exported;
 
   public static function create($member_id){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "INSERT INTO msl_debits (member_id) VALUES (".intval($member_id).")";
-    $id = SQL::insert($qry);
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_debits WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_debits WHERE id=".intval($id));
     $d = new Debit();
     $d->_init_values($values);
     return $d;
@@ -34,12 +34,12 @@ class Debit{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_debits SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
 }

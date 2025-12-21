@@ -7,10 +7,10 @@ class InfoUser{
   public $read;
 
   public static function create($info_id, $user_id){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "INSERT INTO msl_info_users (info_id, user_id) VALUES ('".intval($info_id)."','".intval($user_id)."')";
-    SQL::insert($qry);
-    $values = SQL::selectOne("SELECT * FROM msl_info_users WHERE info_id=".intval($info_id)." AND user_id=".intval($user_id));
+    sql_insert($qry);
+    $values = sql_select_one("SELECT * FROM msl_info_users WHERE info_id=".intval($info_id)." AND user_id=".intval($user_id));
     $info_user = new InfoUser();
     $info_user->_init_values($values); 
     return $info_user;
@@ -25,10 +25,10 @@ class InfoUser{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "UPDATE msl_info_users SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE info_id='".intval($this->info_id)."' AND user_id='".intval($this->user_id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

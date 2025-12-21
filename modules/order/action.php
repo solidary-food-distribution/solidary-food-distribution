@@ -58,8 +58,8 @@ function execute_index(){
     $suppliers = new Members(array('producer>=' => 1));
     $do_inventories = true;
   }elseif($modus == 'f'){
-    require_once('sql.class.php');
-    $product_ids=SQL::selectKey2Val("SELECT f.product_id,p.name FROM msl_favorites f,msl_products p WHERE f.product_id=p.id AND member_id='".intval($user['member_id'])."' AND p.status IN ('o','s') ORDER BY p.name",'product_id','product_id');
+    require_once('sql.inc.php');
+    $product_ids=sql_select_key2value("SELECT f.product_id,p.name FROM msl_favorites f,msl_products p WHERE f.product_id=p.id AND member_id='".intval($user['member_id'])."' AND p.status IN ('o','s') ORDER BY p.name",'product_id','product_id');
     if(empty($product_ids)){
       $product_ids=array('0');
     }
@@ -117,12 +117,12 @@ function execute_index(){
     #logger("inventory ".print_r($inventory,1));
   }
 
-  require_once('sql.class.php');
-  $favorites = SQL::selectKey2Val("SELECT product_id, 1 AS value FROM msl_favorites WHERE member_id=".intval($user['member_id']), 'product_id', 'value');
+  require_once('sql.inc.php');
+  $favorites = sql_select_key2value("SELECT product_id, 1 AS value FROM msl_favorites WHERE member_id=".intval($user['member_id']), 'product_id', 'value');
 
   $brands = array();
   if(!empty($products)){
-    $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands", 'id', 'name');
+    $brands = sql_select_key2value("SELECT id, name FROM msl_brands", 'id', 'name');
   }
 
   $ois = array();
@@ -185,10 +185,10 @@ function get_supplier_unlocked($order_id){
 }
 
 function search_products($search, $scategories, $suppliers){
-  require_once('sql.class.php');
-  $qry = "SELECT p.id FROM msl_members m,msl_products p LEFT JOIN msl_brands b ON (brand_id=b.id) WHERE m.id = p.supplier_id AND p.supplier_id IN (".SQL::escapeArray($suppliers->keys()).") AND p.status IN ('o', 's') AND p.type IN ('k', 'p', 'w') AND (";
+  require_once('sql.inc.php');
+  $qry = "SELECT p.id FROM msl_members m,msl_products p LEFT JOIN msl_brands b ON (brand_id=b.id) WHERE m.id = p.supplier_id AND p.supplier_id IN (".sql_escape_array($suppliers->keys()).") AND p.status IN ('o', 's') AND p.type IN ('k', 'p', 'w') AND (";
   if(is_numeric($search)){
-    $esc_search = SQL::escapeString($search);
+    $esc_search = sql_escape_string($search);
     $qry .= "p.supplier_product_id='$esc_search' OR p.gtin_piece='$esc_search' OR p.gtin_bundle='$esc_search'";
   }else{
     $wheres = array();
@@ -198,7 +198,7 @@ function search_products($search, $scategories, $suppliers){
       if($term == ''){
         continue;
       }
-      $esc_term = SQL::escapeString('%'.$term.'%');
+      $esc_term = sql_escape_string('%'.$term.'%');
       $wheres[] = "(p.name LIKE '$esc_term' OR b.name LIKE '$esc_term')";
     }
     $qry .= implode(' AND ', $wheres);
@@ -210,7 +210,7 @@ function search_products($search, $scategories, $suppliers){
       $scategories['']=1;
     }
     foreach($scategories as $scategory => $dummy){
-      $wheres[] = "p.category = '".SQL::escapeString($scategory)."'";
+      $wheres[] = "p.category = '".sql_escape_string($scategory)."'";
     }
     if($search!=''){
       $qry .= ' AND ';
@@ -219,7 +219,7 @@ function search_products($search, $scategories, $suppliers){
   }
   $qry .= ") ORDER BY IF(p.status='o', 0, 1), m.producer, p.name, b.name, p.id DESC";
   #logger($qry);
-  $res = SQL::selectKey2Val($qry, 'id', 'id');
+  $res = sql_select_key2value($qry, 'id', 'id');
   return $res;
 }
 
@@ -269,8 +269,8 @@ function execute_infos_lazy_load_ajax(){
       }
     }
     if(!empty($brand_ids)){
-      require_once('sql.class.php');
-      $brands = SQL::selectKey2Val("SELECT id, name FROM msl_brands WHERE id IN (".SQL::escapeArray(array_keys($brand_ids)).")", 'id', 'name');
+      require_once('sql.inc.php');
+      $brands = sql_select_key2value("SELECT id, name FROM msl_brands WHERE id IN (".sql_escape_array(array_keys($brand_ids)).")", 'id', 'name');
     }
     foreach($add_search as $product_id => $dummy){
       $product = $products[$product_id];
@@ -506,11 +506,11 @@ function execute_favorite(){
   global $user;
   $product_id = get_request_param('product_id');
   $set = get_request_param('set');
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   if(intval($set)){
-    SQL::update("INSERT INTO msl_favorites (member_id, product_id, created) VALUES (".intval($user['member_id']).",".intval($product_id).",NOW())");
+    sql_update("INSERT INTO msl_favorites (member_id, product_id, created) VALUES (".intval($user['member_id']).",".intval($product_id).",NOW())");
   }else{
-    SQL::update("DELETE FROM msl_favorites WHERE member_id=".intval($user['member_id'])." AND product_id=".intval($product_id));
+    sql_update("DELETE FROM msl_favorites WHERE member_id=".intval($user['member_id'])." AND product_id=".intval($product_id));
   }
   echo json_encode(array('set' => $set));
   exit;

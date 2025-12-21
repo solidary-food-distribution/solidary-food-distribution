@@ -123,9 +123,9 @@ function execute_password_lost_ajax(){
     $message='Bitte E-Mail-Adresse angeben und erneut auf "Passwort zurücksetzen" klicken';
   }
   if($message==''){
-    require('sql.class.php');
-    $qry="SELECT * FROM msl_users WHERE email='".SQL::escapeString($email)."'";
-    $user=SQL::selectOne($qry);
+    require('sql.inc.php');
+    $qry="SELECT * FROM msl_users WHERE email='".sql_escape_string($email)."'";
+    $user=sql_select_one($qry);
     if(empty($user)){
       $message='Unbekannte E-Mail-Adresse';
     }elseif(time()-strtotime($user['passwd_sent'])<120){
@@ -134,7 +134,7 @@ function execute_password_lost_ajax(){
   }
   if($message==''){
     $pwt=create_temp_password();
-    SQL::update("UPDATE msl_users SET passwd_tmp='".SQL::escapeString($pwt)."', passwd_sent='".date('Y-m-d H:i:s')."' WHERE id='".intval($user['id'])."'");
+    sql_update("UPDATE msl_users SET passwd_tmp='".sql_escape_string($pwt)."', passwd_sent='".date('Y-m-d H:i:s')."' WHERE id='".intval($user['id'])."'");
     send_email($email,"Mit Sinn Leben eG - Passwort erneuern",
       "Dieser Link ist ca 1 Stunde gültig zum Erneuern vom Passwort:\r\n".
       "https://".$_SERVER['HTTP_HOST']."/auth/password_reset?pwt=".$pwt."\r\n");
@@ -155,9 +155,9 @@ function execute_password_reset(){
     $hide_form=1;
   }
   if($message==''){
-    require('sql.class.php');
-    $qry="SELECT * FROM msl_users WHERE passwd_tmp='".SQL::escapeString($pwt)."'";
-    $user=SQL::selectOne($qry);
+    require('sql.inc.php');
+    $qry="SELECT * FROM msl_users WHERE passwd_tmp='".sql_escape_string($pwt)."'";
+    $user=sql_select_one($qry);
     if(empty($user)){
       $message='Ungültiger Link.';
       $hide_form=1;
@@ -179,9 +179,9 @@ function execute_password_set_ajax(){
     $hide_form=1;
   }
   if($message==''){
-    require('sql.class.php');
-    $qry="SELECT * FROM msl_users WHERE passwd_tmp='".SQL::escapeString($pwt)."'";
-    $user=SQL::selectOne($qry);
+    require('sql.inc.php');
+    $qry="SELECT * FROM msl_users WHERE passwd_tmp='".sql_escape_string($pwt)."'";
+    $user=sql_select_one($qry);
     if(empty($user)){
       $message='Ungültiger Aufruf.';
       $hide_form=1;
@@ -198,8 +198,8 @@ function execute_password_set_ajax(){
   }
   if($message=='' && $user['id']){
     $password=password_hash($password,PASSWORD_DEFAULT);
-    $qry="UPDATE msl_users SET passwd_tmp='',passwd='".SQL::escapeString($password)."' WHERE id='".intval($user['id'])."'";
-    SQL::update($qry);
+    $qry="UPDATE msl_users SET passwd_tmp='',passwd='".sql_escape_string($password)."' WHERE id='".intval($user['id'])."'";
+    sql_update($qry);
     $message='Neues Passwort wurde gesetzt.<br>'.
       '<div class="button" onclick="location.href=\'/\';">Zur Loginseite</div>';
     $hide_form=1;

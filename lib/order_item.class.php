@@ -20,13 +20,13 @@ class OrderItem{
   public string $comment;
 
   public static function create($order_id, $product_id){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry="INSERT INTO msl_order_items (order_id, product_id) VALUES (".intval($order_id).", ".intval($product_id).")";
-    $id = SQL::insert($qry);
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_order_items WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_order_items WHERE id=".intval($id));
     $oi = new OrderItem();
     $oi->_init_values($values); 
     return $oi;
@@ -41,19 +41,19 @@ class OrderItem{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_order_items SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "DELETE FROM msl_order_items ";
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

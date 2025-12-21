@@ -81,17 +81,17 @@ class Objects implements ArrayAccess,Iterator,Countable{
   }
 
   private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $id_key='';
     if(isset($this->_id_key)){
       $id_key=$this->_id_key.' AS id,';
     }
     $qry = "SELECT $id_key t.* FROM ".$this->_table." t WHERE 1=1 ";
     if(!empty($filters)){
-      $qry .= "AND ".SQL::buildFilterQuery($filters);
+      $qry .= "AND ".sql_build_filter_query($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY ".sql_build_orderby_query($orderby);
     }else{
       $qry .= "ORDER BY ".$this->_default_order_by;
     }
@@ -103,7 +103,7 @@ class Objects implements ArrayAccess,Iterator,Countable{
     }elseif($limit_count != -1){
       $qry .= " LIMIT ".intval($limit_count);
     }
-    $recset = SQL::selectID($qry, 'id');
+    $recset = sql_select_id($qry, 'id');
 
     $this->array = array();
     foreach($recset as $id => $row){

@@ -12,7 +12,7 @@ function execute_index(){
 }
 
 function get_users($user_id = 0, $order_by = 'u.name,m_name,a.access'){
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry=
     "SELECT u.id,u.created,u.name,u.email,u.pickup_pin,(SELECT um.name FROM msl_members um WHERE um.id=u.member_id) AS um_name,a.member_id,m.name AS m_name,m.identification,a.access,a.start,a.end ".
     "FROM msl_users u ".
@@ -23,7 +23,7 @@ function get_users($user_id = 0, $order_by = 'u.name,m_name,a.access'){
   }
   $qry.=
     "ORDER BY ".$order_by;
-  $res=SQL::select($qry);
+  $res=sql_select($qry);
   $users=array();
   foreach($res as $v){
     $users[$v['id']]['id']=$v['id'];

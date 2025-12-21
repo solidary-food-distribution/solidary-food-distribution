@@ -5,19 +5,19 @@ require_once('inc.php');
 function execute_run(){
   global $user;
   $ignore_next_run = get_request_param('ignore_next_run');
-  $user = array('user_id' => 1); //for SQL::update-logger
-  require_once('sql.class.php');
+  $user = array('user_id' => 1); //for sql_update-logger
+  require_once('sql.inc.php');
   $where = "next_run<='".date('Y-m-d H:i:s')."'";
   if($ignore_next_run){
     $where = "1=1";
   }
   $qry = "SELECT * FROM msl_crons WHERE $where ORDER BY next_run";
-  $crons = SQL::select($qry);
+  $crons = sql_select($qry);
   foreach($crons as $cron){
     if(substr($cron['task'],0,5) == 'cron_' && function_exists($cron['task'])){
       call_user_func($cron['task']);
       $qry = "UPDATE msl_crons SET last_run='".date('Y-m-d H:i:s')."', next_run='".date('Y-m-d H:i:s', time() + 60*intval($cron['minutes_interval']))."' WHERE cron_id='".$cron['cron_id']."'";
-      SQL::update($qry);
+      sql_update($qry);
     }
   }
   exit;
@@ -32,12 +32,12 @@ function cron_close_pickups(){
 }
 
 function cron_update_delivery_dates(){
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $qry = "SELECT * FROM msl_delivery_dates WHERE `date`>=CURDATE() ORDER BY `date`";
-  $delivery_dates = SQL::select($qry);
+  $delivery_dates = sql_select($qry);
 
   $qry = "SELECT id, purchase_time FROM msl_members WHERE producer>0 AND status='a' AND purchase_time!=''";
-  $supplier_purchase_times = SQL::selectKey2Val($qry, 'id', 'purchase_time');
+  $supplier_purchase_times = sql_select_key2value($qry, 'id', 'purchase_time');
 
   foreach($delivery_dates as $delivery_date){
     $qry = "INSERT INTO msl_purchases (delivery_date_id, supplier_id, `datetime`) VALUES ";
@@ -47,7 +47,7 @@ function cron_update_delivery_dates(){
       $qry .= "'".$purchase_datetime."'),";
     }
     $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE `delivery_date_id`=VALUES(`delivery_date_id`)";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }
 
@@ -202,12 +202,12 @@ function create_delivery($purchase_id){
 
 function cron_polls_mandatory_check(){
   require_once('polls.class.php');
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   $reminded_max = date('Y-m-d H:i:s', strtotime('-72 HOURS',time()));
   $polls = new Polls(array('mandatory' => 1, 'close_datetime' => '0000-00-00 00:00:00', 'reminded<' => $reminded_max));
   foreach($polls as $poll){
     $qry = "SELECT GROUP_CONCAT(m.id) member_ids FROM msl_members m WHERE m.id NOT IN (SELECT u.member_id FROM msl_users u, msl_poll_answers pa, msl_poll_votes pv WHERE pa.poll_answer_id=pv.poll_answer_id AND pv.value=1 AND pv.user_id=u.id AND pa.poll_id=".$poll->poll_id.") AND m.id NOT IN (1) AND m.consumer=1";
-    $member_ids = SQL::selectOne($qry)['member_ids'];
+    $member_ids = sql_select_one($qry)['member_ids'];
     $member_ids = explode(',', $member_ids);
     require_once('members.class.php');
     $members = new Members(array('id' => $member_ids));
@@ -235,14 +235,22 @@ function send_poll_reminder_email($poll, $user, $member){
 }
 
 function cron_send_order_notifications(){
-  #$now = date('Y-m-d H:i:s');
-  $now = date('Y-m-d H:i:s',strtotime('2025-11-19 19:00:00'));
-  require_once('sql.class.php');
-  $last = SQL::selectOne("SELECT value FROM msl_var WHERE var='NOTIFICATION_ORDER_REMINDER_LAST'")['value'];
+  return; //not yet active/implemented
+  $now = date('Y-m-d H:i:s');
+  #$now = date('Y-m-d H:i:s',strtotime('2025-12-01 09:00:00'));
+  require_once('sql.inc.php');
+  $last = sql_select_one("SELECT value FROM msl_var WHERE var='NOTIFICATION_ORDER_REMINDER_LAST'")['value'];
+  if($last == ''){
+    $last = $now;
+    sql_insert("INSERT msl_var (var, value, updated) VALUES ('NOTIFICATION_ORDER_REMINDER_LAST', '$now', NOW())");
+  }
+
+  $last = date('Y-m-d H:i:s',strtotime('2025-12-01 05:00:00'));
+
   logger("now $now last $last");
 
   $qry = "SELECT setting, GROUP_CONCAT(user_id) user_ids FROM msl_settings WHERE setting LIKE 'NOTIFICATION_ORDER_REMINDER%' AND value='1' GROUP BY setting";
-  $settings = SQL::selectId($qry, 'setting');
+  $settings = sql_select_id($qry, 'setting');
   $notifications = array();
   foreach($settings as $setting => $notification){
     $delta = substr($setting, strlen('NOTIFICATION_ORDER_REMINDER'));
@@ -253,26 +261,30 @@ function cron_send_order_notifications(){
     $notifications[$hours] = $notification;
   }
   ksort($notifications);
-  #logger(print_r($notifications,1));
+  logger(print_r($notifications,1));
 
   require_once('purchases.class.php');
   $purchases = new Purchases(array('datetime>' => $now, 'status' => 'a', 'sent' => '0000-00-00 00:00:00'));
-  #logger(print_r($purchases,1));
+  logger(print_r($purchases,1));
   foreach($purchases as $purchase){
     foreach($notifications as $hours => $notification){
       $delta = $notification['delta'];
       $datetime = date('Y-m-d H:i:s', strtotime($delta, strtotime($purchase->datetime)));
-      #logger("now $now hours $hours purchase.datetime ".$purchase->datetime." purchase.order_notification_last ".$purchase->order_notification_last." $delta $datetime");
-      if($datetime <= $now && $datetime > $last){
-        $notifications[$hours]['purchases'][] = $purchase;
-      }
+      logger("now $now hours $hours purchase.datetime ".$purchase->datetime." purchase.order_notification_last ".$purchase->order_notification_last." $delta $datetime");
+      #if($datetime <= $now && $datetime > $last){
+      #  $notifications[$hours]['purchases'][] = $purchase;
+      #}
     }
   }
-  logger(print_r($notifications,1));
-  $user_notifications = array();
-  foreach($notifications as $hour => $notification){
-    
-  }
+  #logger(print_r($notifications,1));
+  #$user_notifications = array();
+  #foreach($notifications as $hour => $notification){
+  #  foreach($notification['puchases'] as $purchase){
+      #$user_notifications[$purchase['
+  #  }
+  #}
+
+  sql_update("UPDATE msl_var SET value='$now', updated=NOW() WHERE var='NOTIFICATION_ORDER_REMINDER_LAST'");
 }
 
 function cron_may_deactivate_members(){

@@ -22,11 +22,11 @@ class Product{
   public string $category;
 
   public static function create($inserts){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $fields = array_keys($inserts);
-    array_walk($fields, 'SQL::escapeFieldName');
-    $qry="INSERT INTO msl_products (".implode(',', $fields).") VALUES (".SQL::escapeArray($inserts).")";
-    $id = SQL::insert($qry);
+    array_walk($fields, 'sql_escape_fieldname');
+    $qry="INSERT INTO msl_products (".implode(',', $fields).") VALUES (".sql_escape_array($inserts).")";
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
@@ -50,12 +50,12 @@ class Product{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_products SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
 }

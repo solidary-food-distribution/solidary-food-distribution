@@ -7,9 +7,9 @@ class Order{
   public string $pickup_date; //REFACTOR DateTime
 
   public static function create($member_id, $pickup_date){
-    require_once('sql.class.php');
-    $qry="INSERT INTO msl_orders (member_id, pickup_date) VALUES (".intval($member_id).", '".SQL::escapeString($pickup_date)."')";
-    $id = SQL::insert($qry);
+    require_once('sql.inc.php');
+    $qry="INSERT INTO msl_orders (member_id, pickup_date) VALUES (".intval($member_id).", '".sql_escape_string($pickup_date)."')";
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }

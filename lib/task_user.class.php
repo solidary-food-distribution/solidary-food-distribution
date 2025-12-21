@@ -12,14 +12,14 @@ class TaskUser{
   public $comment;
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     if(isset($updates['assign'])){
       $updates['assign'] = intval($updates['assign']);
     }
     $qry = 
       "UPDATE msl_task_users SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE task_id='".intval($this->task_id)."' AND user_id='".intval($this->user_id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

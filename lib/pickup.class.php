@@ -10,13 +10,13 @@ class Pickup{
   public $status;
 
   public static function create( $member_id, $user_id){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "INSERT INTO msl_pickups (member_id, user_id) VALUES (".intval($member_id).", ".intval($user_id).")";
-    $id = SQL::insert($qry);
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_pickups WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_pickups WHERE id=".intval($id));
     $pu = new Pickup();
     $pu->_init_values($values); 
     return $pu;
@@ -32,12 +32,12 @@ class Pickup{
 
   /*
   public function item_create( $product_id, $delivery_item_id ) {
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "INSERT INTO msl_pickup_items ".
         "(pickup_id, product_id, delivery_item_id) VALUES ".
         "('" . intval($this->id) . "', '" . intval($product_id) . "', '" . intval($delivery_item_id) . "')";
-    $item_id = SQL::insert($qry);
+    $item_id = sql_insert($qry);
     $item = new PickupItem();
     $item->id = $item_id;
     $item->product_id = intval($product_id);
@@ -47,29 +47,29 @@ class Pickup{
   }
 
   public function item_delete( $item_id ) {
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "DELETE FROM msl_pickup_items " .
         "WHERE pickup_id='" . intval($this->id) . "' AND id='" . intval($item_id) . "'";
-    SQL::update($qry);
+    sql_update($qry);
     return true;
   }
   */
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_pickups SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "DELETE FROM msl_pickups ";
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }

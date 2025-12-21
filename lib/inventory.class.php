@@ -19,13 +19,13 @@ class Inventory{
   public float $weight_avg;
 
   public static function create($product_id, $delivery_item_id, $pickup_item_id, $user_id){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "INSERT INTO msl_inventory (product_id, delivery_item_id, pickup_item_id, user_id) VALUES (".intval($product_id).",".intval($delivery_item_id).",".intval($pickup_item_id).",".intval($user_id).")";
-    $id = SQL::insert($qry);
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_inventory WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_inventory WHERE id=".intval($id));
     $inventory = new Inventory();
     $inventory->_init_values($values); 
     return $inventory;
@@ -40,19 +40,19 @@ class Inventory{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = "UPDATE msl_inventory SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete() {
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry =
       "DELETE FROM msl_inventory " .
         "WHERE id='" . intval($this->id) . "'";
-    SQL::update($qry);
+    sql_update($qry);
     return true;
   }
 }

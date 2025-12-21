@@ -48,13 +48,13 @@ function oekoring_import_bnn($file){
   if(basename($file) == 'PL.BNN'){
     $full = true;
   }
-  require_once('sql.class.php');
+  require_once('sql.inc.php');
   if($full){
-    SQL::update("UPDATE msl_products SET import_status='n' WHERE supplier_id='35'");
+    sql_update("UPDATE msl_products SET import_status='n' WHERE supplier_id='35'");
   }
 
-  $brands = SQL::selectKey2Val("SELECT bnn,id FROM msl_brands WHERE supplier_id=35", 'bnn', 'id');
-  $categories = SQL::selectKey2Val("SELECT wg_nr,(CASE WHEN wg_ersatz>0 THEN (SELECT wg_name FROM msl_wg_oeko wg2 WHERE wg2.wg_nr=wg.wg_ersatz) ELSE wg_name END) wg_name FROM msl_wg_oeko wg", 'wg_nr' , 'wg_name');
+  $brands = sql_select_key2value("SELECT bnn,id FROM msl_brands WHERE supplier_id=35", 'bnn', 'id');
+  $categories = sql_select_key2value("SELECT wg_nr,(CASE WHEN wg_ersatz>0 THEN (SELECT wg_name FROM msl_wg_oeko wg2 WHERE wg2.wg_nr=wg.wg_ersatz) ELSE wg_name END) wg_name FROM msl_wg_oeko wg", 'wg_nr' , 'wg_name');
 
   $products = array();
   $prices = array();
@@ -96,7 +96,7 @@ function oekoring_import_bnn($file){
       $line[6], //gtin_bundle
       $category,
     );
-    $products[$linenr]=SQL::escapeArray($row);
+    $products[$linenr]=sql_escape_array($row);
     $start = $prices_start;
     $end = $prices_end;
     $promo = 0;
@@ -138,9 +138,9 @@ function oekoring_import_bnn($file){
   if(count($products)){
     oekoring_insert_products_prices($products, $prices);
   }
-  SQL::update("UPDATE msl_products SET status='d' WHERE import_status='d' AND supplier_id='35'");
+  sql_update("UPDATE msl_products SET status='d' WHERE import_status='d' AND supplier_id='35'");
   if($full){
-    SQL::update("UPDATE msl_products SET status='d' WHERE import_status='n' AND supplier_id='35'");
+    sql_update("UPDATE msl_products SET status='d' WHERE import_status='n' AND supplier_id='35'");
   }
   fclose($h);
 
@@ -204,54 +204,54 @@ function oekoring_import_bnn($file){
 
   );
   foreach($category_replace as $search => $replace){
-    $qry = "UPDATE msl_products SET category='".SQL::escapeString($replace)."' WHERE category='".SQL::escapeString($search)."'";
-    SQL::update($qry);
+    $qry = "UPDATE msl_products SET category='".sql_escape_string($replace)."' WHERE category='".sql_escape_string($search)."'";
+    sql_update($qry);
   }
 
   $piece_factor = 0.7;
   $bundle_factor = 0.6;
 
   $qry = "UPDATE msl_prices pr, msl_products p SET pr.amount_per_bundle=p.amount_per_bundle WHERE p.id=pr.product_id AND p.supplier_id=35 AND start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND end>=CURDATE()";
-  SQL::update($qry);
+  sql_update($qry);
   $qry = "UPDATE msl_prices pr, msl_products p SET pr.price=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$piece_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.suggested_retail>0 AND pr.start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND pr.end>=CURDATE()";
-  SQL::update($qry);
+  sql_update($qry);
   $qry = "UPDATE msl_prices pr, msl_products p SET pr.price_bundle=ROUND((pr.suggested_retail-ROUND(pr.purchase + (pr.purchase*pr.tax/100),2))*".$bundle_factor.",2)+ROUND(pr.purchase + (pr.purchase*pr.tax/100),2) WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.amount_per_bundle>1 AND pr.suggested_retail>0 AND pr.start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND pr.end>=CURDATE()";
-  SQL::update($qry);
+  sql_update($qry);
 
   $qry = "UPDATE msl_prices pr, msl_products p SET p.status='n' WHERE p.id=pr.product_id AND p.supplier_id=35 AND pr.price=0 AND pr.price_bundle=0 AND pr.start<=DATE_ADD(CURDATE(), INTERVAL 7 DAY) AND pr.end>=CURDATE()";
-  SQL::update($qry);
+  sql_update($qry);
 
   $qry = "UPDATE msl_products SET status='n' WHERE supplier_id=35 AND category='Tiefkühlprodukte'";
-  SQL::update($qry);
+  sql_update($qry);
 
   $qry = "UPDATE msl_products SET status='n' WHERE supplier_id=35 AND (BINARY name LIKE '% TK %' OR BINARY name LIKE '% TK' OR BINARY name LIKE '%TK %')";
-  SQL::update($qry);
+  sql_update($qry);
 
   $qry = "UPDATE msl_products SET status='n' WHERE supplier_id=35 AND category=''";
-  SQL::update($qry);
+  sql_update($qry);
 
   $qry = "UPDATE msl_products SET stock='o' WHERE supplier_id=35 AND status='o'";
-  SQL::update($qry);
+  sql_update($qry);
 
   return 'ok '.print_r($header,1);
 }
 
 function oekoring_insert_products_prices($products, $prices){
   $qry = "INSERT INTO msl_products (supplier_id, supplier_product_id, name, type, status, stock, import_status, amount_per_bundle, brand_id, gtin_piece, gtin_bundle, category) VALUES (".implode('),(', $products).") ON DUPLICATE KEY UPDATE name=VALUES(name), type=VALUES(type), import_status=VALUES(import_status), amount_per_bundle=VALUES(amount_per_bundle), brand_id=VALUES(brand_id), gtin_piece=VALUES(gtin_piece), gtin_bundle=VALUES(gtin_bundle), category=VALUES(category), stock=VALUES(stock), updated=NOW()";
-  SQL::update($qry);
-  $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='35' AND supplier_product_id IN (".SQL::escapeArray(array_keys($prices)).")";
-  $pids = SQL::selectKey2Val($qry, 'supplier_product_id', 'id');
+  sql_update($qry);
+  $qry = "SELECT supplier_product_id, id FROM msl_products WHERE supplier_id='35' AND supplier_product_id IN (".sql_escape_array(array_keys($prices)).")";
+  $pids = sql_select_key2value($qry, 'supplier_product_id', 'id');
   $qry = "INSERT INTO msl_prices (product_id, start, end, purchase, purchase_promo, tax, purchase_bulk1_amount, purchase_bulk1, purchase_bulk2_amount, purchase_bulk2, suggested_retail) VALUES ";
   foreach($prices as $supplier_product_id => $pps){
     $product_id = $pids[$supplier_product_id];
     foreach($pps as $pp){
       array_unshift($pp, $product_id);
-      $qry .= "(".SQL::escapeArray($pp)."),";
+      $qry .= "(".sql_escape_array($pp)."),";
       #logger($product_id." ".$supplier_product_id." ".print_r($pp,1));
     }
   }
   $qry = rtrim($qry, ',')." ON DUPLICATE KEY UPDATE end=VALUES(end), purchase=VALUES(purchase), purchase_promo=VALUES(purchase_promo), tax=VALUES(tax), purchase_bulk1_amount=VALUES(purchase_bulk1_amount), purchase_bulk1=VALUES(purchase_bulk1), purchase_bulk2_amount=VALUES(purchase_bulk2_amount), purchase_bulk2=VALUES(purchase_bulk2), suggested_retail=VALUES(suggested_retail)";
-  SQL::update($qry);
+  sql_update($qry);
   #logger(print_r($pids,1));
 }
 

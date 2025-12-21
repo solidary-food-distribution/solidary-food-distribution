@@ -20,16 +20,16 @@ class Polls extends ArrayObject{
   }
 
   private function load_from_db(array $filters, array $orderby, int $limit_start, int $limit_count){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry=
       "SELECT * ".
       "FROM msl_polls ".
       "WHERE 1=1 ";
     if(!empty($filters)){
-      $qry .= "AND ".SQL::buildFilterQuery($filters);
+      $qry .= "AND ".sql_build_filter_query($filters);
     }
     if(!empty($orderby)){
-      $qry .= "ORDER BY ".SQL::buildOrderbyQuery($orderby);
+      $qry .= "ORDER BY ".sql_build_orderby_query($orderby);
     }else{
       $qry .= "ORDER BY poll_id";
     }
@@ -40,7 +40,7 @@ class Polls extends ArrayObject{
       $qry .=
         " LIMIT ".intval($limit_start).", ".intval($limit_count);
     }
-    $rec = SQL::selectID($qry,'poll_id');
+    $rec = sql_select_id($qry,'poll_id');
     $polls = array();
     #logger(print_r($rec,1));
     foreach($rec as $poll_id=>$p){

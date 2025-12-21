@@ -12,13 +12,13 @@ class Purchase{
   public $order_notification_last;
 
   public static function create( $supplier_id, $datetime){
-    require_once('sql.class.php');
-    $qry = "INSERT INTO msl_purchases (supplier_id, `datetime`) VALUES (".intval($supplier_id).", '".SQL::escapeString($datetime)."')";
-    $id = SQL::insert($qry);
+    require_once('sql.inc.php');
+    $qry = "INSERT INTO msl_purchases (supplier_id, `datetime`) VALUES (".intval($supplier_id).", '".sql_escape_string($datetime)."')";
+    $id = sql_insert($qry);
     if(!$id){
       return false;
     }
-    $values = SQL::selectOne("SELECT * FROM msl_purchases WHERE id=".intval($id));
+    $values = sql_select_one("SELECT * FROM msl_purchases WHERE id=".intval($id));
     $object = new Purchase();
     $object->_init_values($values); 
     return $object;
@@ -33,19 +33,19 @@ class Purchase{
   }
 
   public function update( array $updates = array() ){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "UPDATE msl_purchases SET ";
-    $qry .= SQL::buildUpdateQuery($updates).' ';
+    $qry .= sql_build_update_query($updates).' ';
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 
   public function delete(){
-    require_once('sql.class.php');
+    require_once('sql.inc.php');
     $qry = 
       "DELETE FROM msl_purchases ";
     $qry .= "WHERE id='".intval($this->id)."'";
-    SQL::update($qry);
+    sql_update($qry);
   }
 }
