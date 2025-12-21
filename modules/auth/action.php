@@ -76,6 +76,7 @@ function execute_login_ajax(){
 }
 
 function execute_login_pin_ajax(){
+  $_SESSION['scale'] = 1; //session cookie might have run out
   $pickup_pin = get_request_param('pickup_pin');
   $error = '';
   require('users.class.php');
@@ -85,7 +86,6 @@ function execute_login_pin_ajax(){
     $error = 'Unbekannte PIN';
   }
   if(empty($error)){
-    $_SESSION['scale'] = 1;
     $user = $users->first();
     set_session($user);
     #logger(print_r($_SESSION['user'],1));

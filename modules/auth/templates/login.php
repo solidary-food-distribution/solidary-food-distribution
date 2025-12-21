@@ -3,16 +3,7 @@
     <div class="row" id="pin_form">
       <div class="inner_row">
         <div class="col6">
-          <div id="pickup_pin" class="input active" style="width:100%;font-size: 3em;"></div>
-          <!--
-          <div class="keyboard_keys icons smaller">
-            <div id="pickup_pin">
-              <?php for($pini = 0; $pini < 6; $pini++): ?>
-                <div class="mr0_2"></div>
-              <?php endfor ?>
-            </div>
-          </div>
-        -->
+          <div id="pickup_pin" class="input active" style="width:100%;font-size: 3em;" data-pin=""></div>
         </div>
       </div>
     </div>
@@ -26,6 +17,25 @@
       $('#keyboard_numbers').show();
       $('#keyboard_ctrl').show();
       $('#keyboard').show();
+      keyboard_input_change_func = function(){
+        var pin_input = $('#pickup_pin').text().trim();
+        if(pin_input.length > 6){
+          pin_input = pin_input.substr(0, 6);
+          $('#pickup_pin').html(pin_input);
+          return;
+        }
+        var pin = $('#pickup_pin').data('pin');
+        if(pin_input.length && pin_input.substr(-1, 1) != 'X'){
+          pin = pin.substr(0, pin_input.length - 1);
+          pin += pin_input.substr(-1, 1);
+        }
+        pin = pin.substr(0, pin_input.length);
+        $('#pickup_pin').data('pin', pin);
+        if(pin_input.length){
+          pin_input = 'X'.repeat(pin_input.length - 1) + pin_input.substr(-1, 1);
+          $('#pickup_pin').html(pin_input);
+        }
+      }
     </script>
     <br>
     <div class="button large" style="width:auto;position:absolute;bottom:-1em;left:0em;height:auto;line-height:1em;" onclick="auth_shutdown()">Herunterfahren<br><span style="font-size:50%">(<?php echo $others?$others.' offene Abholungen':'Keine offenen Abholungen' ?>)</span></div>

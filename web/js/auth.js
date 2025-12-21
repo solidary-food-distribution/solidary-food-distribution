@@ -83,101 +83,25 @@ function password_set(pwt){
 }
 
 function keyboard_ok_func(){
+  var pickup_pin = $('#pickup_pin').data('pin');
   $('#loading').show();
   $.ajax({
     type: 'POST',
-    data: {pickup_pin: $('#pickup_pin').html()},
-    url: '/auth/login_pin_ajax',
+    data: {pickup_pin: pickup_pin},
+    url: '/auth/login_pin_ajax?',
     dataType: 'json',
     success: function(json){
       $('#loading').hide();
       if(json.error == ''){
-        user_pickup_pin = [];
         location.href = '/';
       }else{
-        alert(json.error);
+        notify(json.error);
+        $('#pickup_pin').data('pin', '');
+        $('#pickup_pin').html('');
       }
     }
   });
 }
-
-
-/*
-var user_pickup_pin = [];
-function pin_click(el){
-  if(user_pickup_pin.length==6){
-    return;
-  }
-  if($(el).hasClass('disabled')){
-    return;
-  }
-  var id = $(el).data('id');
-  user_pickup_pin.push(id);
-  user_show_pickup_pin();
-}
-
-function user_show_pickup_pin(){
-  var index = 0;
-  $('#pin .keyboard_keys.icons div').removeClass('disabled');
-  $('#pickup_pin > div').each(function(){
-    if(user_pickup_pin.length-1 >= index){
-      var icon_id = user_pickup_pin[index];
-      var icon_name = PIN_ICONS[icon_id-1];
-      if(user_pickup_pin.length-1 > index){
-        icon_name = 'asterisk disabled';
-      }
-      $(this).html('<i class="fas fa-'+icon_name+'"></i>');
-    }else{
-      $(this).html('');
-    }
-    index++;
-  });
-  if(user_pickup_pin.length>=3){
-    $('#pin_ok_button').removeClass('disabled');
-  }else{
-    $('#pin_ok_button').addClass('disabled');
-  }
-  if(user_pickup_pin.length>0){
-    $('#pin_backspace_button').removeClass('disabled');
-    $('#pin_cancel_button').removeClass('disabled');
-  }else{
-    $('#pin_cancel_button').addClass('disabled');
-    $('#pin_backspace_button').addClass('disabled');
-  }
-}
-
-function pin_backspace(){
-  if($('#pin_backspace_button').hasClass('disabled')){
-    return;
-  }
-  var id = user_pickup_pin.pop();
-  user_show_pickup_pin();
-}
-
-function pin_cancel(){
-  user_pickup_pin = [];
-  user_show_pickup_pin();
-}
-
-function pin_ok(){
-  $('#loading').show();
-  $.ajax({
-    type: 'POST',
-    data: {pickup_pin: user_pickup_pin.join(',')},
-    url: '/auth/login_pin_ajax',
-    dataType: 'json',
-    success: function(json){
-      $('#loading').hide();
-      if(json.error == ''){
-        user_pickup_pin = [];
-        location.href = '/';
-      }else{
-        alert(json.error);
-      }
-    }
-  });
-}
-*/
 
 function auth_shutdown(){
   $('#main').html('<div class="row">Wird heruntergefahren...</div>');
