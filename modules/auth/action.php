@@ -79,11 +79,16 @@ function execute_login_pin_ajax(){
   $_SESSION['scale'] = 1; //session cookie might have run out
   $pickup_pin = get_request_param('pickup_pin');
   $error = '';
-  require('users.class.php');
-  $users = new Users(array('pickup_pin' => $pickup_pin));
-  #logger(print_r($users, 1));
-  if(empty($users->keys())){
-    $error = 'Unbekannte PIN';
+  if(trim($pickup_pin) == ''){
+    $error = 'Bitte PIN eingeben - diese kann unter Einstellungen angesehen werden.';
+  }
+  if(empty($error)){
+    require('users.class.php');
+    $users = new Users(array('pickup_pin' => $pickup_pin));
+    #logger(print_r($users, 1));
+    if(empty($users->keys())){
+      $error = 'Unbekannte PIN';
+    }
   }
   if(empty($error)){
     $user = $users->first();
