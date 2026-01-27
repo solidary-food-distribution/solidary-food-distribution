@@ -107,7 +107,7 @@ $PROPERTIES['body_class']=$body_class;
         $split_label = 'Offen: '.$split_data['needed'];
         $amount_price = 0;
         $split_label_class = 'italic bold';
-      }elseif(trim($split_data['needed']) === '0'){
+      }elseif(trim($split_data['needed']) === '0' && $amount > 0){
         $split_label = 'Bestellt: ';
         if($amount != $order_item->amount_max){
           $split_label .= 'vsl. ';

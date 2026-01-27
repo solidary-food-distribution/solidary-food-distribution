@@ -17,12 +17,13 @@ function purchases_get_product_sums($pickup_date, $supplier_id){
     if(!isset($products[$order_item->product_id]) || (!$order_item->amount_pieces && !$order_item->amount_weight)){
       continue;
     }
+    #logger("purchases_get_product_sums order_item ".print_r($order_item,1));
     if($order_item->split_status == 'n'){
       $order_amounts[$order_item->product_id]['amount_pieces'] = $order_amounts[$order_item->product_id]['amount_pieces'] + $order_item->amount_pieces;
       $order_amounts[$order_item->product_id]['amount_weight'] = $order_amounts[$order_item->product_id]['amount_weight'] + $order_item->amount_weight;
     }elseif($order_item->split_status == 'o'){
       $split_data = json_decode($order_item->split_data, 1);
-      $order_amounts[$order_item->product_id]['amount_pieces'] = $order_amounts[$order_item->product_id]['amount_pieces'] + $split_data['amount'];
+      $order_amounts[$order_item->product_id]['amount_pieces'] = $order_amounts[$order_item->product_id]['amount_pieces'] + $split_data['ordered'];
     }
   }
   #logger("purchases_get_product_sums order_amounts ".print_r($order_amounts,1));

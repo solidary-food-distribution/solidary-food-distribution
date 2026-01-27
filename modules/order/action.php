@@ -159,6 +159,7 @@ function execute_index(){
   }
 
   #logger("products ".print_r($products,1));
+  #logger("ois ".print_r($ois,1));
 
   $supplier_unlocked = get_supplier_unlocked($order->id);
   $order_sum_oekoring = -1;
