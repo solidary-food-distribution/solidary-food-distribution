@@ -34,6 +34,12 @@ function purchases_get_product_sums($pickup_date, $supplier_id){
     $inventory=array(); //only Oekoring
   }
 
+  foreach($inventory as $product_id => $pi){
+    if($products[$product_id]->status!='o' && $products[$product_id]->status!='e'){
+      unset($inventory[$product_id]); //workaround
+    }
+  }
+
   #logger("purchases_get_product_sums inventory ".print_r($inventory,1));
 
   foreach($order_amounts as $product_id => $amounts){
@@ -42,9 +48,9 @@ function purchases_get_product_sums($pickup_date, $supplier_id){
     $order_amounts[$product_id]['amount_pieces_inventory'] = $inventory[$product_id]['amount_pieces'];
     $order_amounts[$product_id]['amount_weight_inventory'] = $inventory[$product_id]['amount_weight'];
     if(isset($inventory[$product_id]) && ($products[$product_id]->type == 'p' || $products[$product_id]->type == 'w') && $inventory[$product_id]['amount_pieces'] >= $amounts['amount_pieces']){
-      unset($order_amounts[$product_id]);
+      $order_amounts[$product_id]['amount_pieces'] = 0;
     }elseif(isset($inventory[$product_id]) && $products[$product_id]->type == 'k' && $inventory[$product_id]['amount_weight'] >= $amounts['amount_weight']){
-      unset($order_amounts[$product_id]);
+      $order_amounts[$product_id]['amount_weight'] = 0;
     }else{
       $order_amounts[$product_id]['amount_pieces'] -= $inventory[$product_id]['amount_pieces'];
       $order_amounts[$product_id]['amount_weight'] -= $inventory[$product_id]['amount_weight'];
