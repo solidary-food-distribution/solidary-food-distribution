@@ -49,14 +49,17 @@ $PROPERTIES['body_class']='header_h5 footer_h8';
     if(isset($pickup_items[$product_id])){
       $pickup_item = $pickup_items[$product_id];
       $order_item = $order_items[$pickup_item->order_item_id];
+      $order_item_comment = $order_item->comment;
       if($order_item->split_status == 's'){
         $order_item->amount_pieces = 0;
         $order_item->amount_weight = 0;
       }elseif($order_item->split_status == 'o'){
         $split_data = json_decode($order_item->split_data, 1);
         $order_item->amount_pieces = $split_data['ordered'];
+        if($prices[$product_id]->amount_per_bundle > 1 && $order_item->amount_pieces > 0 && ($order_item->amount_pieces % $prices[$product_id]->amount_per_bundle !== 0)){
+          $order_item_comment = trim($order_item_comment . ' Nur ' .$order_item->amount_pieces . ' Stück nehmen!');
+        }
       }
-      $order_item_comment = $order_item->comment;
       if($product->type == 'k'){
         $amount_ordered = $order_item->amount_weight;
         $amount_ordered_type = 'k';
