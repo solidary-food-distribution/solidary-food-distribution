@@ -136,7 +136,7 @@ if($date_next){
           </div>
           <div class="col1 right">
           </div>
-          <div class="col3 right <?php echo $amount_pickup?'':'warn' ?>">
+          <div class="col3 right <?php echo (!$amount_pickup || ($product->type == 'w' && !$pickup_item->amount_weight))?'warn':'' ?>">
             <div>
               <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
               <?php if($product->type == 'w'): ?>
