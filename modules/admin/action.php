@@ -530,7 +530,8 @@ function execute_orders_update_ajax(){
   $order_item_comment = get_request_param('order_item_comment');
   $amount_order = get_request_param('amount_order');
   $amount_pickup = get_request_param('amount_pickup');
-  logger("$order_item_id $pickup_item_id $product_id $order_item_comment $amount_order $amount_pickup");
+  $amount_pickup_weight = get_request_param('amount_pickup_weight');
+  logger("$order_item_id $pickup_item_id $product_id $order_item_comment $amount_order $amount_pickup $amount_pickup_weight");
   if($order_item_id){
     require_once('order_items.class.php');
     $oi = OrderItems::sget($order_item_id);
@@ -559,7 +560,9 @@ function execute_orders_update_ajax(){
     }elseif($product->type == 'w'){
       if(round($pui->amount_pieces,3) != round(floatval(str_replace(',', '.', $amount_pickup)),3)){
         $updates['amount_pieces'] = round(floatval(str_replace(',', '.', $amount_pickup)),3);
-        $updates['amount_weight'] = round($updates['amount_pieces'] * $product->kg_per_piece, 3);
+      }
+      if(round($pui->amount_weight,3) != round(floatval(str_replace(',', '.', $amount_pickup_weight)),3)){
+        $updates['amount_weight'] = round(floatval(str_replace(',', '.', $amount_pickup_weight)),3);
       }
     }else{
       logger("product->type not implemented ".$product->type);

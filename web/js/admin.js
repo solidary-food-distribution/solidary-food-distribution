@@ -99,6 +99,12 @@ function admin_orders_edit(el, order_item_id, pickup_item_id){
   div.find('[data-field="amount_order"]').html(amount_order);
   var amount_pickup = $(el).parent().parent().find('.amount_pickup').html();
   div.find('[data-field="amount_pickup"]').html(amount_pickup);
+  if($(el).closest('.inner_row').data('product_type') == 'w'){
+    var amount_pickup_weight = $(el).parent().parent().find('.amount_pickup_weight').html();
+    div.find('[data-field="amount_pickup_weight"]').html(amount_pickup_weight);
+  }else{
+    div.find('[data-field="amount_pickup_weight"]').hide();
+  }
   $(el).parent().parent().parent().parent().find('.button.edit').hide();
   div.css('display', 'flex');
 }
@@ -111,12 +117,13 @@ function admin_orders_update(el){
   var order_item_comment = div.find('[data-field="order_item_comment"]').val();
   var amount_order = div.find('[data-field="amount_order"]').html();
   var amount_pickup = div.find('[data-field="amount_pickup"]').html();
-  console.log("admin_orders_update "+order_item_id+" "+product_id+" "+order_item_comment+" "+amount_order+" "+amount_pickup);
+  var amount_pickup_weight = div.find('[data-field="amount_pickup_weight"]').html();
+  console.log("admin_orders_update "+order_item_id+" "+product_id+" "+order_item_comment+" "+amount_order+" "+amount_pickup+" "+amount_pickup_weight);
   $('#loading').show();
   $.ajax({
     type: 'POST',
     url: '/admin/orders_update_ajax?order_item_id='+order_item_id+'&pickup_item_id='+pickup_item_id,
-    data: { 'product_id': product_id, 'order_item_comment': order_item_comment, 'amount_order': amount_order, 'amount_pickup': amount_pickup},
+    data: { 'product_id': product_id, 'order_item_comment': order_item_comment, 'amount_order': amount_order, 'amount_pickup': amount_pickup, 'amount_pickup_weight': amount_pickup_weight},
     dataType: 'html',
     success: function(html){
       $('#loading').hide();

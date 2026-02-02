@@ -57,13 +57,22 @@ if($date_next){
         )); ?>
       </div>
       <div class="col1"></div>
-      <div class="col3">
-        <?php echo html_input(array(
-          'type' => 'number',
-          'class' => 'admin_orders_input',
-          'field' => 'amount_pickup',
-          'value' => '',
-        )); ?>
+      <div class="col3 right">
+        <div>
+          <?php echo html_input(array(
+            'type' => 'number',
+            'class' => 'admin_orders_input',
+            'field' => 'amount_pickup',
+            'value' => '',
+          )); ?>
+          <br>
+          <?php echo html_input(array(
+            'type' => 'number',
+            'class' => 'admin_orders_input',
+            'field' => 'amount_pickup_weight',
+            'value' => '',
+          )); ?>
+        </div>
       </div>
       <div class="col1 right">
         <span class="button small" onclick="admin_orders_update(this)">
@@ -96,12 +105,13 @@ if($date_next){
             $class = 'linethrough grey';
           }
         ?>
-        <div class="inner_row <?php echo $class ?>" data-order_item_id="<?php echo $order_item->id ?>" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $pickup_item->id ?>">
+        <div class="inner_row <?php echo $class ?>" data-order_item_id="<?php echo $order_item->id ?>" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $pickup_item->id ?>" data-product_type="<?php echo $product->type ?>">
           <?php
             if($order_item->split_status == 'o'){
               $split_data = json_decode($order_item->split_data, 1);
               $order_item->amount_pieces = $split_data['ordered'];
             }
+            $amount_pickup_weight=0;
             if($product->type == 'k'){
               $amount_order = $order_item->amount_weight;
               $amount_pickup = $pickup_item->amount_weight;
@@ -127,7 +137,12 @@ if($date_next){
           <div class="col1 right">
           </div>
           <div class="col3 right <?php echo $amount_pickup?'':'warn' ?>">
-            <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
+            <div>
+              <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
+              <?php if($product->type == 'w'): ?>
+                <br><span class="amount_pickup_weight"><?php echo format_amount($pickup_item->amount_weight) ?></span>&nbsp;kg
+              <?php endif ?>
+            </div>
           </div>
           <div class="col1 right">
             <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $order_item->id ?>','<?php echo $pickup_item->id ?>')">
@@ -147,7 +162,7 @@ if($date_next){
             $unit = 'St.';
           }
         ?>
-        <div class="inner_row" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $order_item->id ?>" >
+        <div class="inner_row" data-product_id="<?php echo $product->id ?>" data-pickup_item_id="<?php echo $order_item->id ?>"  data-product_type="<?php echo $product->type ?>">
           <div class="col9">
             <?php if($product->supplier_id == 35): ?>
               <?php echo htmlentities($product->supplier_product_id) ?>
@@ -159,7 +174,12 @@ if($date_next){
           <div class="col1 right">
           </div>
           <div class="col3 right">
-            <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
+            <div>
+              <span class="amount_pickup"><?php echo format_amount($amount_pickup) ?></span>&nbsp;<?php echo $unit ?>
+              <?php if($product->type == 'w'): ?>
+                <br><span class="amount_pickup_weight"><?php echo format_amount($pickup_item->amount_weight) ?></span>&nbsp;kg
+              <?php endif ?>
+            </div>
           </div>
           <div class="col1 right">
             <span class="button small edit" onclick="admin_orders_edit(this,'<?php echo $pickup_item->id ?>','<?php echo $pickup_item->id ?>')">
