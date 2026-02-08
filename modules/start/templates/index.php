@@ -58,8 +58,8 @@ $PROPERTIES['body_class']='footer_h4';
   <div class="item" onclick="location.href='/activities'">
     <span class="label">Aktivitäten</span>
   </div>
-  <div class="item" onclick="location.href='/infos'">
-    <span class="label">Infos</span>
+  <div class="item" onclick="location.href='/forum'">
+    <span class="label">Forum</span>
   </div>
   <div class="item" onclick="location.href='/settings'">
     <span class="label">Einstellungen</span>

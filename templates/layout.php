@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202512210230';
+$version='202602080753';
 $body_class='';
 $header='';
 $footer='';
@@ -26,6 +26,7 @@ if(isset($_SESSION['browser'])){
 <html class="<?php echo $html_class ?>">
 <head>
 <title>Mit Sinn Leben eG</title>
+<?php /*<meta name="viewport" content="width=device-width, initial-scale=1.0" />*/?>
 <script data-cfasync="false" type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>
 <script data-cfasync="false" type="text/javascript" src="/js/main.js?v=<?php echo $version ?>"></script>
 <?php if(file_exists('../web/js/'.$MODULE.'.js')): ?>

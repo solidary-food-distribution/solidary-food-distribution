@@ -1,0 +1,18 @@
+.pathbar{
+  display: none;
+}
+
+.ready_display_block{
+  display: none;
+}
+
+.forum input, .forum textarea{
+  width: 100%;
+}
+.forum textarea{
+  min-height: 150px;
+}
+
+.forum_post_new{
+  margin-right: 0.5em;
+}
