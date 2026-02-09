@@ -10,7 +10,7 @@ $mysqli=mysqli_connect($env['DB_HOST'], $env['DB_USER'], $env['DB_PWD'], $env['D
 if(mysqli_connect_errno()){
     die('Fehler: '.mysqli_connect_errno());
 }else{
-  mysqli_set_charset($mysqli,"UTF8");
+  mysqli_set_charset($mysqli,"UTF8MB4");
 }
 mysqli_report(MYSQLI_REPORT_ERROR);
 

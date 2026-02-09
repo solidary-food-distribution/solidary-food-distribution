@@ -13,7 +13,7 @@ function template_show_list(template, data){
       if(value === null){
         value = '';
       }
-      tmpl.html(tmpl.html().replace('{{'+key+'}}', value.replace('\n','<br>')));
+      tmpl.html(tmpl.html().replace('{{'+key+'}}', value.replaceAll('\n','<br>')));
     }
     $('#'+template).before(tmpl);
     tmpl.show();
