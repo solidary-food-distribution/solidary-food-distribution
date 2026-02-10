@@ -50,9 +50,11 @@ function execute_topic(){
 function execute_topic_ajax(){
   global $user;
   $id = get_request_param('id');
-  $topic = sql_select_one("SELECT t.id AS topic_id, t.name AS topic_name, t.forum_id, f.name AS forum_name FROM msl_forum_topics t, msl_forums f WHERE f.id=t.forum_id AND t.id='".intval($id)."'");
-  $posts = sql_select("SELECT p.id, p.text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS created, u.name AS created_by_name FROM msl_forum_posts p LEFT JOIN msl_users u ON (p.created_by = u.id) WHERE p.topic_id='".intval($id)."' ORDER BY p.id ASC");
+  $topic = sql_select_one("SELECT t.id AS topic_id, t.name AS topic_name, t.created_by, t.forum_id, f.name AS forum_name FROM msl_forum_topics t, msl_forums f WHERE f.id=t.forum_id AND t.id='".intval($id)."'");
+  $posts = sql_select("SELECT p.id, p.text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS created, u.name AS created_by_name, IF(p.created_by='".intval($user['user_id'])."',1,0) AS post_editable FROM msl_forum_posts p LEFT JOIN msl_users u ON (p.created_by = u.id) WHERE p.topic_id='".intval($id)."' ORDER BY p.id ASC");
   
+  $topic['editable'] = ($topic['created_by'] == $user['user_id'])?'1':'0';
+
   $return = array(
     'topic' => $topic,
     'posts' => $posts,
@@ -112,6 +114,46 @@ function execute_topic_new_post_ajax(){
   exit;
 }
 
+function execute_topic_edit(){
+}
+function execute_topic_edit_ajax(){
+  global $user;
+  $id = get_request_param('id');
+  $topic = sql_select_one("SELECT t.id AS topic_id, t.name AS topic_name, t.created_by, t.forum_id, f.name AS forum_name FROM msl_forum_topics t, msl_forums f WHERE f.id=t.forum_id AND t.id='".intval($id)."'");
+
+  if($topic['created_by'] != $user['user_id']){
+    exit;
+  }
+
+  $return = array(
+    'topic' => $topic,
+  );
+  echo json_encode($return);
+  exit;
+}
+function execute_topic_edit_post_ajax(){
+  global $user;
+  $id = get_request_param('id');
+  $topic_name = trim(get_request_param('topic_name'));
+
+  $error = '';
+  if(empty($topic_name)){
+    $error .= 'Bitte Thema angeben. ';
+  }
+  if(empty($error)){
+    $topic = sql_select_one("SELECT * FROM msl_forum_topics WHERE id='".intval($id)."'");
+    logdata("topic_id $id ".$topic['name']);
+    sql_update("UPDATE msl_forum_topics SET name='".sql_escape_string($topic_name)."' WHERE id='".intval($id)."' AND created_by='".$user['user_id']."'");
+  }
+
+  $return = array(
+    'error' => $error,
+    'id' => $id
+  );
+  echo json_encode($return);
+  exit;
+}
+
 function execute_post_new(){
 }
 function execute_post_new_ajax(){
@@ -143,6 +185,46 @@ function execute_post_new_post_ajax(){
     'error' => $error,
     'topic_id' => $topic_id,
     'post_id' => $post_id
+  );
+  echo json_encode($return);
+  exit;
+}
+
+function execute_post_edit(){
+}
+function execute_post_edit_ajax(){
+  global $user;
+  $id = get_request_param('id');
+  $post = sql_select_one("SELECT p.*,t.id AS topic_id, t.name AS topic_name, t.forum_id, f.name AS forum_name FROM msl_forum_posts p, msl_forum_topics t, msl_forums f WHERE f.id=t.forum_id AND t.id=p.topic_id AND p.id='".intval($id)."'");
+
+  if($post['created_by'] != $user['user_id']){
+    exit;
+  }
+
+  $return = array(
+    'post' => $post,
+  );
+  echo json_encode($return);
+  exit;
+}
+function execute_post_edit_post_ajax(){
+  global $user;
+  $id = get_request_param('id');
+  $post_text = trim(get_request_param('post_text'));
+
+  $error = '';
+  if(empty($post_text)){
+    $error .= 'Bitte Inhalt angeben. ';
+  }
+  $post = sql_select_one("SELECT topic_id, `text` FROM msl_forum_posts WHERE id='".intval($id)."'");
+  if(empty($error)){
+    logdata("post_id $id ".$post['text']);
+    sql_update("UPDATE msl_forum_posts SET `text`='".sql_escape_string($post_text)."' WHERE id='".intval($id)."' AND created_by='".intval($user['user_id'])."'");
+  }
+
+  $return = array(
+    'error' => $error,
+    'topic_id' => $post['topic_id'],
   );
   echo json_encode($return);
   exit;

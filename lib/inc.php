@@ -6,6 +6,11 @@ function logger($str){
   file_put_contents(__DIR__.'/../log/logger.log',date('Y-m-d H:i:s')." $MODULE $ACTION\n$str\n",FILE_APPEND);
 }
 
+function logdata($str){
+  global $MODULE,$ACTION;
+  file_put_contents(__DIR__.'/../log/logdata.log',date('Y-m-d H:i:s')." $MODULE $ACTION\n$str\n",FILE_APPEND);
+}
+
 function get_request_param($param){
   global $_request_cache;
   init_request_cache();

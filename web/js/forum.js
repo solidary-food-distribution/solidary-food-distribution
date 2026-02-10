@@ -1,19 +1,18 @@
 function template_replace(data){
   for (const [key, value] of Object.entries(data)) {
-    document.body.innerHTML = document.body.innerHTML.replace(new RegExp('{{'+key+'}}', 'g'), value);
+    document.body.innerHTML = document.body.innerHTML.replaceAll(new RegExp('{{'+key+'}}', 'g'), value);
   }
 }
 
 function template_show_list(template, data){
   for (const element of data) {
-    //console.log(element);
     var tmpl = $('#'+template).clone();
     tmpl.attr('id',template+'-'+element.id);
     for (var [key, value] of Object.entries(element)) {
       if(value === null){
         value = '';
       }
-      tmpl.html(tmpl.html().replace('{{'+key+'}}', value.replaceAll('\n','<br>')));
+      tmpl.html(tmpl.html().replaceAll('{{'+key+'}}', value.replaceAll('\n','<br>')));
     }
     $('#'+template).before(tmpl);
     tmpl.show();
@@ -46,7 +45,18 @@ function forum_save_input(el, context, context_id){
 
 function forum_ready(){
   $('.pathbar').css('display', 'inline-block');
-  $('.ready_display_block').css('display', 'block');
+  $('.ready_display').each(function(){
+    var display = $(this).data('display');
+    if(!display){
+      display = 'block';
+    }
+    $(this).css('display', display);
+  });
+  const anchor = get_url_anchor();
+  if(anchor){
+    const tag = $("a[name='"+ anchor +"']");
+    $('main').animate({scrollTop: tag.offset().top - $('header').height() - $('#scrollup').height()},'slow');
+  }
 }
 
 function forum_init(){
@@ -122,7 +132,7 @@ function forum_topic_new_post(){
     dataType: 'json',
     success: function(json){
       $('#loading').hide();
-      console.log(json);
+      //console.log(json);
       if(json.error != ''){
         notify(json.error);
       }else{
@@ -133,6 +143,57 @@ function forum_topic_new_post(){
     }
   });
 }
+
+function forum_topic_edit_init(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/forum/topic_edit_ajax?id='+id,
+    data: {},
+    dataType: 'json',
+    success: function(json){
+      $('#loading').hide();
+      //console.log(json);
+      template_replace(json.topic);
+      forum_restore_input('topic_edit', id);
+      forum_ready();
+    }
+  });
+}
+
+var forum_topic_edit_post_running = false;
+function forum_topic_edit_post(){
+  if(forum_topic_edit_post_running){
+    return;
+  }
+  forum_topic_edit_post_running = true;
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  var data = {
+    'topic_name': $('#topic_name').val()
+  };
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/forum/topic_edit_post_ajax?id='+id,
+    data: data,
+    dataType: 'json',
+    success: function(json){
+      $('#loading').hide();
+      //console.log(json);
+      if(json.error != ''){
+        notify(json.error);
+      }else{
+        localStorage.removeItem('forum-topic_edit-'+id);
+        location.href='/forum/topic?id='+id;
+      }
+      forum_topic_edit_post_running = false;
+    }
+  });
+}
+
 
 function forum_topic_init(){
   const params = new URLSearchParams(window.location.search);
@@ -190,7 +251,7 @@ function forum_post_new_post(){
     dataType: 'json',
     success: function(json){
       $('#loading').hide();
-      console.log(json);
+      //console.log(json);
       if(json.error != ''){
         notify(json.error);
       }else{
@@ -202,3 +263,52 @@ function forum_post_new_post(){
   });
 }
 
+function forum_post_edit_init(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/forum/post_edit_ajax?id='+params.get('id'),
+    data: {},
+    dataType: 'json',
+    success: function(json){
+      $('#loading').hide();
+      //console.log(json);
+      template_replace(json.post);
+      forum_restore_input('post_edit', id);
+      forum_ready();
+    }
+  });
+}
+
+var forum_post_edit_post_running = false;
+function forum_post_edit_post(){
+  if(forum_post_edit_post_running){
+    return;
+  }
+  forum_post_edit_post_running = true;
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  var data = {
+    'post_text': $('#post_text').val()
+  };
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/forum/post_edit_post_ajax?id='+id,
+    data: data,
+    dataType: 'json',
+    success: function(json){
+      $('#loading').hide();
+      //console.log(json);
+      if(json.error != ''){
+        notify(json.error);
+      }else{
+        localStorage.removeItem('forum-post_edit-'+id);
+        location.href='/forum/topic?id='+json.topic_id+'#post'+id;
+      }
+      forum_post_edit_post_running = false;
+    }
+  });
+}

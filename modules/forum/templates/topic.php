@@ -6,9 +6,14 @@ $PROPERTIES['pathbar']=array(
 );
 ?>
 
-<div class="row ready_display_block">
+<div class="row ready_display" data-display="flex" style="display:none">
   <div class="col13">
     <b>{{topic_name}}</b>
+  </div>
+  <div class="col1 last right">
+    <div class="button show{{editable}}" onclick="location.href='/forum/topic_edit?id={{topic_id}}';">
+      <i class="fa-solid fa-pencil"></i>
+    </div>
   </div>
 </div>
 
@@ -26,6 +31,13 @@ $PROPERTIES['pathbar']=array(
     <div class="col16">
       <div>
         {{text}}
+      </div>
+    </div>
+  </div>
+  <div class="inner_row show{{post_editable}}">
+    <div class="col1 last right">
+      <div class="button" onclick="location.href='/forum/post_edit?id={{id}}';">
+        <i class="fa-solid fa-pencil"></i>
       </div>
     </div>
   </div>

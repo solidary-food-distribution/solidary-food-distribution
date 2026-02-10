@@ -8,6 +8,9 @@ class Member{
   public string $status;
   public string $deactivate_on;
   public string $name;
+  public string $street;
+  public string $zip_code;
+  public string $city;
   public string $identification;
   public int $producer;
   public bool $consumer;

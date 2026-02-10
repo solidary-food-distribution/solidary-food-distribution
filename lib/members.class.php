@@ -58,6 +58,9 @@ class Members extends ArrayObject{
       $member->id = intval($m['id']);
       $member->created = $m['created'];
       $member->name = $m['name'];
+      $member->street =$m['street'];
+      $member->zip_code = $m['zip_code'];
+      $member->city = $m['city'];
       $member->status = $m['status'];
       $member->deactivate_on = strval($m['deactivate_on']);
       $member->identification = $m['identification'];

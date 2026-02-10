@@ -116,6 +116,10 @@ function get_url_params(){
   return data;
 }
 
+function get_url_anchor(){
+  return (document.URL.split('#').length > 1) ? document.URL.split('#')[1] : null;
+}
+
 function get_ts(){
   var date = new Date();
   return date.getTime();
