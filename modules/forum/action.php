@@ -35,7 +35,7 @@ function execute_forum(){
 function execute_forum_ajax(){
   $id = get_request_param('id');
   $forum = sql_select_one("SELECT id AS forum_id, name AS forum_name FROM msl_forums WHERE id='".intval($id)."'");
-  $topics = sql_select("SELECT t.*,p.id AS latest_id,CONCAT(SUBSTR(p.text,1,50),'...') AS latest_text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS latest_date FROM msl_forum_topics t LEFT JOIN msl_forum_posts p ON (t.last_post_id = p.id) WHERE t.forum_id='".intval($id)."' ORDER BY (CASE WHEN pinned>0 THEN pinned ELSE 999 END),t.last_post_id ASC");
+  $topics = sql_select("SELECT t.*,p.id AS latest_id,CONCAT(SUBSTR(p.text,1,50),'...') AS latest_text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS latest_date FROM msl_forum_topics t LEFT JOIN msl_forum_posts p ON (t.last_post_id = p.id) WHERE t.forum_id='".intval($id)."' ORDER BY (CASE WHEN pinned>0 THEN pinned ELSE 999 END),t.last_post_id DESC");
   
   $return = array(
     'forum' => $forum,
@@ -217,9 +217,9 @@ function execute_post_edit_post_ajax(){
     $error .= 'Bitte Inhalt angeben. ';
   }
   $post = sql_select_one("SELECT topic_id, `text` FROM msl_forum_posts WHERE id='".intval($id)."'");
-  if(empty($error)){
+  if(empty($error) && $post['text']!==$post_text){
     logdata("post_id $id ".$post['text']);
-    sql_update("UPDATE msl_forum_posts SET `text`='".sql_escape_string($post_text)."' WHERE id='".intval($id)."' AND created_by='".intval($user['user_id'])."'");
+    sql_update("UPDATE msl_forum_posts SET `text`='".sql_escape_string($post_text)."',modified=NOW() WHERE id='".intval($id)."' AND created_by='".intval($user['user_id'])."'");
   }
 
   $return = array(

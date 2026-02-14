@@ -67,6 +67,9 @@ function execute_login_ajax(){
   }
   if(empty($error)){
     unset($_SESSION['browser']);
+    $_SESSION['last_login'] = $user->last_login; //for forum
+    $user->last_login = date('Y-m-d H:i:s');
+    $user->update(array('last_login' => $user->last_login));
     set_session($user);
     #logger(print_r($_SESSION['user'],1));
   }

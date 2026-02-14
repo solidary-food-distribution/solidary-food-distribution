@@ -10,6 +10,42 @@ $PROPERTIES['body_class']='footer_h4';
 
 <?php if(!$deactivated): ?>
 
+<?php if(!empty($forum_posts)): ?>
+  <div class="row" id="forum_posts">
+    <div class="inner_row">
+      <div class="col18"><b>Neue Forum Beiträge <?php echo $_SESSION['last_login']!='0000-00-00 00:00:00'?'seit '.date('d.m.Y H:i', strtotime($_SESSION['last_login'])):''; ?></b></div>
+    </div>
+    <?php foreach($forum_posts as $forum_topics): ?>
+      <div class="inner_row">
+        <div class="col18"><b><?php echo htmlentities($forum_topics[key($forum_topics)]['forum_name']) ?></b></div>
+      </div>
+      <?php foreach($forum_topics as $forum_topic): ?>
+        <?php
+          $post_label='Beitrag';
+          $last_label='am';
+          if($forum_topic['count_posts']>1){
+            $post_label='Beiträge';
+            $last_label='zuletzt';
+          }
+        ?>
+        <div class="inner_row">
+          <div class="col11"><?php echo htmlentities($forum_topic['topic_name']) ?></div>
+          <div class="col2 right"><span class="smaller"><?php echo $forum_topic['count_posts'].' '.$post_label ?></span></div>
+          <div class="col5 right"><span class="smaller"><?php echo $last_label.' '.date('d.m.Y H:i', strtotime($forum_topic['max_created'])) ?></span></div>
+        </div>
+      <?php endforeach ?>
+    <?php endforeach ?>
+    <div class="inner_row">
+      <div class="col1 right last">
+        <span class="button" onclick="start_forum_read()">
+          <i class="fa-solid fa-check"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+<?php endif //forum_posts ?>
+
+<?php /*
 <?php foreach($infos as $info): ?>
   <div class="row" id="info<?php echo $info->id ?>">
     <div class="inner_row">
@@ -40,6 +76,7 @@ $PROPERTIES['body_class']='footer_h4';
     </div>
   </div>
 <?php endforeach ?>
+*/ ?>
 
 
 <div class="selection">
@@ -71,7 +108,7 @@ $PROPERTIES['body_class']='footer_h4';
   <?php endif ?>
 </div>
 
-<?php endif ?>
+<?php endif //deactivted? ?>
 
 <?php ob_start(); ?>
 <div class="row center">

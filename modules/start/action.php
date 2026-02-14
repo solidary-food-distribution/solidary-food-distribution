@@ -25,6 +25,7 @@ function execute_index(){
       forward_to_page('/start/store');
     }
   }
+  /* replaced with forum
   require_once('infos.class.php');
   $infos = new Infos(array('published!=' => '0000-00-00 00:00:00', 'published>' => date('Y-m-d', strtotime('-1 months', time()))));
   require_once('info_users.class.php');
@@ -34,9 +35,26 @@ function execute_index(){
       unset($infos[$info_user->info_id]);
     }
   }
-  return array('infos' => $infos, 'message' => $message, 'deactivated' => $deactivated);
+  */
+  $forum_posts = array();
+  if(!isset($_SESSION['scale']) && !isset($_SESSION['start_forum_read'])){
+    require_once('sql.inc.php');
+    $qry = "SELECT t.forum_id, f.name AS forum_name, p.topic_id, t.name AS topic_name, MAX(p.created) AS max_created, MIN(p.id) AS min_post_id, COUNT(p.id) AS count_posts FROM msl_forum_posts p, msl_forum_topics t, msl_forums f
+  WHERE p.topic_id=t.id AND t.forum_id=f.id AND p.created_by!='".intval($user['user_id'])."' AND p.created>='".sql_escape_string($_SESSION['last_login'])."' GROUP BY t.forum_id, f.name, p.topic_id, t.name ORDER BY max_created;";
+    $forum_posts = sql_select_id2($qry, 'forum_id', 'topic_id');
+  }
+
+  return array(/*'infos' => $infos,*/ 'message' => $message, 'forum_posts' => $forum_posts, 'deactivated' => $deactivated);
 }
 
+function execute_forum_read_ajax(){
+  global $user;
+  $_SESSION['start_forum_read']=1;
+  echo json_encode(array('result'=>1));
+  exit;
+}
+
+/*
 function execute_info_read_ajax(){
   global $user;
   $info_id = get_request_param('info_id');
@@ -51,6 +69,7 @@ function execute_info_read_ajax(){
   echo json_encode(array('result'=>1));
   exit;
 }
+*/
 
 function execute_store(){
 }

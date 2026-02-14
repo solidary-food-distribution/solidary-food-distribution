@@ -10,6 +10,7 @@ class User{
   public $pickup_pin;
   public $access=array();
   public $members=array();
+  public $last_login;
 
   public function password_verify($password){
     if($this->password == $password && trim($password)!==''){
