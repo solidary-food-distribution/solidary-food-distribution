@@ -312,3 +312,20 @@ function forum_post_edit_post(){
     }
   });
 }
+
+function forum_post_vote(el){
+  const id = $(el).data('id');
+  const value = $(el).is(':checked')?1:0;
+  $('#loading').show();
+  $.ajax({
+    type: 'POST',
+    url: '/forum/post_vote_ajax?id='+id,
+    data: {value: value},
+    dataType: 'json',
+    success: function(json){
+      $('#loading').hide();
+      console.log(json);
+      $('#post_vote_count'+json.id).html(json.count);
+    }
+  });
+}

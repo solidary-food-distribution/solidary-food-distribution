@@ -51,7 +51,7 @@ function execute_topic_ajax(){
   global $user;
   $id = get_request_param('id');
   $topic = sql_select_one("SELECT t.id AS topic_id, t.name AS topic_name, t.created_by, t.forum_id, f.name AS forum_name FROM msl_forum_topics t, msl_forums f WHERE f.id=t.forum_id AND t.id='".intval($id)."'");
-  $posts = sql_select("SELECT p.id, p.text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS created, u.name AS created_by_name, IF(p.created_by='".intval($user['user_id'])."',1,0) AS post_editable FROM msl_forum_posts p LEFT JOIN msl_users u ON (p.created_by = u.id) WHERE p.topic_id='".intval($id)."' ORDER BY p.id ASC");
+  $posts = sql_select("SELECT p.id, p.text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS created, u.name AS created_by_name, IF(p.created_by='".intval($user['user_id'])."',1,0) AS post_editable,(SELECT COUNT(*) FROM msl_forum_reactions r WHERE r.post_id=p.id) AS post_vote_count,(CASE WHEN (SELECT COUNT(*) FROM msl_forum_reactions r WHERE r.post_id=p.id AND r.created_by='".intval($user['user_id'])."') THEN 'checked' ELSE '' END) AS post_vote_checked FROM msl_forum_posts p LEFT JOIN msl_users u ON (p.created_by = u.id) WHERE p.topic_id='".intval($id)."' ORDER BY p.id ASC");
   
   $topic['editable'] = ($topic['created_by'] == $user['user_id'])?'1':'0';
 
@@ -236,4 +236,26 @@ function forum_user_post_user_id($context, $context_id){
     return 0;
   }
   return $user['user_id'];
+}
+
+function execute_post_vote_ajax(){
+  global $user;
+  $id = get_request_param('id');
+  $value = get_request_param('value');
+
+  if(intval($value)){
+    sql_update("INSERT INTO msl_forum_reactions (post_id, created_by) VALUES ('".intval($id)."','".intval($user['user_id'])."') ON DUPLICATE KEY UPDATE post_id=VALUES(post_id)");
+  }else{
+    sql_update("DELETE FROM msl_forum_reactions WHERE post_id='".intval($id)."' AND created_by='".intval($user['user_id'])."'");
+  }
+  $count=sql_select_one("SELECT COUNT(*) AS cnt FROM msl_forum_reactions WHERE post_id='".intval($id)."'")['cnt'];
+  #logger("id $id value $value count $cnt");
+
+  $return = array(
+    'id'=>$id,
+    'value'=>$value,
+    'count'=>$count,
+  );
+  echo json_encode($return);
+  exit;
 }

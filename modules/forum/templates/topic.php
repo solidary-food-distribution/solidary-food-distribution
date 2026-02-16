@@ -34,10 +34,18 @@ $PROPERTIES['pathbar']=array(
       </div>
     </div>
   </div>
-  <div class="inner_row show{{post_editable}}">
-    <div class="col1 last right">
-      <div class="button" onclick="location.href='/forum/post_edit?id={{id}}';">
+  <div class="inner_row ">
+    <div class="col3 last right">
+      <div class="button show{{post_editable}}" onclick="location.href='/forum/post_edit?id={{id}}';">
         <i class="fa-solid fa-pencil"></i>
+      </div>
+      <div style="height:100%;">
+        <div class="input">
+          <input type="checkbox" value="1" data-id="{{id}}" onclick="forum_post_vote(this)" {{post_vote_checked}} />
+          <span onclick="$(this).prev('input').click()"><i class="fa-solid fa-thumbs-up"></i></span>
+          <span onclick="$(this).prevAll('input').click()" id="post_vote_count{{id}}">{{post_vote_count}}</span>
+          &nbsp;
+        </div>
       </div>
     </div>
   </div>
