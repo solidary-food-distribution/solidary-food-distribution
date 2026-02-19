@@ -8,6 +8,7 @@ function execute_index(){
 }
 function execute_index_ajax(){
   global $user;
+  /*
   $forums = sql_select("SELECT *, (SELECT t.id FROM msl_forum_topics t WHERE t.forum_id=f.id ORDER BY last_post_id DESC LIMIT 1) topic_id  FROM msl_forums f ORDER BY sort");
   $topic_ids = array();
   foreach($forums as $forum){
@@ -18,8 +19,35 @@ function execute_index_ajax(){
     $forums[$key]['latest_topic'] = $topics[$forum['id']]['latest_topic'];
     $forums[$key]['latest_date'] = $topics[$forum['id']]['latest_date'];
   }
+  */
+  $qry = "SELECT t.forum_id, f.name AS forum_name, p.topic_id, t.name AS topic_name, t.last_post_id, MAX(p.created) AS max_created, COUNT(p.id) AS posts_count, f.sort FROM msl_forum_posts p, msl_forum_topics t, msl_forums f
+  WHERE p.topic_id=t.id AND t.forum_id=f.id GROUP BY t.forum_id, f.name, p.topic_id, t.name, t.last_post_id, f.sort ORDER BY sort, max_created DESC";
+  $res = sql_select($qry);
+  $forums = array();
+  foreach($res as $f){
+    $forums[$f['forum_id']]['id'] = $f['forum_id'];
+    $forums[$f['forum_id']]['forum_name'] = $f['forum_name'];
+    $forums[$f['forum_id']]['more_count_label'] = '';
+    if(isset($forums[$f['forum_id']]['sub']) && count($forums[$f['forum_id']]['sub'])==3){
+      $forums[$f['forum_id']]['more_count'] = isset($forums[$f['forum_id']]['more_count'])?($forums[$f['forum_id']]['more_count']+1):1;
+      $forums[$f['forum_id']]['more_count_label'] = $forums[$f['forum_id']]['more_count'].($forums[$f['forum_id']]['more_count']==1?' weiteres Thema':' weitere Themen');
+      continue;
+    }
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['id'] = $f['topic_id'];
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['topic_id'] = $f['topic_id'];
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['topic_name'] = $f['topic_name'];
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['posts_count'] = $f['posts_count'];
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['posts_label'] = ($f['posts_count']==1?'Beitrag':'Beiträge');
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['last_post_id'] = $f['last_post_id'];
+    $forums[$f['forum_id']]['sub'][$f['topic_id']]['max_created'] = date('d.m.Y H:i',strtotime($f['max_created']));
+  }
+  $forum_index = array_values($forums);
+  foreach($forum_index as $key => $forum){
+    $forum_index[$key]['sub'] = array_values($forum_index[$key]['sub']);
+  }
+  logger(print_r($forum_index,1));
   
-  $return = array('forums' => $forums);
+  $return = array('forums' => $forum_index);
   echo json_encode($return);
   exit;
 }
@@ -35,7 +63,10 @@ function execute_forum(){
 function execute_forum_ajax(){
   $id = get_request_param('id');
   $forum = sql_select_one("SELECT id AS forum_id, name AS forum_name FROM msl_forums WHERE id='".intval($id)."'");
-  $topics = sql_select("SELECT t.*,p.id AS latest_id,CONCAT(SUBSTR(p.text,1,50),'...') AS latest_text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS latest_date FROM msl_forum_topics t LEFT JOIN msl_forum_posts p ON (t.last_post_id = p.id) WHERE t.forum_id='".intval($id)."' ORDER BY (CASE WHEN pinned>0 THEN pinned ELSE 999 END),t.last_post_id DESC");
+  $topics = sql_select("SELECT t.*,p.id AS latest_id,CONCAT(SUBSTR(p.text,1,50),'...') AS latest_text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS latest_date, (SELECT COUNT(*) FROM msl_forum_posts pc WHERE pc.topic_id=t.id) AS posts_count FROM msl_forum_topics t LEFT JOIN msl_forum_posts p ON (t.last_post_id = p.id) WHERE t.forum_id='".intval($id)."' ORDER BY (CASE WHEN pinned>0 THEN pinned ELSE 999 END),t.last_post_id DESC");
+  foreach($topics as $key => $topic){
+    $topics[$key]['posts_label'] = ($topic['posts_count']==1?'Beitrag':'Beiträge');
+  }
   
   $return = array(
     'forum' => $forum,
@@ -99,7 +130,7 @@ function execute_topic_new_post_ajax(){
   if(empty($error)){
     $topic_id = sql_select_one("SELECT id FROM msl_forum_topics WHERE forum_id='".intval($forum_id)."' AND name='".sql_escape_string($topic_name)."'")['topic_id'];
     if(empty($topic_id)){
-      $topic_id = sql_insert("INSERT INTO msl_forum_topics (forum_id, name) VALUES ('".intval($forum_id)."', '".sql_escape_string($topic_name)."')");
+      $topic_id = sql_insert("INSERT INTO msl_forum_topics (forum_id, name, created_by) VALUES ('".intval($forum_id)."', '".sql_escape_string($topic_name)."', '".intval($user_id)."')");
     }
     $post_id = sql_insert("INSERT INTO msl_forum_posts (topic_id, `text`, created_by) VALUES ('".intval($topic_id)."', '".sql_escape_string($post_text)."', '".intval($user_id)."')");
     sql_update("UPDATE msl_forum_topics SET last_post_id='".intval($post_id)."' WHERE id='".intval($topic_id)."'");

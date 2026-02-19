@@ -1,0 +1,6 @@
+#forum_posts a{
+  text-decoration: none;
+}
+#forum_posts a:hover{
+  text-decoration: underline;
+}

@@ -16,7 +16,7 @@ if(!isset($hide_topic_new)){
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 <?php endif ?>
 
-<div id="TMPL_TOPIC_ROW" class="row" style="display:none">
+<div id="TMPL_TOPIC_ROW" class="row forum" style="display:none">
   <div class="inner_row">
     <div class="col13">
       <b><a href="/forum/topic?id={{id}}#post{{latest_id}}">{{name}}</a></b>
@@ -28,8 +28,11 @@ if(!isset($hide_topic_new)){
         {{latest_text}}
       </div>
     </div>
-    <div class="col4 last">
-      {{latest_date}}
+    <div class="col2">
+      <span class="smaller">{{posts_count}} {{posts_label}}</span>
+    </div>
+    <div class="col3 right">
+      <span class="smaller">{{latest_date}}</span>
     </div>
   </div>
 </div>

@@ -17,14 +17,16 @@ $PROPERTIES['pathbar']=array(
   </div>
 </div>
 
-<div id="TMPL_POST_ROW" class="row" style="display:none">
+<div id="TMPL_POST_ROW" class="row forum" style="display:none">
   <a name="post{{id}}"></a>
   <div class="inner_row">
     <div class="col13">
-      {{created_by_name}}
+      <span class="smaller">{{created_by_name}}</span>
     </div>
-    <div class="col4 last">
-      {{created}}
+    <div class="col2">
+    </div>
+    <div class="col3 right">
+      <span class="smaller">{{created}}</span>
     </div>
   </div>
   <div class="inner_row mt0_5">

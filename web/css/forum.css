@@ -6,7 +6,7 @@
   display: none;
 }
 
-.forum input, .forum textarea{
+.forum input:not([type="checkbox"]), .forum textarea{
   width: 100%;
 }
 .forum textarea{
@@ -15,4 +15,11 @@
 
 .forum_post_new{
   margin-right: 0.5em;
+}
+
+.forum a{
+  text-decoration: none;
+}
+.forum a:hover{
+  text-decoration: underline;
 }

@@ -40,7 +40,7 @@ function execute_index(){
   if(!isset($_SESSION['scale']) && !isset($_SESSION['start_forum_read'])){
     require_once('sql.inc.php');
     $qry = "SELECT t.forum_id, f.name AS forum_name, p.topic_id, t.name AS topic_name, MAX(p.created) AS max_created, MIN(p.id) AS min_post_id, COUNT(p.id) AS count_posts FROM msl_forum_posts p, msl_forum_topics t, msl_forums f
-  WHERE p.topic_id=t.id AND t.forum_id=f.id AND p.created_by!='".intval($user['user_id'])."' AND p.created>='".sql_escape_string($_SESSION['last_login'])."' GROUP BY t.forum_id, f.name, p.topic_id, t.name ORDER BY max_created;";
+  WHERE p.topic_id=t.id AND t.forum_id=f.id AND p.created_by!='".intval($user['user_id'])."' AND p.created>='".sql_escape_string($_SESSION['last_login'])."' GROUP BY t.forum_id, f.name, p.topic_id, t.name ORDER BY f.sort, max_created DESC;";
     $forum_posts = sql_select_id2($qry, 'forum_id', 'topic_id');
   }
 

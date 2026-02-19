@@ -16,9 +16,13 @@ $PROPERTIES['body_class']='footer_h4';
       <div class="col18"><b>Neue Forum Beiträge <?php echo $_SESSION['last_login']!='0000-00-00 00:00:00'?'seit '.date('d.m.Y H:i', strtotime($_SESSION['last_login'])):''; ?></b></div>
     </div>
     <?php foreach($forum_posts as $forum_topics): ?>
-      <div class="inner_row">
-        <div class="col18"><b><?php echo htmlentities($forum_topics[key($forum_topics)]['forum_name']) ?></b></div>
+      <div class="inner_row mt0_5">
+        <div class="col18"><b><a href="/forum/forum?id=<?php echo $forum_topics[key($forum_topics)]['forum_id'] ?>"><?php echo htmlentities($forum_topics[key($forum_topics)]['forum_name']) ?></a></b></div>
       </div>
+      <?php
+        $topic_count=0;
+        $topic_end=0;
+      ?>
       <?php foreach($forum_topics as $forum_topic): ?>
         <?php
           $post_label='Beitrag';
@@ -27,9 +31,27 @@ $PROPERTIES['body_class']='footer_h4';
             $post_label='Beiträge';
             $last_label='zuletzt';
           }
+          $topic_count++;
+          if($topic_count>3){
+            $topic_end = 1;
+            $topic_count_more = count($forum_topics)-$topic_count + 1;
+            if($topic_count_more==1){
+              $topic_count_more_label='weiteres Thema';
+            }else{
+              $topic_count_more_label='weitere Themen';
+            }
+          }
         ?>
+        <?php if($topic_end): ?>
+          <div class="inner_row">
+            <div class="col8">
+              <span class="smaller">(<?php echo $topic_count_more.' '.$topic_count_more_label ?> mit neuen Beiträgen)</small>
+            </div>
+          </div>
+          <?php break; ?>
+        <?php endif ?>
         <div class="inner_row">
-          <div class="col11"><?php echo htmlentities($forum_topic['topic_name']) ?></div>
+          <div class="col11"><a href="/forum/topic?id=<?php echo $forum_topic['topic_id'] ?>#post<?php echo $forum_topic['min_post_id'] ?>"><?php echo htmlentities($forum_topic['topic_name']) ?></a></div>
           <div class="col2 right"><span class="smaller"><?php echo $forum_topic['count_posts'].' '.$post_label ?></span></div>
           <div class="col5 right"><span class="smaller"><?php echo $last_label.' '.date('d.m.Y H:i', strtotime($forum_topic['max_created'])) ?></span></div>
         </div>

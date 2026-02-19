@@ -5,18 +5,26 @@ function template_replace(data){
 }
 
 function template_show_list(template, data){
-  for (const element of data) {
+  //console.log("template_show_list "+template);
+  console.log(data);
+  Object.values(data).forEach(element => {
+    //console.log(template);
     var tmpl = $('#'+template).clone();
     tmpl.attr('id',template+'-'+element.id);
     for (var [key, value] of Object.entries(element)) {
       if(value === null){
         value = '';
+      }else if(typeof value !== 'string'){
+        continue;
       }
       tmpl.html(tmpl.html().replaceAll('{{'+key+'}}', value.replaceAll('\n','<br>')));
     }
     $('#'+template).before(tmpl);
+    if(element.sub !== undefined){
+      template_show_list(template+'-'+element.id+'-SUB', element.sub);
+    }
     tmpl.show();
-  }
+  });
 }
 
 function forum_restore_input(context, context_id){
@@ -67,7 +75,6 @@ function forum_init(){
     data: {},
     dataType: 'json',
     success: function(json){
-      console.log(json);
       $('#loading').hide();
       template_show_list('TMPL_FORUM_ROW', json.forums);
       forum_ready();
