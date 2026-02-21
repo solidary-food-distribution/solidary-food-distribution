@@ -146,7 +146,73 @@ function execute_notifications_update_ajax(){
   $notification = get_request_param('notification');
   $value = get_request_param('value');
   require_once('sql.inc.php');
-  $qry = "INSERT INTO msl_settings (user_id, setting, value) VALUES ('".intval($user['user_id'])."', '".sql_escape_string($notification)."', '".sql_escape_string($value)."') ON DUPLICATE KEY UPDATE value=VALUES(value),modified=NOW()";
+  $qry = "INSERT INTO msl_settings (user_id, setting, value) VALUES ('".intval($user['user_id'])."', '".sql_escape_string($notification)."', '".sql_escape_string($value)."') ON DUPLICATE KEY UPDATE value=VALUES(value),updated=NOW()";
   sql_update($qry);
   exit;
+}
+
+function execute_privacy(){
+  global $user;
+  require_once('sql.inc.php');
+  $settings = sql_select_key2value("SELECT SUBSTR(setting,9) AS setting, value FROM msl_settings WHERE user_id='".intval($user['user_id'])."' AND setting LIKE 'PRIVACY-%'", 'setting', 'value');
+
+  #logger(print_r($settings,1));
+
+  return array(
+    'membermap_name' => get_privacy_member_name($user['member_id']),
+    'forum_name' => $user['forum_name'],
+    'settings' => $settings,
+  );
+}
+
+function execute_privacy_update_field_ajax(){
+  global $user;
+  $field = get_request_param('field');
+  $type = get_request_param('type');
+  $value = get_request_param('value');
+  if($field == 'forum_name'){
+    require_once('users.class.php');
+    $u = user_get($user['user_id']);
+    $u->update(array('forum_name' => trim($value)));
+    $u->set_session();
+    echo json_encode(array('error' => ''));
+  }
+  exit;
+}
+
+function execute_privacy_update_ajax(){
+  global $user;
+  $setting = get_request_param('setting');
+  $value = get_request_param('value');
+  
+  if($setting == 'membermap_name'){
+    require_once('sql.inc.php');
+    $setting = 'PRIVACY-'.sql_escape_fieldname($setting);
+    $qry = "INSERT INTO msl_settings (user_id, setting, value) VALUES ('".intval($user['user_id'])."', '".sql_escape_string($setting)."', '".sql_escape_string($value)."') ON DUPLICATE KEY UPDATE value=VALUES(value),updated=NOW()";
+    sql_update($qry);
+    require_once('members.class.php');
+    $member = Members::sget($user['member_id']);
+    $privacy_names = get_privacy_member_name($user['member_id']);
+    $member->update(array('map_name' => $privacy_names[$value], 'modified' => date('Y-m-d H:i:s')));
+  }
+
+  $return = execute_privacy();
+  $return['template'] = 'privacy.php';
+  $return['layout'] = 'layout_null.php';
+  return $return;
+}
+
+function get_privacy_member_name($member_id){
+  require_once('members.class.php');
+  $member = Members::sget($member_id);
+  $name = explode(' ', $member->name);
+  $first_letters = substr($name[0],0,1).'. '.substr($name[1],0,1).'.';
+  $given_name = $name[0].' '.substr($name[1],0,1).'.';
+  $street = explode(' ', $member->street);
+  $given_name_street = $given_name.', '.$street[0].', '.$member->city;
+  return array(
+    'first_letters' => $first_letters,
+    'given_name' => $given_name,
+    'given_name_street' => $given_name_street,
+  );
 }

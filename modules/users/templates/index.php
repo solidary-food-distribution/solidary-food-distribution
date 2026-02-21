@@ -24,6 +24,7 @@ $PROPERTIES['body_class']='header_h5';
         <div>
           <div>Name: <?php echo $user['name'] ?></div>
           <div>E-Mail: <?php echo $user['email'] ?></div>
+          <div>Letzter Login: <?php echo substr($user['last_login'],0,10) ?></div>
         </div>
       </div>
     </div>

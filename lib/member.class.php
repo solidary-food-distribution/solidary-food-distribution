@@ -17,6 +17,7 @@ class Member{
   public int $pate_id;
   public float $order_limit;
   public string $purchase_name;
+  public string $map_name;
 
   public function update( array $updates = array() ){
     require_once('sql.inc.php');

@@ -49,6 +49,7 @@ class Users extends ArrayObject{
       $user = new User();
       $user->id = $u['id'];
       $user->name = $u['name'];
+      $user->forum_name = $u['forum_name'];
       $user->email = $u['email'];
       $user->password = $u['passwd'];
       $user->last_login = $u['last_login'];

@@ -17,9 +17,9 @@
   margin-right: 0.5em;
 }
 
-.forum a{
+.forum_index a{
   text-decoration: none;
 }
-.forum a:hover{
+.forum_index a:hover{
   text-decoration: underline;
 }

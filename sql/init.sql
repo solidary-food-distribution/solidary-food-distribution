@@ -134,6 +134,60 @@ CREATE TABLE `msl_favorites` (
   PRIMARY KEY (`member_id`,`product_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `msl_forum_posts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `msl_forum_posts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `topic_id` int(10) unsigned NOT NULL,
+  `ref_post_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `text` text NOT NULL DEFAULT '',
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  `modified` datetime NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `topic_id` (`topic_id`),
+  KEY `created_by` (`created_by`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `msl_forum_reactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `msl_forum_reactions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `post_id` int(10) unsigned NOT NULL,
+  `created_by` int(10) unsigned NOT NULL,
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique` (`post_id`,`created_by`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `msl_forum_topics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `msl_forum_topics` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `forum_id` int(10) unsigned NOT NULL,
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `created` datetime NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `last_post_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `pinned` tinyint(4) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `forum_id` (`forum_id`),
+  KEY `last_post` (`last_post_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `msl_forums`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `msl_forums` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '',
+  `sort` int(10) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `msl_info_users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -246,6 +300,10 @@ CREATE TABLE `msl_members` (
   `status` char(1) NOT NULL DEFAULT 'a' COMMENT 'a(ctive), c(ancelled), i(nactive), d(eleted)',
   `deactivate_on` date NOT NULL DEFAULT '0000-00-00' COMMENT 'set status to inactive',
   `name` varchar(50) NOT NULL,
+  `street` varchar(100) NOT NULL DEFAULT '',
+  `zip_code` varchar(10) NOT NULL DEFAULT '',
+  `city` varchar(50) NOT NULL DEFAULT '',
+  `latlng` varchar(50) NOT NULL DEFAULT '',
   `identification` varchar(255) NOT NULL DEFAULT '',
   `producer` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1: farm 2: trader',
   `consumer` tinyint(1) NOT NULL DEFAULT 1,
@@ -253,6 +311,7 @@ CREATE TABLE `msl_members` (
   `order_limit` decimal(6,2) NOT NULL DEFAULT 0.00 COMMENT 'test membership limit per order',
   `purchase_time` varchar(50) NOT NULL DEFAULT '' COMMENT 'relative to pickup date',
   `purchase_name` varchar(50) NOT NULL DEFAULT '',
+  `map_name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -596,8 +655,10 @@ CREATE TABLE `msl_users` (
   `passwd` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `passwd_tmp` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'password recovery 	',
   `passwd_sent` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `last_login` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `pickup_pin` varchar(50) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `forum_name` varchar(100) NOT NULL DEFAULT '',
   `member_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'primary member_id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`) USING BTREE,

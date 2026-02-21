@@ -82,7 +82,7 @@ function execute_topic_ajax(){
   global $user;
   $id = get_request_param('id');
   $topic = sql_select_one("SELECT t.id AS topic_id, t.name AS topic_name, t.created_by, t.forum_id, f.name AS forum_name FROM msl_forum_topics t, msl_forums f WHERE f.id=t.forum_id AND t.id='".intval($id)."'");
-  $posts = sql_select("SELECT p.id, p.text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS created, u.name AS created_by_name, IF(p.created_by='".intval($user['user_id'])."',1,0) AS post_editable,(SELECT COUNT(*) FROM msl_forum_reactions r WHERE r.post_id=p.id) AS post_vote_count,(CASE WHEN (SELECT COUNT(*) FROM msl_forum_reactions r WHERE r.post_id=p.id AND r.created_by='".intval($user['user_id'])."') THEN 'checked' ELSE '' END) AS post_vote_checked FROM msl_forum_posts p LEFT JOIN msl_users u ON (p.created_by = u.id) WHERE p.topic_id='".intval($id)."' ORDER BY p.id ASC");
+  $posts = sql_select("SELECT p.id, p.text, DATE_FORMAT(p.created,'%d.%m.%Y %H:%i') AS created, (CASE WHEN u.forum_name='' THEN u.name ELSE u.forum_name END) AS created_by_name, IF(p.created_by='".intval($user['user_id'])."',1,0) AS post_editable,(SELECT COUNT(*) FROM msl_forum_reactions r WHERE r.post_id=p.id) AS post_vote_count,(CASE WHEN (SELECT COUNT(*) FROM msl_forum_reactions r WHERE r.post_id=p.id AND r.created_by='".intval($user['user_id'])."') THEN 'checked' ELSE '' END) AS post_vote_checked FROM msl_forum_posts p LEFT JOIN msl_users u ON (p.created_by = u.id) WHERE p.topic_id='".intval($id)."' ORDER BY p.id ASC");
   
   $topic['editable'] = ($topic['created_by'] == $user['user_id'])?'1':'0';
 

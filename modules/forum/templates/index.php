@@ -4,7 +4,7 @@ $PROPERTIES['pathbar']=array(
 );
 ?>
 
-<div id="TMPL_FORUM_ROW" class="row forum" style="display:none">
+<div id="TMPL_FORUM_ROW" class="row forum forum_index" style="display:none">
   <div class="inner_row">
     <div class="col13">
       <b><a href="/forum/forum?id={{id}}">{{forum_name}}</a></b>

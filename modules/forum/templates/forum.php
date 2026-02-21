@@ -16,7 +16,7 @@ if(!isset($hide_topic_new)){
 <?php $PROPERTIES['header']=ob_get_clean(); ?>
 <?php endif ?>
 
-<div id="TMPL_TOPIC_ROW" class="row forum" style="display:none">
+<div id="TMPL_TOPIC_ROW" class="row forum forum_index" style="display:none">
   <div class="inner_row">
     <div class="col13">
       <b><a href="/forum/topic?id={{id}}#post{{latest_id}}">{{name}}</a></b>

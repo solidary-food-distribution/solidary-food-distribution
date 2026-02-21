@@ -6,20 +6,22 @@ $PROPERTIES['pathbar']=array('/settings'=>'Einstellungen');
   <div class="item" onclick="location.href='/preferences'">
     <span class="label">Präferenzen</span>
   </div>
-  <div class="item" onclick="location.href='/order'">
-    <span class="label">Abholmengen</span>
-  </div>
 -->
+  <div class="item" onclick="location.href='/user'">
+    <span class="label">Zugangsdaten</span>
+  </div>
   <?php if(0): ?>
   <div class="item" onclick="location.href='/access'">
     <span class="label">Zugriff</span>
   </div>
   <?php endif ?>
-  <div class="item" onclick="location.href='/user'">
-    <span class="label">Zugangsdaten</span>
-  </div>
+  <!--
   <div class="item" onclick="location.href='/settings/notifications'">
     <span class="label">Benachrichtigen</span>
+  </div>
+  -->
+  <div class="item" onclick="location.href='/settings/privacy'">
+    <span class="label">Privatsphäre</span>
   </div>
   <?php if($membertest): ?>
     <div class="item" onclick="location.href='/settings/membertest'">

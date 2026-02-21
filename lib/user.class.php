@@ -4,6 +4,7 @@ declare(strict_types=1);
 class User{
   public $id;
   public $name;
+  public $forum_name;
   public $email;
   public $password;
   public $member_id; //can be switched in future
@@ -35,6 +36,7 @@ class User{
     $_SESSION['user']=array(
       'user_id'=>$this->id,
       'name'=>$this->name,
+      'forum_name'=>$this->forum_name,
       'email'=>$this->email,
       'pickup_pin'=>$this->pickup_pin,
       'member_id'=>$this->member_id,
