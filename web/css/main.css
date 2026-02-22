@@ -182,8 +182,16 @@ a{
 }
 
 /*TOP WHERE - WHO START*/
+header .top{
+  height: 2.5em;
+  overflow: hidden;
+}
 .pathbar{
   display: inline-block;
+  height: 2.5em;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 .path, .logout{
   display: inline-block;
@@ -213,7 +221,9 @@ a{
   margin-right: 0.2em;
 }
 .logout{
-  float:right;
+  position: absolute;
+  top: 0em;
+  right: 0em;
 }
 /*TOP WHERE - WHO END*/
 
@@ -848,4 +858,78 @@ div.mr1{
 
 .show0{
   display: none;
+}
+
+
+
+
+
+header .controls .filter .mobile_filters{
+  display: none;
+  background-color: white;
+  border: 1px solid black;
+}
+header .controls .filter .mobile_filters input{
+  display: none;
+}
+header .controls .filter .mobile_filters label{
+  padding: 0.4em;
+  display: inline-block;
+}
+header .controls .filter .mobile_filters_overlay{
+  display: none;
+  position: absolute;
+  top: 0px;
+  height: 2em;
+  width: 8em;
+}
+
+@media (max-width: 1091px) {
+  header .controls .filter .mobile_filters{
+    display: inline-block;
+  }
+  header .controls .filter .mobile_filters_overlay{
+    display: block;
+  }
+  header .controls .control{
+    z-index: 10;
+    overflow: visible;
+    vertical-align: top;
+  }
+  header .controls .filter .options .option:not(.selected){
+    display: none;
+  }
+  .order_note_oekoring{
+    display: none!important;
+  }
+}
+
+@media (max-width: 600px) {
+  .top .pathbar .path, .logout{
+    font-size: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  .top .pathbar .path, .logout{
+    font-size: 60%;
+  }
+  html{
+    font-size: 22px;
+  }
+  .headline .image{
+    display: none;
+  }
+}
+
+@media (max-width: 350px) {
+  html{
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 250px) {
+  html{
+    font-size: 14px;
+  }
 }

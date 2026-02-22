@@ -59,7 +59,7 @@
       </div>
       <div class="inner_row mt1">
         <div class="col6">
-          <div id="password_lost" class="button" onclick="location.href='/auth/password_lost?email='+$('#email').val()">Passwort vergessen</div>
+          <a class="smaller" href="#" onclick="location.href='/auth/password_lost?email='+$('#email').val()">Passwort vergessen?</a>
         </div>
         <div class="col2 right last">
           <input type="hidden" id="_forward" value="<?php echo htmlentities($_forward) ?>" />

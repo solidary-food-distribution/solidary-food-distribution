@@ -1,5 +1,8 @@
 function document_ready(){
-  //var mobile=is_mobile();
+  var mobile=is_mobile();
+  if(mobile){
+    $('html').addClass('is_mobile');
+  }
   //calc_scroll_filler();
   $(window).on('resize', function(){
     $('html').removeClass('browser_set');
@@ -615,4 +618,16 @@ function favorite_set(el){
       highlight_input($('#header .controls .filter[data-field="modus"] .option[data-value="f"]'));
     }
   });
+}
+
+
+function mobile_toggle_menu(el){
+  const elclass = $(el).data('menu');
+  if($('#'+$(el).attr('for')).is(':checked')){
+    $(elclass).hide();
+    $('.mobile_filters_overlay').show();
+  }else{
+    $(elclass).show();
+    $('.mobile_filters_overlay').hide();
+  }
 }

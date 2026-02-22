@@ -2,7 +2,7 @@
 $PROPERTIES['pathbar']=array('/orders'=>'Bestellungen',''=>format_date($order->pickup_date));
 $body_class='header_h5';
 if($modus == 'o'){
-  $body_class .= ' footer_h8';
+  $body_class .= ' footer_h4';
 }
 $PROPERTIES['body_class']=$body_class;
 ?>
@@ -30,6 +30,14 @@ $PROPERTIES['body_class']=$body_class;
             'value' => $modus,
             'options' => $options,
         )); ?>
+        <div class="mobile_filters">
+          <input type="checkbox" id="mobile_filters-toggle" />
+          <label for="mobile_filters-toggle" id="mobile_filters-toggle-label" data-menu="header .controls .filter .options .option:not(.selected)" onclick="mobile_toggle_menu(this)">
+            <span>...</span>
+          </label>
+        </div>
+        <div class="mobile_filters_overlay" onclick="mobile_toggle_menu($('#mobile_filters-toggle-label'))">
+        </div>
       </div>
       <div class="button help"><a href="/help/Bestellen.pdf" target="_blank"><i class="fa-solid fa-question"></i></a></div>
     </div>
@@ -40,7 +48,7 @@ $PROPERTIES['body_class']=$body_class;
   <div class="input" style="margin:auto;width:50%;display:block;margin-top:0.5em;padding:0.5em;">
     <div style="display:block"><small>Produktname, Hersteller, Strichcode-Nummer...</small></div>
     <div style="display:block">
-      <input class="filter" type="text" id="search" value="<?php echo htmlentities($search) ?>" onkeyup="order_search_keyup(event)" style="padding:0.2em;" />
+      <input class="filter" type="text" id="search" value="<?php echo htmlentities($search) ?>" onkeyup="order_search_keyup(event)" style="padding:0.2em;width:95%" />
       <div class="button search" id="search_button" onclick="order_filter(this)" style="padding-top:0em;padding-bottom:0em;";>suchen</div>
     </div>
   </div>
@@ -290,6 +298,29 @@ $PROPERTIES['body_class']=$body_class;
     <?php if($modus == 'o'): ?>
       <div class="row">
         <div class="inner_row">
+          <div class="col6 order_note_oekoring">
+            <?php if(floor($order_sum_oekoring) < 300 && $order_sum_oekoring >= 0): ?>
+              <span style="font-size:70%;border:1px solid grey;border-radius:0.5em;padding:0.2em">Hinweis Ökoring-Bestellung:<br>Noch <?php echo 300-floor($order_sum_oekoring) ?> EUR Bestellwert notwendig.</span>
+            <?php endif ?>
+          </div>
+          <div class="col5 right last">
+            <div>
+              Summe: <?php 
+              echo format_money($sum['sum']).' EUR';
+              if($_SESSION['member']['order_limit']){
+                echo '<br><span class="smaller">(max '.intval($_SESSION['member']['order_limit']).' EUR)</span>';
+              }
+              ?>
+            </div>
+          </div>
+        </div>
+      </div>
+    <?php endif ?>
+  <?php
+    $PROPERTIES['footer']=ob_get_clean();
+  ?>
+<?php endif ?>
+<?php /*
           <div class="col2"></div>
           <div class="col3 right"><small>Einkauf</small></div>
           <div class="col3 right"><small>-&gt; Geno</small></div>
@@ -315,9 +346,7 @@ $PROPERTIES['body_class']=$body_class;
         </div>
         <div class="inner_row">
           <div class="col12">
-            <?php if(floor($order_sum_oekoring) < 300 && $order_sum_oekoring >= 0): ?>
-              <span style="font-size:70%;border:1px solid grey;border-radius:0.5em;padding:0.2em">Hinweis Ökoring-Bestellung: Noch <?php echo 300-floor($order_sum_oekoring) ?> EUR Bestellwert notwendig.</span>
-            <?php endif ?>
+            
           </div>
           <div class="col6 right last">
             <small>Der Warenkorb bleibt gespeichert</small>
@@ -333,3 +362,4 @@ $PROPERTIES['body_class']=$body_class;
     $PROPERTIES['footer']=ob_get_clean();
   ?>
 <?php endif ?>
+*/ ?>
