@@ -174,11 +174,11 @@ function execute_change_ajax(){
       exit;
     }
 
-    if($change == '+' && ($product->status == 'o' || $split_status == 'o')){
+    if($change == '+' && ($product->status == 'o' || $product->status == 'e' || $split_status == 'o')){
       $amount_new = round($amount + $product->amount_steps, 3);
     }elseif($change == '+' && $product->status == 's'){
       $amount_new = round($amount + $product->amount_per_bundle, 3);
-    }elseif($change == '-' && ($product->status == 'o' || $split_status == 'o')){
+    }elseif($change == '-' && ($product->status == 'o' || $product->status == 'e' || $split_status == 'o')){
       $amount_new = round($amount - $product->amount_steps, 3);
     }elseif($change == '-' && $product->status == 's'){
       $amount_new = round($amount - $product->amount_per_bundle, 3);
