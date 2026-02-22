@@ -3,7 +3,10 @@ $PROPERTIES['pathbar']=array(
   '/pickups'=>'Abholungen',
   '/pickup?pickup_id='.$pickup->id => format_date($pickup->created,'j.n.Y H:i')
 );
-$PROPERTIES['body_class']='header_h5 footer_h8';
+$PROPERTIES['body_class']='header_h5';
+if($modus == 'p'){
+  $PROPERTIES['body_class'].=' footer_h8';
+}
 ?>
 
 <?php echo $start ?>

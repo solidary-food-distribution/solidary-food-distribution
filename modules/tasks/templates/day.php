@@ -36,7 +36,6 @@ global $user;
     </div>
     <?php if(!empty($task->description)): ?>
       <div class="inner_row mb1">
-        <div class="col5"></div>
         <div class="col8">
           <?php echo $task->description; ?>
         </div> 
@@ -52,11 +51,10 @@ global $user;
         }
       ?>
       <div class="inner_row">
-        <div class="col5"></div>
-        <div class="col2 center">
+        <div class="col1 center">
           <?php echo $task_user->assign?'ja:':'' ?>
         </div>
-        <div class="col10">
+        <div class="col5">
           <?php 
             echo htmlentities($users[$task_user->user_id]->name);
             if(!empty($task_user->comment)){
@@ -67,7 +65,6 @@ global $user;
       </div>
     <?php endforeach ?>
     <div class="inner_row mt0_5">
-      <div class="col5"></div>
       <div class="col2">
         <?php echo html_input(array(
           'type' => 'options',
@@ -78,7 +75,7 @@ global $user;
         ));
         ?>
       </div>
-      <div class="col10" style="padding-top:0.5em">
+      <div class="col5" style="padding-top:0.5em">
         <?php echo html_input(array(
           'type' => 'input_text',
           'url' => '/tasks/assign_update_ajax?task_id='.$task->task_id,

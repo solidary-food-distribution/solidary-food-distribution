@@ -31,7 +31,7 @@ function execute_index(){
     }
   }elseif($modus == 'd'){
     require_once('products.class.php');
-    $products = new Products(array('stock' => array('o', 'i'), 'status' => 'o'), array('name' => 'ASC'));
+    $products = new Products(array('stock' => array('o', 'i'), 'status' => array ('o', 'e')), array('name' => 'ASC'));
     $product_ids = $products->keys();
     $puis = new PickupItems(array('pickup_id' => $pickup_id, 'product_id' => $product_ids));
     foreach($puis as $pui){

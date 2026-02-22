@@ -1,4 +1,7 @@
 <div class="row">
+  2026-02-22 16:45 Mobile-Ansicht implementiert
+</div>
+<div class="row">
   2026-02-09 10:00 Forum implementiert
 </div>
 <div class="row">
