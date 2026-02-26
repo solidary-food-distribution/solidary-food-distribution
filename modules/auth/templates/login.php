@@ -2,7 +2,7 @@
   <?php if(isset($_SESSION['scale']) && $_SESSION['scale']): ?>
     <div class="row" id="pin_form">
       <div class="inner_row">
-        <div class="col6">
+        <div class="col6" style="margin-left:auto;margin-right:auto;">
           <div id="pickup_pin" class="input active" style="width:100%;font-size: 3em;" data-pin=""></div>
         </div>
       </div>

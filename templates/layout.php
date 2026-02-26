@@ -1,6 +1,6 @@
 <?php
 global $user;
-$version='202602221613';
+$version='202602262030';
 $body_class='';
 $header='';
 $footer='';
@@ -13,6 +13,7 @@ if($authed){
   $footer=isset($PROPERTIES['footer'])?$PROPERTIES['footer']:'';
   $footer=str_replace('%VERSION%',$version,$footer);
 }
+$body_class = trim($body_class.' '.$MODULE);
 $scale = isset($_SESSION['scale']) && intval($_SESSION['scale']);
 if($scale){
   $body_class = trim($body_class.' scale');

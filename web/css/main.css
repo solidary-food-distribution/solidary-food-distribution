@@ -884,22 +884,22 @@ header .controls .filter .mobile_filters_overlay{
   width: 8em;
 }
 
-@media (max-width: 1091px) {
-  header .controls .filter .mobile_filters{
+@media (max-width: 1000px) {
+  .order header .controls .filter .mobile_filters{
     display: inline-block;
   }
-  header .controls .filter .mobile_filters_overlay{
+  .order header .controls .filter .mobile_filters_overlay{
     display: block;
   }
-  header .controls .control{
+  .order header .controls .control{
     z-index: 10;
     overflow: visible;
     vertical-align: top;
   }
-  header .controls .filter .options .option:not(.selected){
+  .order header .controls .filter .options .option:not(.selected){
     display: none;
   }
-  .order_note_oekoring{
+  .order .order_note_oekoring{
     display: none!important;
   }
 }
